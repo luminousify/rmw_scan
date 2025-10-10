@@ -319,7 +319,7 @@
                 <i class="bi bi-upc-scan mr-2"></i>
                 Request Number
               </div>
-              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['request_number']) ?></div>
+              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['request_number'] ?? 'N/A') ?></div>
             </div>
             
             <div class="bg-white rounded-lg p-4 border border-blue-100">
@@ -347,7 +347,7 @@
               <div class="font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['production_user'] ?? 'System') ?></div>
             </div>
             
-            <?php if (!empty($requestDetails['customer_reference'])): ?>
+            <?php if (!empty($requestDetails['customer_reference'] ?? '')): ?>
             <div class="bg-white rounded-lg p-4 border border-blue-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-tag mr-2"></i>
@@ -358,13 +358,13 @@
             <?php endif; ?>
           </div>
           
-          <?php if (!empty($requestDetails['notes'])): ?>
+          <?php if (!empty($requestDetails['notes'] ?? '')): ?>
           <div class="mt-4 bg-white rounded-lg p-4 border border-blue-100">
             <div class="flex items-center text-gray-500 mb-2 text-sm">
               <i class="bi bi-sticky-note mr-2"></i>
               Notes
             </div>
-            <div class="text-gray-900"><?= htmlspecialchars($requestDetails['notes']) ?></div>
+            <div class="text-gray-900"><?= htmlspecialchars($requestDetails['notes'] ?? '') ?></div>
           </div>
           <?php endif; ?>
           <?php endif; ?>
@@ -557,31 +557,37 @@
                       $statusClass = 'bg-green-100 text-green-800';
                       $statusText = 'Match';
                       
-                      // Check for mismatches
-                      foreach($comparisonResults['mismatched_names'] as $mismatch) {
-                        if ($mismatch['product_id'] === $item['product_id']) {
-                          $itemStatus = 'name_mismatch';
-                          $statusClass = 'bg-yellow-100 text-yellow-800';
-                          $statusText = 'Name Diff';
-                          break;
+                      // Check for mismatches - with defensive array checks
+                      if (!empty($comparisonResults['mismatched_names'])) {
+                        foreach($comparisonResults['mismatched_names'] as $mismatch) {
+                          if ($mismatch['product_id'] === ($item['product_id'] ?? null)) {
+                            $itemStatus = 'name_mismatch';
+                            $statusClass = 'bg-yellow-100 text-yellow-800';
+                            $statusText = 'Name Diff';
+                            break;
+                          }
                         }
                       }
                       
-                      foreach($comparisonResults['mismatched_quantities'] as $mismatch) {
-                        if ($mismatch['product_id'] === $item['product_id']) {
-                          $itemStatus = 'quantity_mismatch';
-                          $statusClass = 'bg-orange-100 text-orange-800';
-                          $statusText = 'Qty Diff';
-                          break;
+                      if (!empty($comparisonResults['mismatched_quantities'])) {
+                        foreach($comparisonResults['mismatched_quantities'] as $mismatch) {
+                          if ($mismatch['product_id'] === ($item['product_id'] ?? null)) {
+                            $itemStatus = 'quantity_mismatch';
+                            $statusClass = 'bg-orange-100 text-orange-800';
+                            $statusText = 'Qty Diff';
+                            break;
+                          }
                         }
                       }
                       
-                      foreach($comparisonResults['extra_in_customer'] as $extra) {
-                        if ($extra['product_id'] === $item['product_id']) {
-                          $itemStatus = 'extra';
-                          $statusClass = 'bg-blue-100 text-blue-800';
-                          $statusText = 'Extra';
-                          break;
+                      if (!empty($comparisonResults['extra_in_customer'])) {
+                        foreach($comparisonResults['extra_in_customer'] as $extra) {
+                          if ($extra['product_id'] === ($item['product_id'] ?? null)) {
+                            $itemStatus = 'extra';
+                            $statusClass = 'bg-blue-100 text-blue-800';
+                            $statusText = 'Extra';
+                            break;
+                          }
                         }
                       }
                       ?>
@@ -607,28 +613,28 @@
               <?php if (!empty($comparisonResults['mismatched_names'])): ?>
               <li><strong>Name Mismatches:</strong></li>
               <?php foreach($comparisonResults['mismatched_names'] as $mismatch): ?>
-              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_id']) ?>: Request has "<?= htmlspecialchars($mismatch['request_name']) ?>" but customer has "<?= htmlspecialchars($mismatch['customer_name']) ?>"</li>
+              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_id'] ?? 'N/A') ?>: Request has "<?= htmlspecialchars($mismatch['request_name'] ?? 'Unknown') ?>" but customer has "<?= htmlspecialchars($mismatch['customer_name'] ?? 'Unknown') ?>"</li>
               <?php endforeach; ?>
               <?php endif; ?>
               
               <?php if (!empty($comparisonResults['mismatched_quantities'])): ?>
               <li><strong>Quantity Differences:</strong></li>
               <?php foreach($comparisonResults['mismatched_quantities'] as $mismatch): ?>
-              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_name']) ?>: Request has <?= $mismatch['request_quantity'] ?> but customer has <?= $mismatch['customer_quantity'] ?></li>
+              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_name'] ?? 'Unknown Product') ?>: Request has <?= $mismatch['request_quantity'] ?? 0 ?> but customer has <?= $mismatch['customer_quantity'] ?? 0 ?></li>
               <?php endforeach; ?>
               <?php endif; ?>
               
               <?php if (!empty($comparisonResults['missing_in_customer'])): ?>
               <li><strong>Missing in Customer Reference:</strong></li>
               <?php foreach($comparisonResults['missing_in_customer'] as $missing): ?>
-              <li class="ml-4">• <?= htmlspecialchars($missing['product_name']) ?> (<?= $missing['requested_quantity'] ?> <?= $missing['unit'] ?>)</li>
+              <li class="ml-4">• <?= htmlspecialchars($missing['product_name'] ?? 'Unknown Product') ?> (<?= $missing['requested_quantity'] ?? 0 ?> <?= $missing['unit'] ?? 'pcs' ?>)</li>
               <?php endforeach; ?>
               <?php endif; ?>
               
               <?php if (!empty($comparisonResults['extra_in_customer'])): ?>
               <li><strong>Extra in Customer Reference:</strong></li>
               <?php foreach($comparisonResults['extra_in_customer'] as $extra): ?>
-              <li class="ml-4">• <?= htmlspecialchars($extra['product_name']) ?> (<?= $extra['quantity'] ?> <?= $extra['unit'] ?>)</li>
+              <li class="ml-4">• <?= htmlspecialchars($extra['product_name'] ?? 'Unknown Product') ?> (<?= $extra['quantity'] ?? 0 ?> <?= $extra['unit'] ?? 'pcs' ?>)</li>
               <?php endforeach; ?>
               <?php endif; ?>
             </ul>
