@@ -1,0 +1,54 @@
+[2025-07-09 01:12:30] POST value nobon = [239/RMW-CKU/04/2025]
+[2025-07-09 08:12:30] Connected via driver odbc
+[2025-07-09 08:12:30] Prepared SQL:
+
+            SELECT
+                fer.[StockDate],
+                fer.[Product ID]      AS prod,
+                fer.[Unit],
+                fer.[RecdTotal],
+                fer.[CustNoRef],
+                fer.[Ke-Dari],
+                fer.[Mode],
+                fer.[Keterangan],
+                fer.[NoSJSales],
+                fer.[status],
+                rry.[Product Name]    AS proName
+            FROM StockDetailVer AS fer
+            INNER JOIN Products AS rry
+              ON fer.[Product ID] = rry.[Product ID]
+            WHERE fer.[SuppRef] = :id
+              AND fer.[Verifikasi] = 0           -- False literal in Access
+            ORDER BY fer.[Product ID] ASC
+[2025-07-09 08:12:30] PDOException: SQLSTATE[42000]: Syntax error or access violation: -3100 [Microsoft][ODBC Microsoft Access Driver] Syntax error (missing operator) in query expression 'fer.[SuppRef] = Pa_RaM000
+              AND fer.[Verifikasi] = 0           -- False literal in Access'. (SQLExecute[-3100] at ext\pdo_odbc\odbc_stmt.c:254)
+[2025-07-09 01:14:29] ERROR: No nobon parameter supplied.
+[2025-07-09 01:14:40] ERROR: No nobon parameter supplied.
+[2025-07-09 08:15:45] PDO driver = odbc
+[2025-07-09 08:15:45] Prepared SQL:
+
+SELECT
+    fer.[StockDate],
+    fer.[Product ID]      AS prod,
+    fer.[Unit],
+    fer.[RecdTotal],
+    fer.[CustNoRef],
+    fer.[Ke-Dari],
+    fer.[Mode],
+    fer.[Keterangan],
+    fer.[NoSJSales],
+    fer.[status],
+    rry.[Product Name]    AS proName
+FROM StockDetailVer AS fer
+INNER JOIN Products AS rry
+      ON fer.[Product ID] = rry.[Product ID]
+WHERE fer.[Verifikasi] = 0          -- only unverified rows
+ORDER BY fer.[Product ID] ASC
+[2025-07-09 08:15:45] PDOException = SQLSTATE[42000]: Syntax error or access violation: [Microsoft][ODBC Microsoft Access Driver] Syntax error (missing operator) in query expression 'fer.[Verifikasi] = 0          -- only unverified rows'. (SQLPrepare[0] at ext\pdo_odbc\odbc_driver.c:198)
+[2025-07-09 08:16:46] PDO driver  = odbc
+[2025-07-09 08:16:46] Executing SQL (no comments kept inside string)...
+[2025-07-09 08:16:46] PDOException = SQLSTATE[42000]: Syntax error or access violation: [Microsoft][ODBC Microsoft Access Driver] Syntax error (missing operator) in query expression 'fer.[Verifikasi] = 0                 -- Access boolean FALSE'. (SQLPrepare[0] at ext\pdo_odbc\odbc_driver.c:198)
+[2025-07-09 08:17:11] PDO driver = odbc
+[2025-07-09 08:17:11] Executing SQL...
+[2025-07-09 08:17:12] Rows fetched = 32
+[2025-07-09 08:17:12] Done.

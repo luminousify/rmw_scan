@@ -1,0 +1,130 @@
+[2025-07-08 11:42:22] Attempting to connect to database at X:\FGW ALL2021_be.mdb
+[2025-07-08 11:42:22] System error: Database file not found or not accessible
+[2025-07-08 11:43:21] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 11:43:21] System error: Database file not found or not accessible
+[2025-07-08 11:46:45] Attempting to connect to database at Z:\FGW_ALL2021_be_tama.mdb
+[2025-07-08 11:46:45] System error: Database file not found or not accessible
+[2025-07-08 11:51:19] Attempting to connect to database at Z:\FGW_ALL2021_be_tama.mdb
+[2025-07-08 11:51:19] System error: Database file not found or not accessible
+[2025-07-08 12:06:06] Attempting to connect to database at C:\wamp64\www\cku_scan
+[2025-07-08 12:06:06] Connection failed: SQLSTATE[HY000] SQLDriverConnect: -1811 [Microsoft][ODBC Microsoft Access Driver] Could not find file '(unknown)'.
+[2025-07-08 12:07:12] Attempting to connect to database at C:\wamp64\www\cku_scan\FGW ALL2021_be.mdb
+[2025-07-08 12:07:12] System error: Database file not found or not accessible
+[2025-07-08 12:07:40] Attempting to connect to database at C:\wamp64\www\cku_scan\FGW_ALL2021_be.mdb
+[2025-07-08 12:07:40] Successfully connected to database
+[2025-07-08 13:11:33] Attempting to connect to database at 
+[2025-07-08 13:11:33] System error: Database file not found or not accessible
+[2025-07-08 13:14:11] Attempting to connect to database at 
+[2025-07-08 13:14:11] System error: Database file not found or not accessible
+[2025-07-08 13:14:13] Attempting to connect to database at 
+[2025-07-08 13:14:13] System error: Database file not found or not accessible
+[2025-07-08 13:14:18] Attempting to connect to database at 
+[2025-07-08 13:14:18] System error: Database file not found or not accessible
+[2025-07-08 13:54:42] Attempting to connect to database at 
+[2025-07-08 13:54:42] System error: Database file not found or not accessible
+[2025-07-08 13:55:03] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:55:03] System error: Database file not found or not accessible
+[2025-07-08 13:57:50] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:57:50] System error: Database file not found or not accessible
+[2025-07-08 13:58:55] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:58:55] System error: Database file not found or not accessible
+[2025-07-08 13:58:58] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:58:58] System error: Database file not found or not accessible
+[2025-07-08 13:59:01] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:59:01] System error: Database file not found or not accessible
+[2025-07-08 13:59:05] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 13:59:05] System error: Database file not found or not accessible
+[2025-07-08 14:01:11] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 14:01:11] System error: Database file not found or not accessible
+[2025-07-08 16:09:46] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 16:09:46] Successfully connected to database
+[2025-07-08 16:23:09] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 16:23:09] Successfully connected to database
+[2025-07-08 16:40:12] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 16:40:12] Successfully connected to database
+[2025-07-08 16:40:24] Attempting to connect to database at Z:\FGW ALL2021_be.mdb
+[2025-07-08 16:40:24] Successfully connected to database
+[2025-07-08 16:43:24] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:43:24] Successfully connected to database
+[2025-07-08 16:43:28] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:43:28] Successfully connected to database
+[2025-07-08 16:44:56] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:44:56] Successfully connected to database
+[2025-07-08 16:45:15] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:45:15] Successfully connected to database
+[2025-07-08 16:45:22] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:45:22] Successfully connected to database
+[2025-07-08 16:46:02] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:46:02] Successfully connected to database
+[2025-07-08 16:46:09] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:46:09] Successfully connected to database
+[2025-07-08 16:46:31] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:46:31] Successfully connected to database
+[2025-07-08 16:46:36] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:46:36] Successfully connected to database
+[2025-07-08 16:47:12] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:12] Successfully connected to database
+[2025-07-08 16:47:16] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:16] Successfully connected to database
+[2025-07-08 16:47:26] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:26] Successfully connected to database
+[2025-07-08 16:47:43] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:43] Successfully connected to database
+[2025-07-08 16:47:46] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:46] Successfully connected to database
+[2025-07-08 16:47:52] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:47:52] Successfully connected to database
+[2025-07-08 16:48:01] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:48:01] Successfully connected to database
+[2025-07-08 16:52:50] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:52:50] Successfully connected to database
+[2025-07-08 16:55:24] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:55:24] Successfully connected to database
+[2025-07-08 16:55:29] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:55:29] Successfully connected to database
+[2025-07-08 16:55:50] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:55:50] Successfully connected to database
+[2025-07-08 16:55:54] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:55:54] Successfully connected to database
+[2025-07-08 16:55:58] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:55:58] Successfully connected to database
+[2025-07-08 16:56:58] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:56:58] Successfully connected to database
+[2025-07-08 16:57:06] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:57:06] Successfully connected to database
+[2025-07-08 16:57:19] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:57:19] Successfully connected to database
+[2025-07-08 16:57:24] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:57:24] Successfully connected to database
+[2025-07-08 16:57:28] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-08 16:57:28] Successfully connected to database
+[2025-07-09 08:03:39] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:03:39] Successfully connected to database
+[2025-07-09 08:04:08] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:04:08] Successfully connected to database
+[2025-07-09 08:12:30] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:12:30] Successfully connected to database
+[2025-07-09 08:12:50] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:12:50] Successfully connected to database
+[2025-07-09 08:12:58] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:12:58] Successfully connected to database
+[2025-07-09 08:14:40] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:14:40] Successfully connected to database
+[2025-07-09 08:15:45] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:15:45] Successfully connected to database
+[2025-07-09 08:16:46] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:16:46] Successfully connected to database
+[2025-07-09 08:17:11] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:17:11] Successfully connected to database
+[2025-07-09 08:18:21] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:18:21] Successfully connected to database
+[2025-07-09 08:23:07] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:23:07] Successfully connected to database
+[2025-07-09 08:23:16] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:23:16] Successfully connected to database
+[2025-07-09 08:23:29] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:23:29] Successfully connected to database
+[2025-07-09 08:24:42] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:24:42] Successfully connected to database
+[2025-07-09 08:25:40] Attempting to connect to database at Z:\FGW_ALL2021_be.mdb
+[2025-07-09 08:25:40] Successfully connected to database

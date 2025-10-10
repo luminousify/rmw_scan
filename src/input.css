@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom styles for the application */
+.connection-toggle {
+  @apply w-16 h-8 bg-red-500 rounded-full relative cursor-pointer transition-colors duration-300;
+}
+
+.connection-toggle.on {
+  @apply bg-green-500;
+}
+
+.connection-toggle .circle {
+  @apply w-7 h-7 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300;
+}
+
+.connection-toggle.on .circle {
+  @apply translate-x-8;
+}
+
+.scan-input {
+  @apply w-full p-3 text-center bg-orange-100 border border-orange-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500;
+}
+
+.scan-icon {
+  @apply bg-orange-100 border border-r-0 border-orange-300 rounded-l-md px-3 py-3 flex items-center justify-center;
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-xl border-4 border-blue-500;
+}
+
+.table-container {
+  @apply bg-white rounded-lg shadow-md overflow-hidden;
+}
+
+.sticky-table th {
+  @apply bg-gray-600 text-white p-3 sticky top-0 z-10 whitespace-nowrap;
+}
+
+.sticky-table td {
+  @apply p-3 border border-gray-200 whitespace-nowrap;
+}
