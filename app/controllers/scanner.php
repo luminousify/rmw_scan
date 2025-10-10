@@ -1,5 +1,6 @@
 <?php
 require_once '../../config.php';
+require_once '../../includes/DatabaseManager.php';
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
