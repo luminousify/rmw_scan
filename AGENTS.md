@@ -32,6 +32,7 @@
 - Support both SQLite and MySQL via DB_TYPE config
 - Use prepared statements for all queries
 - Connection config in `config.php`
+- **Important**: When using DatabaseManager in controllers, include: `require_once '../../includes/DatabaseManager.php';`
 
 ### Frontend
 - Tailwind CSS for styling with shadcn/ui components
