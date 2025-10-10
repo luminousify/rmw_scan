@@ -1,7 +1,7 @@
 <body class="min-h-screen bg-gray-50">
     <!-- Navbar-->
     <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-5 lg:px-6">
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
           <div class="flex items-center">
@@ -41,9 +41,9 @@
     <div class="flex">
       <!-- Sidebar -->
       <aside class="w-64 bg-white shadow-lg min-h-screen border-r border-gray-200 transition-all duration-300">
-        <div class="p-6">
+        <div class="p-3">
           <!-- Enhanced Logo Area -->
-          <div class="flex flex-col items-center space-y-4 mb-8 pb-6 border-b border-gray-100">
+          <div class="flex flex-col items-center space-y-3 mb-3 pb-3 border-b border-gray-100">
             <div class="relative">
               <div class="w-16 h-16 <?= ($department === 'rmw' ? 'bg-gradient-to-br from-green-500 to-green-600' : 'bg-gradient-to-br from-blue-500 to-blue-600') ?> rounded-2xl flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <i class="<?= ($department === 'rmw' ? 'bi bi-box-seam' : 'bi bi-building') ?> text-white text-2xl"></i>
@@ -64,7 +64,7 @@
           <nav class="space-y-1" role="navigation" aria-label="Main navigation">
             <!-- Dashboard -->
             <a href="<?php echo url('app/controllers/dashboard.php'); ?>" 
-               class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'nav-active' : 'nav-inactive' ?>"
+               class="nav-item group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'nav-active' : 'nav-inactive' ?>"
                role="menuitem" aria-current="<?= $module_name == 'dashboard' ? 'page' : 'false' ?>">
               <i class="bi bi-house-fill mr-3 text-lg"></i>
               <span>Dashboard</span>
@@ -77,7 +77,7 @@
               <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Production</h4>
               
               <a href="<?php echo url('app/controllers/material_request.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
+                 class="nav-item group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'material_request' ? 'page' : 'false' ?>">
                 <i class="bi bi-plus-circle-fill mr-3 text-lg"></i>
                 <span>Create Request</span>
@@ -85,7 +85,7 @@
               </a>
               
               <a href="<?php echo url('app/controllers/my_requests.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
+                 class="nav-item group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'my_requests' ? 'page' : 'false' ?>">
                 <i class="bi bi-list-task mr-3 text-lg"></i>
                 <span>My Requests</span>
@@ -99,7 +99,7 @@
               <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
               
               <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
+                 class="nav-item group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
                 <i class="bi bi-box-seam-fill mr-3 text-lg"></i>
                 <span>Warehouse Dashboard</span>
@@ -114,7 +114,7 @@
       </aside>
 
       <!-- Main content -->
-      <main class="flex-1 p-6">
+      <main class="flex-1 p-3 sm:p-4">
 
     
 
@@ -125,13 +125,13 @@
 
 
     <!-- Scanner Content -->
-    <div class="space-y-6">
+    <div class="space-y-3">
 
       <!-- Scanner Card -->
-      <div class="bg-white rounded-2xl shadow-xl border-4 border-blue-500 p-6">
+      <div class="bg-white rounded-2xl shadow-xl border-4 border-blue-500 p-4 sm:p-5">
         <!-- Header -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-4">
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-3">
             <h2 class="text-2xl font-bold text-gray-900">SCAN NO BON</h2>
             <?php if ($dat!=""): ?>
             <div class="text-right">
@@ -142,7 +142,7 @@
           
           <!-- Request Number Alert (shown when request number is passed from URL) -->
           <?php if (!empty($_GET['request_number']) && $nobon != ''): ?>
-          <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-4 animate-fade-in">
+          <div class="bg-green-50 border-2 border-green-200 rounded-lg p-3 mb-3 animate-fade-in">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <i class="bi bi-check-circle-fill text-green-600 text-xl"></i>
@@ -168,7 +168,7 @@
 
         <!-- Warning Message for non-diproses status -->
           <?php if (isset($warning_message)): ?>
-          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4 animate-fade-in">
+          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 mb-3 animate-fade-in">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <i class="bi bi-exclamation-triangle-fill text-yellow-600 text-xl"></i>
@@ -190,7 +190,7 @@
           
           <!-- Info Message for requests with no materials -->
           <?php if (isset($info_message)): ?>
-          <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4 animate-fade-in">
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mb-3 animate-fade-in">
             <div class="flex items-center">
               <div class="flex-shrink-0">
                 <i class="bi bi-info-circle-fill text-blue-600 text-xl"></i>
@@ -211,13 +211,13 @@
           <?php endif; ?>
 
         <!-- Scanner Input -->
-        <div class="mb-6">
+        <div class="mb-4">
           <form name="form1" action="#" method="post">
             <?php if (!empty($currentRequestNumber)): ?>
             <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
             <?php else: ?>
             <!-- Request Number Selection when no current request -->
-            <div class="mb-4">
+            <div class="mb-3">
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="bi bi-clipboard-check mr-1"></i>
                 Select Production Request Number
@@ -235,14 +235,14 @@
                   required
                 >
               </div>
-              <div class="mt-2 text-sm text-gray-500">
+              <div class="mt-1.5 text-sm text-gray-500">
                 <i class="bi bi-info-circle mr-1"></i>
                 Enter the production request number to compare with RMW data
               </div>
             </div>
             <?php endif; ?>
             
-            <div class="mb-4">
+            <div class="mb-3">
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="bi bi-qr-code-scan mr-1"></i>
                 Scan RMW Customer Reference QR Code
@@ -266,7 +266,7 @@
               >
             </div>
             <?php if (!empty($nobon)): ?>
-            <div class="mt-3 text-sm text-gray-600">
+            <div class="mt-2 text-sm text-gray-600">
               <i class="bi bi-info-circle mr-1"></i>
               <?php if (!empty($currentRequestNumber)): ?>
               Comparing RMW data "<?= htmlspecialchars($nobon) ?>" with Production request <?= htmlspecialchars($currentRequestNumber) ?>.
@@ -286,24 +286,24 @@
         <!-- Material Request Details -->
         <?php if (!empty($dat)): ?>
         <!-- Request Header Card -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 sm:p-5 mb-4 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
             <h2 class="text-2xl font-bold text-gray-900 flex items-center">
               <i class="bi bi-clipboard-data mr-3 text-blue-600"></i>
               Material Request Details (Baseline)
             </h2>
             <div class="flex items-center space-x-2">
-              <span class="px-3 py-1.5 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium">
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium">
                 <?= count($dat) ?> Items
               </span>
-              <a href="<?php echo url('app/controllers/my_requests.php'); ?>" class="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg text-sm font-medium transition-colors">
+              <a href="<?php echo url('app/controllers/my_requests.php'); ?>" class="px-4 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg text-sm font-medium transition-colors">
                 <i class="bi bi-arrow-left mr-2"></i>Back to Requests
               </a>
             </div>
           </div>
           
           <?php if (isset($currentRequestNumber)): ?>
-          <div class="bg-blue-100 border border-blue-200 rounded-lg p-3 mb-4">
+          <div class="bg-blue-100 border border-blue-200 rounded-lg p-3 mb-3">
             <div class="flex items-center text-sm text-blue-800">
               <i class="bi bi-info-circle mr-2"></i>
               This is the baseline material list for request <strong><?= htmlspecialchars($currentRequestNumber) ?></strong>. 
@@ -313,8 +313,8 @@
           <?php endif; ?>
           
           <?php if (isset($requestDetails)): ?>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-            <div class="bg-white rounded-lg p-4 border border-blue-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-upc-scan mr-2"></i>
                 Request Number
@@ -322,7 +322,7 @@
               <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['request_number'] ?? 'N/A') ?></div>
             </div>
             
-            <div class="bg-white rounded-lg p-4 border border-blue-100">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-flag mr-2"></i>
                 Status
@@ -339,7 +339,7 @@
               </div>
             </div>
             
-            <div class="bg-white rounded-lg p-4 border border-blue-100">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-person mr-2"></i>
                 Requested By
@@ -348,18 +348,18 @@
             </div>
             
             <?php if (!empty($requestDetails['customer_reference'] ?? '')): ?>
-            <div class="bg-white rounded-lg p-4 border border-blue-100">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-tag mr-2"></i>
                 Customer Reference
               </div>
-              <div class="font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['customer_reference']) ?></div>
+              <div class="font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['customer_reference'] ?? 'N/A') ?></div>
             </div>
             <?php endif; ?>
           </div>
           
           <?php if (!empty($requestDetails['notes'] ?? '')): ?>
-          <div class="mt-4 bg-white rounded-lg p-4 border border-blue-100">
+          <div class="mt-3 bg-white rounded-lg p-3 border border-blue-100">
             <div class="flex items-center text-gray-500 mb-2 text-sm">
               <i class="bi bi-sticky-note mr-2"></i>
               Notes
@@ -372,7 +372,7 @@
 
         <!-- Materials Table -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
               <i class="bi bi-box-seam mr-2 text-gray-400"></i>
               Requested Materials
@@ -383,43 +383,43 @@
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product ID</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product ID</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                  <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                  <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <?php $no = 1; foreach($dat as $d): ?>
                 <tr class="hover:bg-gray-50 transition-colors">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium"><?php echo $no++; ?></td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium"><?php echo $no++; ?></td>
+                  <td class="px-4 py-3 whitespace-nowrap">
                     <span class="text-sm font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded">
                       <?php echo htmlspecialchars($d['product_id'] ?? 'N/A'); ?>
                     </span>
                   </td>
-                  <td class="px-6 py-4">
+                  <td class="px-4 py-3">
                     <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?></div>
                   </td>
-                  <td class="px-6 py-4 text-sm text-gray-500">
+                  <td class="px-4 py-3 text-sm text-gray-500">
                     <div class="max-w-xs truncate" title="<?php echo htmlspecialchars($d['description'] ?? ''); ?>">
                       <?php echo htmlspecialchars($d['description'] ?? 'No description'); ?>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <td class="px-4 py-3 whitespace-nowrap text-center">
                     <span class="text-lg font-semibold text-gray-900">
                       <?php echo number_format($d['requested_quantity'] ?? 0, 0, '', ','); ?>
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                  <td class="px-4 py-3 whitespace-nowrap">
                     <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
                       <?php echo htmlspecialchars($d['unit'] ?? 'pcs'); ?>
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <td class="px-4 py-3 whitespace-nowrap text-center">
                     <?php 
                     $itemStatus = $d['item_status'] ?? 'pending';
                     if ($itemStatus === 'pending') {
@@ -441,7 +441,7 @@
           </div>
           
           <!-- Summary Footer -->
-          <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div class="px-5 py-3 border-t border-gray-200 bg-gray-50">
             <div class="flex items-center justify-between">
               <div class="text-sm text-gray-500">
                 Showing <?= count($dat) ?> material<?= count($dat) > 1 ? 's' : '' ?>
@@ -465,41 +465,41 @@
 
         <?php if (isset($customerReferenceData) && isset($comparisonResults)): ?>
         <!-- Customer Reference Comparison Results -->
-        <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6 mb-6 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
+        <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4 sm:p-5 mb-4 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
             <h2 class="text-2xl font-bold text-gray-900 flex items-center">
               <i class="bi bi-arrow-left-right mr-3 text-purple-600"></i>
               Comparison Results
             </h2>
             <div class="flex items-center space-x-2">
-              <span class="px-3 py-1.5 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium">
+              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium">
                 <?= $comparisonResults['summary']['identical'] ? 'Perfect Match' : 'Differences Found' ?>
               </span>
             </div>
           </div>
           
           <!-- Customer Reference Details -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6">
-            <div class="bg-white rounded-lg p-4 border border-purple-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-5">
+            <div class="bg-white rounded-lg p-3 border border-purple-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-upc-scan mr-2"></i>
                 Customer Reference
               </div>
-              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_reference']) ?></div>
+              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_reference'] ?? 'N/A') ?></div>
             </div>
             
-            <div class="bg-white rounded-lg p-4 border border-purple-100">
+            <div class="bg-white rounded-lg p-3 border border-purple-100">
               <div class="flex items-center text-gray-500 mb-1">
                 <i class="bi bi-building mr-2"></i>
                 Customer Name
               </div>
-              <div class="font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_name']) ?></div>
+              <div class="font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_name'] ?? 'N/A') ?></div>
             </div>
           </div>
           
           <!-- Comparison Summary -->
-          <div class="bg-white rounded-lg p-4 border border-purple-100 mb-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="bg-white rounded-lg p-3 border border-purple-100 mb-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div class="text-center">
                 <div class="text-2xl font-bold text-gray-900"><?= $comparisonResults['summary']['matched_items'] ?></div>
                 <div class="text-gray-500">Matched</div>
@@ -520,8 +520,8 @@
           </div>
           
           <!-- Customer Reference Materials Table -->
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+          <div class="mb-3">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2.5 flex items-center">
               <i class="bi bi-list-ul mr-2 text-purple-600"></i>
               Customer Reference Materials
             </h3>
@@ -529,29 +529,29 @@
               <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product ID</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <?php $no = 1; foreach($customerReferenceData['items'] as $item): ?>
                   <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium"><?php echo $no++; ?></td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium"><?php echo $no++; ?></td>
+                    <td class="px-4 py-3 whitespace-nowrap">
                       <span class="text-sm font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded">
                         <?php echo htmlspecialchars($item['product_id'] ?? 'N/A'); ?>
                       </span>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-4 py-3">
                       <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($item['product_name'] ?? 'Unknown Product'); ?></div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-3 whitespace-nowrap">
                       <div class="text-sm text-gray-900"><?php echo number_format($item['quantity'] ?? 0); ?> <?php echo htmlspecialchars($item['unit'] ?? ''); ?></div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <td class="px-4 py-3 whitespace-nowrap text-center">
                       <?php 
                       $itemStatus = 'ok';
                       $statusClass = 'bg-green-100 text-green-800';
@@ -582,7 +582,7 @@
                       
                       if (!empty($comparisonResults['extra_in_customer'])) {
                         foreach($comparisonResults['extra_in_customer'] as $extra) {
-                          if ($extra['product_id'] === ($item['product_id'] ?? null)) {
+                          if (($extra['product_id'] ?? null) === ($item['product_id'] ?? null)) {
                             $itemStatus = 'extra';
                             $statusClass = 'bg-blue-100 text-blue-800';
                             $statusText = 'Extra';
@@ -604,7 +604,7 @@
           
           <!-- Mismatch Details -->
           <?php if (!$comparisonResults['summary']['identical']): ?>
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-3">
             <h4 class="text-sm font-medium text-red-800 mb-2">
               <i class="bi bi-exclamation-triangle mr-1"></i>
               Difference Details
@@ -641,7 +641,7 @@
           </div>
           <?php endif; ?>
           
-          <div class="mt-4 text-sm text-gray-500">
+          <div class="mt-3 text-sm text-gray-500">
             <i class="bi bi-info-circle mr-1"></i>
             Customer reference data is sourced from StockDetailVer table.
           </div>
@@ -652,7 +652,7 @@
   
         
         <?php elseif (isset($error_message)): ?>
-        <div class="text-center py-12">
+        <div class="text-center py-10">
           <div class="text-red-400 mb-4">
             <i class="bi bi-exclamation-triangle text-6xl"></i>
           </div>
@@ -660,7 +660,7 @@
           <p class="text-red-600"><?= htmlspecialchars($error_message) ?></p>
         </div>
         <?php else: ?>
-        <div class="text-center py-12">
+        <div class="text-center py-10">
           <div class="text-gray-400 mb-4">
             <i class="bi bi-table text-6xl"></i>
           </div>
@@ -954,9 +954,4 @@
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
     </style>
-
-
-
-
-  
 

@@ -334,7 +334,7 @@ if ($_POST == NULL) {
         }
         
         $dat = $requestItems;
-        $nobon = $currentRequestNumber;
+        $nobon = $customerReference;
         
     } catch (Exception $e) {
         $error_message = "Error processing comparison: " . $e->getMessage();
