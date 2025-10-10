@@ -215,17 +215,48 @@
           <form name="form1" action="#" method="post">
             <?php if (!empty($currentRequestNumber)): ?>
             <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
+            <?php else: ?>
+            <!-- Request Number Selection when no current request -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-clipboard-check mr-1"></i>
+                Select Production Request Number
+              </label>
+              <div class="flex">
+                <div class="scan-icon">
+                  <i class="bi bi-clipboard-data text-lg font-bold text-gray-700"></i>
+                </div>
+                <input 
+                  id="request_number_input" 
+                  type="text" 
+                  class="scan-input" 
+                  name="request_number_input" 
+                  placeholder="Enter request number (e.g., REQ-20241201-1234)" 
+                  required
+                >
+              </div>
+              <div class="mt-2 text-sm text-gray-500">
+                <i class="bi bi-info-circle mr-1"></i>
+                Enter the production request number to compare with RMW data
+              </div>
+            </div>
             <?php endif; ?>
-            <div class="flex">
+            
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="bi bi-qr-code-scan mr-1"></i>
+                Scan RMW Customer Reference QR Code
+              </label>
+              <div class="flex">
               <div class="scan-icon">
-                <i class="bi bi-qr-code-scan text-lg font-bold text-gray-700"></i>
+                <i class="bi bi-box-seam text-lg font-bold text-gray-700"></i>
               </div>
               <input 
                 id="lot_material_bc" 
                 type="text" 
                 class="scan-input" 
                 name="nobon" 
-                placeholder="Scan customer reference QR code" 
+                placeholder="Scan RMW CustNoRef QR Code (format: INJ/FG/1887-1)" 
                 value="<?= htmlspecialchars($nobon) ?>"
                 required 
                 <?php 
@@ -238,14 +269,14 @@
             <div class="mt-3 text-sm text-gray-600">
               <i class="bi bi-info-circle mr-1"></i>
               <?php if (!empty($currentRequestNumber)): ?>
-              Ready to scan customer reference QR codes for comparison with request <?= htmlspecialchars($currentRequestNumber) ?>.
+              Comparing RMW data "<?= htmlspecialchars($nobon) ?>" with Production request <?= htmlspecialchars($currentRequestNumber) ?>.
               <?php else: ?>
-              Enter a request number first, or scan a request QR code to begin.
+              Ready to process RMW customer reference: <?= htmlspecialchars($nobon) ?>
               <?php endif; ?>
               <?php if (isset($requestDetails) && $requestDetails['status'] !== 'diproses'): ?>
-              <br><span class="text-blue-600 font-medium">
-                <i class="bi bi-arrow-left-right mr-1"></i>
-                Comparison mode: Scanned codes will be compared against request materials.
+              <br><span class="text-green-600 font-medium">
+                <i class="bi bi-database-check mr-1"></i>
+                Using real StockDetailVer data for RMW materials
               </span>
               <?php endif; ?>
             </div>
@@ -606,7 +637,7 @@
           
           <div class="mt-4 text-sm text-gray-500">
             <i class="bi bi-info-circle mr-1"></i>
-            Customer reference data is currently using dummy data for testing purposes.
+            Customer reference data is sourced from StockDetailVer table.
           </div>
         </div>
         <?php endif; ?>

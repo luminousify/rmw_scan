@@ -18,42 +18,18 @@ $department = $_SESSION['department'] ?? 'production';
 $requestNumberFromUrl = $_GET['request_number'] ?? '';
 
 /**
- * Get dummy customer reference material data
- * In production, this would be replaced with actual customer reference lookup
+ * Get StockDetailVer customer reference material data
+ * Uses real data from StockDetailVer table
  */
-function getDummyCustomerReferenceData($customerReference) {
-    // Sample dummy data for testing
-    $dummyData = [
-        'CUST-001' => [
-            'customer_reference' => 'CUST-001',
-            'customer_name' => 'PT. Sample Customer',
-            'items' => [
-                ['product_id' => 'P001', 'product_name' => 'Cement 50kg', 'quantity' => 10, 'unit' => 'bags'],
-                ['product_id' => 'P002', 'product_name' => 'Steel Rod 10mm', 'quantity' => 5, 'unit' => 'pieces'],
-                ['product_id' => 'P003', 'product_name' => 'Paint White 5L', 'quantity' => 2, 'unit' => 'cans']
-            ]
-        ],
-        'CUST-002' => [
-            'customer_reference' => 'CUST-002',
-            'customer_name' => 'CV. Construction Co',
-            'items' => [
-                ['product_id' => 'P001', 'product_name' => 'Cement 50kg', 'quantity' => 15, 'unit' => 'bags'], // Different quantity
-                ['product_id' => 'P002', 'product_name' => 'Steel Bar 10mm', 'quantity' => 5, 'unit' => 'pieces'], // Different name
-                ['product_id' => 'P004', 'product_name' => 'Bricks Red', 'quantity' => 100, 'unit' => 'pieces'] // Extra item
-            ]
-        ],
-        'CUST-003' => [
-            'customer_reference' => 'CUST-003',
-            'customer_name' => 'PT. Building Supplies',
-            'items' => [
-                ['product_id' => 'P001', 'product_name' => 'Cement 50kg', 'quantity' => 10, 'unit' => 'bags'],
-                ['product_id' => 'P002', 'product_name' => 'Steel Rod 10mm', 'quantity' => 5, 'unit' => 'pieces']
-                // Missing item P003
-            ]
-        ]
-    ];
-    
-    return $dummyData[$customerReference] ?? null;
+function getStockDetailVerCustomerData($custNoRef) {
+    try {
+        // Use DatabaseManager to get StockDetailVer data
+        $dbManager = new DatabaseManager('sqlite');
+        return $dbManager->getStockDetailVerMaterials($custNoRef);
+    } catch (Exception $e) {
+        error_log("Error getting StockDetailVer customer data: " . $e->getMessage());
+        return null;
+    }
 }
 
 /**
@@ -247,6 +223,11 @@ if ($_POST == NULL) {
     $customerReference = trim($id);
     $currentRequestNumber = $_POST['current_request_number'] ?? '';
     
+    // If no current request number, check for request number input
+    if (empty($currentRequestNumber) && !empty($_POST['request_number_input'])) {
+        $currentRequestNumber = trim($_POST['request_number_input']);
+    }
+    
     // Initialize variables for the view
     $dat = '';
     $nobon = '';
@@ -262,9 +243,12 @@ if ($_POST == NULL) {
             throw new Exception("No request number specified");
         }
         
-        // Validate customer reference
-        if (empty($customerReference)) {
-            throw new Exception("Customer reference is required");
+        // Validate customer reference using DatabaseManager
+        $dbManager = new DatabaseManager('sqlite');
+        $validation = $dbManager->validateCustNoRef($customerReference);
+        
+        if (!$validation['valid']) {
+            throw new Exception($validation['message']);
         }
         
         // Get request details (no status restriction for comparison)
@@ -315,11 +299,11 @@ if ($_POST == NULL) {
             $info_message = "Request has no materials to compare.";
         }
         
-        // Get dummy customer reference data
-        $customerReferenceData = getDummyCustomerReferenceData($customerReference);
+        // Get StockDetailVer customer reference data
+        $customerReferenceData = getStockDetailVerCustomerData($customerReference);
         
         if (!$customerReferenceData) {
-            $warning_message = "No data found for customer reference: " . $customerReference . " (using dummy data system)";
+            $warning_message = "No data found for customer reference: " . $customerReference . " in StockDetailVer table";
         } else {
             // Perform comparison
             $comparisonResults = compareMaterials($requestItems, $customerReferenceData['items']);
