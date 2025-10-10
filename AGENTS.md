@@ -19,6 +19,8 @@
 - Error handling: Try-catch blocks with meaningful exceptions
 - Session management: Start session with `session_start()` at top of controllers
 - Authentication: Check `$_SESSION['loggedin']` before protected content
+- **Array Access Safety**: Always use null coalescing operators for array accesses: `$array['key'] ?? 'default_value'`
+- **Defensive Programming**: Check array existence before iteration: `if (!empty($array)) { foreach($array as $item) { ... } }`
 
 ### File Structure
 - Controllers: `app/controllers/` - Handle request routing
