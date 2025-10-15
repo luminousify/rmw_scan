@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $materialRequestService = new MaterialRequestService();
         $userRequests = $materialRequestService->getUserRequests($idlog, [
             'limit' => $limit,
-            'page' => $currentPage - 1
+            'offset' => $offset
         ]);
         $totalRequests = $materialRequestService->getUserRequestsCount($idlog);
         $totalPages = ceil($totalRequests / $limit);
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $materialRequestService = new MaterialRequestService();
         $userRequests = $materialRequestService->getUserRequests($idlog, [
             'limit' => $limit,
-            'page' => $currentPage - 1
+            'offset' => $offset
         ]);
         $totalRequests = $materialRequestService->getUserRequestsCount($idlog);
         $totalPages = ceil($totalRequests / $limit);

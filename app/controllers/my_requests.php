@@ -27,18 +27,17 @@ try {
     $limit = 10; // Show 10 per page for better pagination testing
     $offset = ($page - 1) * $limit;
     
-    // Validate and sanitize filter parameters
+    // Separate filters from pagination parameters
     $filters = MaterialRequestService::validateFilters([
         'status' => $_GET['status'] ?? 'all',
-        'search' => $_GET['search'] ?? '',
-        'limit' => $limit,
-        'offset' => $offset
+        'search' => $_GET['search'] ?? ''
     ]);
     
     // Get user's requests with filters and pagination
-    $userRequests = $materialRequestService->getUserRequests($idlog, $filters);
+    $paginationParams = ['limit' => $limit, 'offset' => $offset];
+    $userRequests = $materialRequestService->getUserRequests($idlog, array_merge($filters, $paginationParams));
     
-    // Get total count for pagination
+    // Get total count for pagination (exclude pagination parameters)
     $totalRequests = $materialRequestService->getUserRequestsCount($idlog, $filters);
     $totalPages = ceil($totalRequests / $limit);
     

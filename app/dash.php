@@ -122,15 +122,102 @@
 <div class="space-y-6">
   <!-- Dashboard Title -->
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-    <p class="text-gray-600 mt-2">Welcome back, <?= $name ?>!</p>
+    <h1 class="text-3xl font-bold text-gray-900">
+      <?= ($department === 'rmw' ? 'Warehouse Dashboard' : 'Production Dashboard') ?>
+    </h1>
+    <p class="text-gray-600 mt-2">Welcome back, <?= $name ?>! Here's your activity overview.</p>
   </div>
 
-  <!-- Chart Container -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Sales Chart</h3>
-    <div class="aspect-video">
-      <canvas id="salesChart" class="w-full h-full"></canvas>
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Requests Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+          <i class="bi bi-file-text text-blue-600 text-xl"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Requests</p>
+          <p class="text-2xl font-bold text-gray-900" id="totalRequests">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Requests Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
+          <i class="bi bi-clock text-yellow-600 text-xl"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Pending</p>
+          <p class="text-2xl font-bold text-gray-900" id="pendingRequests">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approved Requests Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+          <i class="bi bi-check-circle text-green-600 text-xl"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Approved</p>
+          <p class="text-2xl font-bold text-gray-900" id="approvedRequests">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scanned Items Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-purple-100 rounded-lg p-3">
+          <i class="bi bi-qr-code text-purple-600 text-xl"></i>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Items Scanned</p>
+          <p class="text-2xl font-bold text-gray-900" id="scannedItems">0</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Request Trends Chart -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Trends (Last 7 Days)</h3>
+      <div class="aspect-video">
+        <canvas id="requestTrendsChart" class="w-full h-full"></canvas>
+      </div>
+    </div>
+
+    <!-- Request Status Distribution -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Status Distribution</h3>
+      <div class="aspect-video">
+        <canvas id="statusChart" class="w-full h-full"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity and Top Products -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+      <div class="space-y-3 max-h-96 overflow-y-auto" id="recentActivity">
+        <!-- Activity items will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Top Requested Products -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Requested Products</h3>
+      <div class="space-y-3 max-h-96 overflow-y-auto" id="topProducts">
+        <!-- Product items will be populated by JavaScript -->
+      </div>
     </div>
   </div>
 </div>
@@ -140,54 +227,346 @@
    <!-- Page specific javascripts-->
     
     <script type="text/javascript">
-      const salesData = {
-        type: "line",
-        data: {
-          labels: [
-            "Jan",
-            "Feb",
-            "March",
-            "April",
-            "May",
-            "June",
-          ],
-          datasets: [{
-            label: 'Monthly Sales',
-            data: [45, 50, 48, 48, 52, 55, 40],
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-          }]
-        }
-      }
-      
-      const supportRequests = {
-        type: "doughnut",
-        data: {
-          labels: [
-            'In-Progress',
-            'Complete',
-            'Delayed'
-          ],
-          datasets: [{
-            label: 'Support Requests',
-            data: [300, 50, 100],
-            backgroundColor: [
-              '#EFCC00',
-              '#5AD3D1',
-              '#FF5A5E'
-            ],
-            hoverOffset: 4
-          }]
-        }
+      // Dashboard data will be loaded from PHP
+      const dashboardData = {
+        stats: {
+          totalRequests: <?= getTotalRequests() ?>,
+          pendingRequests: <?= getPendingRequests() ?>,
+          approvedRequests: <?= getApprovedRequests() ?>,
+          scannedItems: <?= getScannedItems() ?>
+        },
+        requestTrends: {
+          labels: <?= json_encode(getLast7Days()) ?>,
+          data: <?= json_encode(getRequestTrends()) ?>
+        },
+        statusDistribution: {
+          labels: ['Pending', 'Approved', 'Rejected', 'Completed'],
+          data: [
+            <?= getRequestsByStatus('pending') ?>,
+            <?= getRequestsByStatus('approved') ?>,
+            <?= getRequestsByStatus('rejected') ?>,
+            <?= getRequestsByStatus('completed') ?>
+          ]
+        },
+        recentActivity: <?= json_encode(getRecentActivity()) ?>,
+        topProducts: <?= json_encode(getTopProducts()) ?>
       };
-      
-      const salesChartCtx = document.getElementById('salesChart');
-      new Chart(salesChartCtx, salesData);
-      
-      const supportChartCtx = document.getElementById('supportRequestChart');
-      new Chart(supportChartCtx, supportRequests);
+
+      // Update stats cards
+      document.getElementById('totalRequests').textContent = dashboardData.stats.totalRequests;
+      document.getElementById('pendingRequests').textContent = dashboardData.stats.pendingRequests;
+      document.getElementById('approvedRequests').textContent = dashboardData.stats.approvedRequests;
+      document.getElementById('scannedItems').textContent = dashboardData.stats.scannedItems;
+
+      // Request Trends Chart
+      const requestTrendsCtx = document.getElementById('requestTrendsChart');
+      if (requestTrendsCtx) {
+        new Chart(requestTrendsCtx, {
+          type: 'line',
+          data: {
+            labels: dashboardData.requestTrends.labels,
+            datasets: [{
+              label: 'Daily Requests',
+              data: dashboardData.requestTrends.data,
+              fill: true,
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.3,
+              pointBackgroundColor: 'rgb(59, 130, 246)',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: 'rgb(59, 130, 246)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Status Distribution Chart
+      const statusCtx = document.getElementById('statusChart');
+      if (statusCtx) {
+        new Chart(statusCtx, {
+          type: 'doughnut',
+          data: {
+            labels: dashboardData.statusDistribution.labels,
+            datasets: [{
+              data: dashboardData.statusDistribution.data,
+              backgroundColor: [
+                '#FCD34D', // Yellow for pending
+                '#34D399', // Green for approved
+                '#F87171', // Red for rejected
+                '#60A5FA'  // Blue for completed
+              ],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+
+      // Populate Recent Activity
+      function populateRecentActivity() {
+        const container = document.getElementById('recentActivity');
+        if (!container) return;
+
+        if (dashboardData.recentActivity.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-sm">No recent activity</p>';
+          return;
+        }
+
+        container.innerHTML = dashboardData.recentActivity.map(activity => `
+          <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="bi bi-${getActivityIcon(activity.action)} text-blue-600 text-sm"></i>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900">${activity.action}</p>
+              <p class="text-xs text-gray-500">${formatTime(activity.created_at)}</p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Populate Top Products
+      function populateTopProducts() {
+        const container = document.getElementById('topProducts');
+        if (!container) return;
+
+        if (dashboardData.topProducts.length === 0) {
+          container.innerHTML = '<p class="text-gray-500 text-sm">No product data available</p>';
+          return;
+        }
+
+        container.innerHTML = dashboardData.topProducts.map((product, index) => `
+          <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+            <div class="flex items-center space-x-3">
+              <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <span class="text-purple-600 text-sm font-semibold">${index + 1}</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">${product.product_name}</p>
+                <p class="text-xs text-gray-500">${product.category || 'Uncategorized'}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-semibold text-gray-900">${product.request_count}</p>
+              <p class="text-xs text-gray-500">requests</p>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Helper functions
+      function getActivityIcon(action) {
+        const iconMap = {
+          'CREATE': 'plus-circle',
+          'APPROVE': 'check-circle',
+          'SCAN': 'qr-code',
+          'COMPLETE': 'check-square',
+          'UPDATE': 'arrow-repeat'
+        };
+        return iconMap[action] || 'activity';
+      }
+
+      function formatTime(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} min ago`;
+        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        return date.toLocaleDateString();
+      }
+
+      // Initialize dashboard
+      document.addEventListener('DOMContentLoaded', function() {
+        populateRecentActivity();
+        populateTopProducts();
+      });
     </script>
+
+    <?php
+    // Dashboard data methods (these should be moved to a proper controller)
+    function getTotalRequests() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    function getPendingRequests() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests WHERE status = 'pending'");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    function getApprovedRequests() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests WHERE status = 'approved'");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    function getScannedItems() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM qr_tracking WHERE status = 'scanned'");
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    function getLast7Days() {
+        $days = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $days[] = date('M j', strtotime("-$i days"));
+        }
+        return $days;
+    }
+
+    function getRequestTrends() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $trends = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = date('Y-m-d', strtotime("-$i days"));
+                $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests WHERE DATE(created_at) = ?");
+                $stmt->execute([$date]);
+                $trends[] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            }
+            return $trends;
+        } catch (Exception $e) {
+            return array_fill(0, 7, 0);
+        }
+    }
+
+    function getRequestsByStatus($status) {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests WHERE status = ?");
+            $stmt->execute([$status]);
+            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    function getRecentActivity() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("
+                SELECT action, created_at 
+                FROM activity_log 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    function getTopProducts() {
+        try {
+            if (!class_exists('DatabaseManager')) {
+                require_once path('includes/DatabaseManager.php');
+            }
+            $db = DatabaseManager::getInstance();
+            $pdo = $db->getConnection();
+            $stmt = $pdo->prepare("
+                SELECT 
+                    p.product_name,
+                    p.category,
+                    COUNT(mri.product_id) as request_count
+                FROM material_request_items mri
+                JOIN products p ON mri.product_id = p.product_id
+                GROUP BY p.product_id, p.product_name, p.category
+                ORDER BY request_count DESC
+                LIMIT 5
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    ?>
 
       </main>
     </div>
