@@ -6,7 +6,7 @@
           <!-- Logo -->
           <div class="flex items-center">
             <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" class="text-xl font-bold text-gray-900">
-              RMW System
+              <?= ($department === 'rmw' ? 'RMW System' : 'Scan No Bon') ?>
             </a>
           </div>
           
@@ -40,49 +40,80 @@
 
     <div class="flex">
       <!-- Sidebar -->
-      <aside class="w-64 bg-white shadow-sm min-h-screen border-r border-gray-200">
+      <aside class="w-64 bg-white shadow-lg min-h-screen border-r border-gray-200 transition-all duration-300">
         <div class="p-6">
-          <div class="flex items-center space-x-3 mb-8">
-            <div class="w-10 h-10 <?= ($department === 'rmw' ? 'bg-green-600' : 'bg-blue-600') ?> rounded-lg flex items-center justify-center">
-              <span class="text-white font-bold text-lg"><?= strtoupper($department ?? 'production') ?></span>
+          <!-- Enhanced Logo Area -->
+          <div class="flex flex-col items-center space-y-4 mb-8 pb-6 border-b border-gray-100">
+            <div class="relative">
+              <div class="w-16 h-16 <?= ($department === 'rmw' ? 'bg-gradient-to-br from-green-500 to-green-600' : 'bg-gradient-to-br from-blue-500 to-blue-600') ?> rounded-2xl flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                <i class="<?= ($department === 'rmw' ? 'bi bi-box-seam' : 'bi bi-building') ?> text-white text-2xl"></i>
+              </div>
+              <div class="absolute -bottom-1 -right-1 w-6 h-6 <?= ($department === 'rmw' ? 'bg-green-500' : 'bg-blue-500') ?> rounded-full flex items-center justify-center">
+                <i class="<?= ($department === 'rmw' ? 'bi bi-check2' : 'bi bi-person') ?> text-white text-xs"></i>
+              </div>
             </div>
-            <div>
-              <p class="text-sm font-medium text-gray-900">Raw Material Warehouse</p>
+            <div class="text-center">
+              <h3 class="text-lg font-bold text-gray-900 capitalize">
+                <?= ($department === 'rmw' ? 'Raw Material Warehouse' : 'Production Department') ?>
+              </h3>
+              <p class="text-sm text-gray-500 mt-1">Management System</p>
             </div>
           </div>
           
-          <nav class="space-y-2">
+          <!-- Enhanced Navigation -->
+          <nav class="space-y-1" role="navigation" aria-label="Main navigation">
+            <!-- Dashboard -->
             <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
-               class="flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors <?= $module_name == 'rmw_dashboard' ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100' ?>">
-              <i class="bi bi-house mr-3"></i>
-              Dashboard
+               class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
+               role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
+              <i class="bi bi-house-fill mr-3 text-lg"></i>
+              <span>Dashboard</span>
+              <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
             </a>
-            <a href="<?php echo url('app/controllers/pending_requests.php'); ?>" 
-               class="flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors <?= $module_name == 'pending_requests' ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100' ?>">
-              <i class="bi bi-clock mr-3"></i>
-              Pending Requests
-            </a>
-            <a href="<?php echo url('app/controllers/processing_requests.php'); ?>" 
-               class="flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors <?= $module_name == 'processing_requests' ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100' ?>">
-              <i class="bi bi-gear mr-3"></i>
-              Processing
-            </a>
-            <a href="<?php echo url('app/controllers/generate_qr.php'); ?>" 
-               class="flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors <?= $module_name == 'generate_qr' ? 'bg-green-100 text-green-700' : 'text-gray-600 hover:bg-gray-100' ?>">
-              <i class="bi bi-qr-code mr-3"></i>
-              Generate QR
-            </a>
+            
+            <?php if ($department === 'rmw'): ?>
+            <!-- RMW Navigation -->
+            <div class="pt-2">
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
+              
+              <a href="<?php echo url('app/controllers/pending_requests.php'); ?>" 
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'pending_requests' ? 'nav-active-rmw' : 'nav-inactive' ?>"
+                 role="menuitem" aria-current="<?= $module_name == 'pending_requests' ? 'page' : 'false' ?>">
+                <i class="bi bi-clock-fill mr-3 text-lg"></i>
+                <span>Pending Requests</span>
+                <?= $module_name == 'pending_requests' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
+              </a>
+              
+              <a href="<?php echo url('app/controllers/processing_requests.php'); ?>" 
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'processing_requests' ? 'nav-active-rmw' : 'nav-inactive' ?>"
+                 role="menuitem" aria-current="<?= $module_name == 'processing_requests' ? 'page' : 'false' ?>">
+                <i class="bi bi-gear-fill mr-3 text-lg"></i>
+                <span>Processing</span>
+                <?= $module_name == 'processing_requests' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
+              </a>
+              
+              <a href="<?php echo url('app/controllers/generate_qr.php'); ?>" 
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'generate_qr' ? 'nav-active-rmw' : 'nav-inactive' ?>"
+                 role="menuitem" aria-current="<?= $module_name == 'generate_qr' ? 'page' : 'false' ?>">
+                <i class="bi bi-qr-code-fill mr-3 text-lg"></i>
+                <span>Generate QR</span>
+                <?= $module_name == 'generate_qr' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
+              </a>
+            </div>
+            <?php endif; ?>
           </nav>
         </div>
       </aside>
 
       <!-- Main content -->
       <main class="flex-1 p-6">
-        <!-- Page Header -->
-        <div class="mb-6">
-          <h1 class="text-3xl font-bold text-gray-900">RMW Dashboard</h1>
-          <p class="text-gray-600 mt-2">Manage material requests from production</p>
-        </div>
+        <!-- Dashboard Content -->
+        <div class="space-y-6">
+          <!-- Dashboard Title -->
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p class="text-gray-600 mt-2">Welcome back, <?= $name ?>!</p>
+          </div>
 
         <!-- Alert Messages -->
         <?php if (isset($success_message)): ?>
@@ -280,25 +311,11 @@
             </table>
           </div>
         </div>
+        </div>
       </main>
     </div>
 
-    <!-- Request Details Modal -->
-    <div id="requestModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-gray-900">Request Details</h3>
-            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-              <i class="bi bi-x-lg text-xl"></i>
-            </button>
-          </div>
-          <div id="requestDetails" class="text-gray-600">
-            <!-- Request details will be loaded here -->
-          </div>
-        </div>
-      </div>
-    </div>
+  
 
     <!-- JavaScript -->
     <script>
@@ -318,24 +335,474 @@
       });
 
       function viewRequest(requestId) {
-        // TODO: Implement AJAX request to get request details
-        document.getElementById('requestModal').classList.remove('hidden');
-        document.getElementById('requestDetails').innerHTML = `
-          <p>Loading request details...</p>
-          <p>Request ID: ${requestId}</p>
+        console.log('viewRequest function called with ID:', requestId);
+        
+        // Remove any existing test modal
+        const existingTest = document.getElementById('testModal');
+        if (existingTest) existingTest.remove();
+        
+        // Create a working modal with proper structure
+        const modal = document.createElement('div');
+        modal.id = 'requestModal';
+        modal.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            z-index: 999999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow-y: auto !important;
         `;
+        
+        modal.innerHTML = `
+            <div style="
+                background: white !important;
+                border-radius: 12px !important;
+                max-width: 1200px !important;
+                width: 95% !important;
+                max-height: 90vh !important;
+                overflow: hidden !important;
+                box-shadow: 0 25px 50px rgba(0,0,0,0.25) !important;
+                display: flex !important;
+                flex-direction: column !important;
+            ">
+                <!-- Header -->
+                <div style="
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    padding: 24px !important;
+                    border-bottom: 1px solid #e5e7eb !important;
+                    background: #f9fafb !important;
+                ">
+                    <h3 style="font-size: 20px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 !important;">
+                        Request Details
+                    </h3>
+                    <button onclick="this.closest('#requestModal').remove()" style="
+                        background: none !important;
+                        border: none !important;
+                        color: #6b7280 !important;
+                        cursor: pointer !important;
+                        padding: 8px !important;
+                        border-radius: 6px !important;
+                        font-size: 20px !important;
+                    ">&times;</button>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="modalLoading" style="
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    padding: 60px !important;
+                ">
+                    <div style="
+                        width: 48px !important;
+                        height: 48px !important;
+                        border: 4px solid #e5e7eb !important;
+                        border-top: 4px solid #10b981 !important;
+                        border-radius: 50% !important;
+                        animation: spin 1s linear infinite !important;
+                        margin-bottom: 16px !important;
+                    "></div>
+                    <p style="color: #6b7280 !important; margin: 0 !important;">Loading request details...</p>
+                </div>
+                
+                <!-- Error State -->
+                <div id="modalError" style="display: none !important; padding: 60px !important; text-align: center !important;">
+                    <div style="font-size: 48px !important; color: #ef4444 !important; margin-bottom: 16px !important;">⚠️</div>
+                    <h4 style="font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 8px !important;">Error Loading Details</h4>
+                    <p id="modalErrorMessage" style="color: #6b7280 !important; margin-bottom: 16px !important;">Failed to load request details</p>
+                    <button onclick="this.closest('#requestModal').remove()" style="
+                        background: #6b7280 !important;
+                        color: white !important;
+                        padding: 8px 16px !important;
+                        border: none !important;
+                        border-radius: 6px !important;
+                        cursor: pointer !important;
+                    ">Close</button>
+                </div>
+                
+                <!-- Request Details Content -->
+                <div id="requestDetails" style="display: none !important; padding: 24px !important; overflow-y: auto !important; flex: 1 !important;">
+                    <!-- Content will be loaded here -->
+                </div>
+                
+                <!-- Footer -->
+                <div id="modalFooter" style="display: none !important; padding: 24px !important; border-top: 1px solid #e5e7eb !important; background: #f9fafb !important; text-align: right !important;">
+                    <button onclick="this.closest('#requestModal').remove()" style="
+                        background: #6b7280 !important;
+                        color: white !important;
+                        padding: 8px 16px !important;
+                        border: none !important;
+                        border-radius: 6px !important;
+                        cursor: pointer !important;
+                    ">Close</button>
+                </div>
+            </div>
+        `;
+        
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Remove any existing modal and add new one
+        const existingModal = document.getElementById('requestModal');
+        if (existingModal) existingModal.remove();
+        
+        document.body.appendChild(modal);
+        
+        // Fetch request details via AJAX
+        const url = `rmw_dashboard.php?action=get_request_details&id=${requestId}`;
+        console.log('Fetching from URL:', url);
+        
+        fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          cache: 'no-cache'
+        })
+          .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            // Check content type to ensure we're getting JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              throw new Error(`Expected JSON response, got: ${contentType || 'unknown'}`);
+            }
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Get response as text first to validate JSON
+            return response.text();
+          })
+          .then(text => {
+            console.log('Response text length:', text.length);
+            
+            // Validate that response starts with JSON object/array
+            const trimmed = text.trim();
+            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+              console.error('Invalid JSON response - starts with:', trimmed.substring(0, 50));
+              throw new Error('Invalid JSON response format');
+            }
+            
+            try {
+              return JSON.parse(text);
+            } catch (parseError) {
+              console.error('JSON parse error:', parseError);
+              console.error('Response content preview:', text.substring(0, 200));
+              throw new Error(`JSON parse error: ${parseError.message}`);
+            }
+          })
+          .then(data => {
+            console.log('Parsed data:', data);
+            document.getElementById('modalLoading').style.display = 'none';
+            
+            // Validate response structure
+            if (!data || typeof data !== 'object') {
+              throw new Error('Invalid response structure');
+            }
+            
+            if (data.success) {
+              console.log('Data success, calling displayRequestDetails');
+              if (!data.request) {
+                throw new Error('Missing request data in response');
+              }
+              displayRequestDetails(data.request);
+            } else {
+              console.log('Data error:', data.error);
+              const errorMessage = data.error || 'Failed to load request details';
+              const errorType = data.error_type || 'Unknown';
+              console.error('Server error details:', { error: errorMessage, type: errorType });
+              
+              document.getElementById('modalErrorMessage').textContent = `${errorMessage} (${errorType})`;
+              document.getElementById('modalError').style.display = 'block';
+            }
+          })
+          .catch(error => {
+            console.error('Request failed:', error);
+            document.getElementById('modalLoading').style.display = 'none';
+            
+            let errorMessage = error.message;
+            let detailedInfo = '';
+            
+            // Provide more user-friendly error messages
+            if (error.message.includes('Expected JSON response')) {
+              errorMessage = 'Server returned invalid response format';
+              detailedInfo = 'The server may be experiencing technical difficulties. Please try again.';
+            } else if (error.message.includes('JSON parse error')) {
+              errorMessage = 'Failed to process server response';
+              detailedInfo = 'There may be an issue with the data format. Contact support if this persists.';
+            } else if (error.message.includes('HTTP error')) {
+              errorMessage = 'Server communication error';
+              detailedInfo = 'Please check your connection and try again.';
+            } else if (error.message.includes('Failed to fetch')) {
+              errorMessage = 'Network connection failed';
+              detailedInfo = 'Please check your internet connection and try again.';
+            }
+            
+            const fullErrorMessage = detailedInfo ? `${errorMessage}: ${detailedInfo}` : errorMessage;
+            document.getElementById('modalErrorMessage').textContent = fullErrorMessage;
+            document.getElementById('modalError').style.display = 'block';
+          });
+      }
+      
+      function displayRequestDetails(request) {
+        console.log('displayRequestDetails called with:', request);
+        
+        const itemsHtml = request.items.map(item => `
+          <tr style="border-bottom: 1px solid #e5e7eb !important;">
+            <td style="padding: 12px 16px !important; font-size: 14px !important; font-family: monospace !important; color: #111827 !important;">${item.product_id}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.product_name}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.requested_quantity}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.unit}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.description || '-'}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important;">
+              <span style="
+                padding: 4px 8px !important;
+                display: inline-flex !important;
+                font-size: 12px !important;
+                font-weight: 600 !important;
+                border-radius: 9999px !important;
+                ${item.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
+                  item.status === 'approved' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
+                  'background: #fee2e2 !important; color: #991b1b !important;'}
+              ">
+                ${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+        
+        const statusColor = request.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
+                           request.status === 'diproses' ? 'background: #dbeafe !important; color: #1e40af !important;' :
+                           request.status === 'completed' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
+                           'background: #fee2e2 !important; color: #991b1b !important;';
+        
+        const detailsContent = `
+          <div style="display: flex !important; flex-direction: column !important; gap: 24px !important;">
+            <!-- Request Header -->
+            <div style="
+              display: grid !important;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+              gap: 20px !important;
+              padding: 20px !important;
+              background: #f9fafb !important;
+              border-radius: 8px !important;
+              border: 1px solid #e5e7eb !important;
+            ">
+              <div>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Request Number</h4>
+                <p style="font-size: 16px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 !important;">${request.request_number}</p>
+              </div>
+              <div>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Status</h4>
+                <span style="
+                  padding: 6px 12px !important;
+                  display: inline-flex !important;
+                  font-size: 14px !important;
+                  font-weight: 600 !important;
+                  border-radius: 6px !important;
+                  ${statusColor}
+                ">
+                  ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                </span>
+              </div>
+              <div>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Priority</h4>
+                <span style="
+                  padding: 6px 12px !important;
+                  display: inline-flex !important;
+                  font-size: 14px !important;
+                  font-weight: 600 !important;
+                  border-radius: 6px !important;
+                  ${request.priority === 'high' ? 'background: #fee2e2 !important; color: #991b1b !important;' :
+                    request.priority === 'medium' ? 'background: #fef3c7 !important; color: #92400e !important;' :
+                    'background: #f3f4f6 !important; color: #374151 !important;'}
+                ">
+                  ${request.priority ? request.priority.charAt(0).toUpperCase() + request.priority.slice(1) : 'Normal'}
+                </span>
+              </div>
+              <div>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Customer Reference</h4>
+                <p style="font-size: 16px !important; font-weight: 500 !important; color: #111827 !important; margin: 0 !important;">${request.customer_reference || '-'}</p>
+              </div>
+            </div>
+            
+            <!-- Request Information -->
+            <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important;">
+              <div style="padding: 20px !important; background: white !important; border-radius: 8px !important; border: 1px solid #e5e7eb !important;">
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Production Information</h4>
+                <div style="display: flex !important; flex-direction: column !important; gap: 12px !important;">
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">User:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_user_name || 'Unknown'}</span>
+                  </div>
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Department:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_department || 'Unknown'}</span>
+                  </div>
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Created:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${new Date(request.created_at).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div style="padding: 20px !important; background: white !important; border-radius: 8px !important; border: 1px solid #e5e7eb !important;">
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Processing Information</h4>
+                <div style="display: flex !important; flex-direction: column !important; gap: 12px !important;">
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Processed By:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_by || 'Not processed'}</span>
+                  </div>
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Processed Date:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_date ? new Date(request.processed_date).toLocaleString() : 'Not processed'}</span>
+                  </div>
+                  <div style="display: flex !important; justify-content: space-between !important;">
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Completed Date:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.completed_date ? new Date(request.completed_date).toLocaleString() : 'Not completed'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Notes -->
+            ${request.notes ? `
+              <div style="padding: 20px !important; background: #f0f9ff !important; border-radius: 8px !important; border: 1px solid #bae6fd !important;">
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 12px !important;">Notes</h4>
+                <p style="font-size: 14px !important; color: #374151 !important; margin: 0 !important; line-height: 1.5 !important;">${request.notes}</p>
+              </div>
+            ` : ''}
+            
+            <!-- Items Table -->
+            <div>
+              <h4 style="font-size: 16px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Requested Items</h4>
+              <div style="border: 1px solid #e5e7eb !important; border-radius: 8px !important; overflow: hidden !important;">
+                <table style="width: 100% !important; border-collapse: collapse !important;">
+                  <thead style="background: #f9fafb !important;">
+                    <tr>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Product ID</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Product Name</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Quantity</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Unit</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsHtml}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('requestDetails').innerHTML = detailsContent;
+        document.getElementById('requestDetails').style.display = 'block';
+        document.getElementById('modalFooter').style.display = 'block';
       }
 
-      function closeModal() {
-        document.getElementById('requestModal').classList.add('hidden');
-      }
-
-      // Close modal when clicking outside
-      document.getElementById('requestModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeModal();
-        }
-      });
+  
     </script>
+    
+    <!-- Enhanced Sidebar Styles -->
+    <style>
+      /* Navigation Item Styles */
+      .nav-item {
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .nav-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s;
+      }
+      
+      .nav-item:hover::before {
+        left: 100%;
+      }
+      
+      .nav-active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transform: translateX(4px);
+      }
+      
+      .nav-active-rmw {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transform: translateX(4px);
+      }
+      
+      .nav-inactive {
+        color: #6b7280;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .nav-inactive:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        transform: translateX(2px);
+        color: #374151;
+      }
+      
+      .nav-item i {
+        transition: transform 0.2s ease;
+      }
+      
+      .nav-item:hover i {
+        transform: scale(1.1);
+      }
+      
+      /* Logo Animation */
+      .hover-scale {
+        transition: transform 0.3s ease;
+      }
+      
+      .hover-scale:hover {
+        transform: scale(1.05);
+      }
+      
+      /* Active Page Indicator */
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
   </body>
 </html>

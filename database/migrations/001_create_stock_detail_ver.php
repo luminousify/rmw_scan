@@ -14,7 +14,7 @@ class StockDetailVerMigration {
     private $pdo;
     
     public function __construct() {
-        $this->db = new DatabaseManager('sqlite');
+        $this->db = DatabaseManager::getInstance();
         $this->pdo = $this->db->getConnection();
     }
     

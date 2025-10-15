@@ -1,8 +1,8 @@
 <?php
 require_once 'config.php';
 
-$user = $_POST['username'];
-$pass = $_POST['password'];
+$user = $_POST['username'] ?? '';
+$pass = $_POST['password'] ?? '';
 
 // Database authentication (SQLite first, then MySQL)
 $authSuccess = false;

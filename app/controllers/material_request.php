@@ -1,5 +1,6 @@
 <?php
 require_once '../../config.php';
+require_once '../../includes/services/MaterialRequestService.php';
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -14,6 +15,18 @@ $pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'] ?? 'production';
 
+// Pagination setup
+$currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+$offset = ($currentPage - 1) * $limit;
+
+// Debug logging for pagination
+error_log("=== Material Request Pagination Debug ===");
+error_log("User ID: $idlog");
+error_log("Current Page: $currentPage");
+error_log("Limit: $limit");
+error_log("Offset: $offset");
+
 include '../common/header.php';
 
 // Handle form submission
@@ -27,12 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $notes = $_POST['notes'] ?? '';
             $createdBy = $_SESSION['full_name'] ?? $_SESSION['user'];
             
-            // Insert material request
+            // Insert material request with server timestamp
+            $requestDate = date('Y-m-d H:i:s'); // Server-side accurate timestamp
             $stmt = $pdo->prepare("
-                INSERT INTO material_requests (request_number, production_user_id, notes, status, created_by) 
-                VALUES (?, ?, ?, 'pending', ?)
+                INSERT INTO material_requests (request_number, production_user_id, request_date, notes, status, created_by) 
+                VALUES (?, ?, ?, ?, 'pending', ?)
             ");
-            $stmt->execute([$requestNumber, $idlog, $notes, $createdBy]);
+            $stmt->execute([$requestNumber, $idlog, $requestDate, $notes, $createdBy]);
             $requestId = $pdo->lastInsertId();
             
             // Insert request items
@@ -75,28 +89,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $pdo->query("SELECT product_id, product_name, unit FROM products WHERE is_active = 1 ORDER BY product_name");
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Get user's requests
-        $stmt = $pdo->prepare("
-            SELECT mr.*, 
-                   COUNT(mri.id) as item_count
-            FROM material_requests mr
-            LEFT JOIN material_request_items mri ON mr.id = mri.request_id
-            WHERE mr.production_user_id = ?
-            GROUP BY mr.id
-            ORDER BY mr.created_at DESC
-        ");
-        $stmt->execute([$idlog]);
-        $userRequests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Get user's requests with pagination using MaterialRequestService
+        $materialRequestService = new MaterialRequestService();
+        $userRequests = $materialRequestService->getUserRequests($idlog, [
+            'limit' => $limit,
+            'page' => $currentPage - 1
+        ]);
+        $totalRequests = $materialRequestService->getUserRequestsCount($idlog);
+        $totalPages = ceil($totalRequests / $limit);
         
-        // Get items summary for each request
+        // Debug logging for service results
+        error_log("Service returned " . count($userRequests) . " requests");
+        error_log("Total requests from service: $totalRequests");
+        error_log("Total pages calculated: $totalPages");
+        error_log("Show pagination condition: " . ($totalPages > 1 ? 'TRUE' : 'FALSE'));
+        
+        // Get DatabaseManager instance for items summary
+        $dbManager = DatabaseManager::getInstance();
+        
+        
+        
+        // Get items summary for each request using DatabaseManager
         foreach ($userRequests as &$request) {
-            $stmt = $pdo->prepare("
+            $stmt = $dbManager->query("
                 SELECT product_name, requested_quantity, unit 
                 FROM material_request_items 
                 WHERE request_id = ?
-            ");
-            $stmt->execute([$request['id']]);
-            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            ", [$request['id']]);
+            $items = $stmt->fetchAll();
             
             $request['items_summary'] = '';
             if (!empty($items)) {
@@ -110,6 +130,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
     } catch (Exception $e) {
         $error_message = "Error: " . $e->getMessage();
+        error_log("Material Request Controller Error: " . $e->getMessage());
+        // Don't reset pagination variables to 0, keep them unset to maintain existing behavior
+        // $totalRequests = 0;
+        // $totalPages = 0;
     }
 } else {
     try {
@@ -119,28 +143,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $pdo->query("SELECT product_id, product_name, unit FROM products WHERE is_active = 1 ORDER BY product_name");
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Get user's requests
-        $stmt = $pdo->prepare("
-            SELECT mr.*, 
-                   COUNT(mri.id) as item_count
-            FROM material_requests mr
-            LEFT JOIN material_request_items mri ON mr.id = mri.request_id
-            WHERE mr.production_user_id = ?
-            GROUP BY mr.id
-            ORDER BY mr.created_at DESC
-        ");
-        $stmt->execute([$idlog]);
-        $userRequests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Get user's requests with pagination using MaterialRequestService
+        $materialRequestService = new MaterialRequestService();
+        $userRequests = $materialRequestService->getUserRequests($idlog, [
+            'limit' => $limit,
+            'page' => $currentPage - 1
+        ]);
+        $totalRequests = $materialRequestService->getUserRequestsCount($idlog);
+        $totalPages = ceil($totalRequests / $limit);
         
-        // Get items summary for each request
+        // Debug logging for service results
+        error_log("Service returned " . count($userRequests) . " requests");
+        error_log("Total requests from service: $totalRequests");
+        error_log("Total pages calculated: $totalPages");
+        error_log("Show pagination condition: " . ($totalPages > 1 ? 'TRUE' : 'FALSE'));
+        
+        // Get DatabaseManager instance for items summary
+        $dbManager = DatabaseManager::getInstance();
+        
+        
+        
+        // Get items summary for each request using DatabaseManager
         foreach ($userRequests as &$request) {
-            $stmt = $pdo->prepare("
+            $stmt = $dbManager->query("
                 SELECT product_name, requested_quantity, unit 
                 FROM material_request_items 
                 WHERE request_id = ?
-            ");
-            $stmt->execute([$request['id']]);
-            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            ", [$request['id']]);
+            $items = $stmt->fetchAll();
             
             $request['items_summary'] = '';
             if (!empty($items)) {
@@ -154,10 +184,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         
     } catch (Exception $e) {
         $error_message = "Database error: " . $e->getMessage();
+        error_log("Material Request Database Error: " . $e->getMessage());
         $products = [];
         $userRequests = [];
+        // Don't reset pagination variables to 0 - this breaks pagination display
+        // $totalRequests = 0;
+        // $totalPages = 0;
     }
 }
+
+// Ensure pagination variables are properly set before including view
+if (!isset($totalRequests)) {
+    $totalRequests = $materialRequestService->getUserRequestsCount($idlog) ?? 0;
+    error_log("totalRequests was not set, calculated: $totalRequests");
+}
+
+if (!isset($totalPages)) {
+    $totalPages = ceil($totalRequests / $limit);
+    error_log("totalPages was not set, calculated: $totalPages");
+}
+
+if (!isset($userRequests)) {
+    $userRequests = [];
+    error_log("userRequests was not set, initialized to empty array");
+}
+
+// Final debug logging before view
+error_log("Final pagination state - Total: $totalRequests, Pages: $totalPages, Current: $currentPage");
 
 include '../material_request.php';
 include '../common/footer.php';

@@ -1,5 +1,7 @@
 <?php
 require_once '../../config.php';
+require_once '../../includes/services/MaterialRequestService.php';
+
 session_start();
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -18,52 +20,36 @@ include '../common/header.php';
 
 try {
     include '../../includes/conn_sqlite.php';
+    $materialRequestService = new MaterialRequestService();
     
-    // Get filter parameters
-    $status = $_GET['status'] ?? 'all';
-    $search = $_GET['search'] ?? '';
+    // Pagination parameters
+    $page = max(1, intval($_GET['page'] ?? 1));
+    $limit = 10; // Show 10 per page for better pagination testing
+    $offset = ($page - 1) * $limit;
     
-    // Build query based on filters
-    $whereConditions = ["mr.production_user_id = ?"];
-    $params = [$idlog];
+    // Validate and sanitize filter parameters
+    $filters = MaterialRequestService::validateFilters([
+        'status' => $_GET['status'] ?? 'all',
+        'search' => $_GET['search'] ?? '',
+        'limit' => $limit,
+        'offset' => $offset
+    ]);
     
-    if ($status !== 'all') {
-        $whereConditions[] = "mr.status = ?";
-        $params[] = $status;
-    }
+    // Get user's requests with filters and pagination
+    $userRequests = $materialRequestService->getUserRequests($idlog, $filters);
     
-    if (!empty($search)) {
-        $whereConditions[] = "(mr.request_number LIKE ? OR mri.product_name LIKE ?)";
-        $searchParam = "%$search%";
-        $params[] = $searchParam;
-        $params[] = $searchParam;
-    }
-    
-    $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
-    
-    // Get user's requests with details
-    $query = "
-        SELECT 
-            mr.*,
-            COUNT(mri.id) as item_count
-        FROM material_requests mr
-        LEFT JOIN material_request_items mri ON mr.id = mri.request_id
-        $whereClause
-        GROUP BY mr.id
-        ORDER BY mr.created_at DESC
-    ";
-    
-    $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
-    $userRequests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get total count for pagination
+    $totalRequests = $materialRequestService->getUserRequestsCount($idlog, $filters);
+    $totalPages = ceil($totalRequests / $limit);
     
     // Get items summary for each request
     foreach ($userRequests as &$request) {
-        $stmt = $pdo->prepare("
+        $itemsQuery = "
             SELECT product_name, requested_quantity, unit 
             FROM material_request_items 
             WHERE request_id = ?
-        ");
+        ";
+        $stmt = $pdo->prepare($itemsQuery);
         $stmt->execute([$request['id']]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -71,30 +57,18 @@ try {
         if (!empty($items)) {
             $itemStrings = [];
             foreach ($items as $item) {
-                $itemStrings[] = $item['product_name'] . ' (' . $item['requested_quantity'] . ' ' . $item['unit'] . ')';
+                $itemStrings[] = htmlspecialchars($item['product_name']) . ' (' . $item['requested_quantity'] . ' ' . $item['unit'] . ')';
             }
             $request['items_summary'] = implode(', ', $itemStrings);
         }
     }
     
     // Get statistics for user's requests
-    $statsQuery = "
-        SELECT 
-            status,
-            COUNT(*) as count
-        FROM material_requests
-        WHERE production_user_id = ?
-        GROUP BY status
-    ";
-    $stmt = $pdo->prepare($statsQuery);
-    $stmt->execute([$idlog]);
-    $stats = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $stats[$row['status']] = $row['count'];
-    }
+    $stats = $materialRequestService->getUserRequestStats($idlog);
     
 } catch (Exception $e) {
-    $error_message = "Database error: " . $e->getMessage();
+    error_log("MaterialRequestService Error: " . $e->getMessage());
+    $error_message = "Unable to load your requests. Please try again.";
     $userRequests = [];
     $stats = [];
 }

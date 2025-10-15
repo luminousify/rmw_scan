@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS material_request_items (
     requested_quantity INTEGER NOT NULL,
     unit VARCHAR(20) DEFAULT 'pcs',
     description TEXT,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'completed')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'completed', 'cancelled')),
     approved_quantity INTEGER,
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

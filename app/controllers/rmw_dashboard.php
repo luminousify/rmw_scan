@@ -18,6 +18,160 @@ $title = "RMW Dashboard";
 $name = $_SESSION['user'];
 $pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
+$department = $_SESSION['department'];
+
+// Handle AJAX request for request details
+if (isset($_GET['action']) && $_GET['action'] === 'get_request_details') {
+    // Start output buffering to prevent any HTML/error output contamination
+    ob_start();
+    
+    // Clear any previous output
+    if (ob_get_level()) {
+        ob_clean();
+    }
+    
+    // Set JSON response header
+    header('Content-Type: application/json');
+    header('Cache-Control: no-cache, must-revalidate');
+    header('X-Content-Type-Options: nosniff');
+    
+    try {
+        // Disable error display for this AJAX request to prevent HTML in JSON
+        ini_set('display_errors', 0);
+        error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
+        
+        include '../../includes/conn_sqlite.php';
+        
+        $requestId = $_GET['id'] ?? null;
+        
+        // Validate request ID
+        if (!$requestId || !is_numeric($requestId) || $requestId <= 0) {
+            http_response_code(400);
+            throw new Exception('Invalid request ID provided');
+        }
+        
+        // RMW users can view all requests (no user restriction)
+        $query = "
+            SELECT mr.*, u.full_name as production_user_name, u.department as production_department
+            FROM material_requests mr
+            LEFT JOIN users u ON mr.production_user_id = u.id
+            WHERE mr.id = ?
+        ";
+        
+        $stmt = $pdo->prepare($query);
+        if (!$stmt) {
+            throw new Exception('Failed to prepare database query');
+        }
+        
+        $stmt->execute([$requestId]);
+        $request = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$request) {
+            http_response_code(404);
+            throw new Exception('Request not found');
+        }
+        
+        // Get request items with proper error handling
+        $itemsQuery = "
+            SELECT 
+                mri.*,
+                p.category
+            FROM material_request_items mri
+            LEFT JOIN products p ON mri.product_id = p.product_id
+            WHERE mri.request_id = ?
+            ORDER BY mri.id
+        ";
+        
+        $stmt = $pdo->prepare($itemsQuery);
+        if (!$stmt) {
+            throw new Exception('Failed to prepare items query');
+        }
+        
+        $stmt->execute([$requestId]);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get processing info if available with error handling
+        $processedBy = null;
+        if (!empty($request['processed_by'])) {
+            $stmt = $pdo->prepare("SELECT full_name FROM users WHERE full_name = ? LIMIT 1");
+            if ($stmt) {
+                $stmt->execute([$request['processed_by']]);
+                $processedBy = $stmt->fetchColumn();
+            }
+        }
+        
+        // Sanitize and format the response data
+        $response = [
+            'success' => true,
+            'request' => [
+                'id' => (int)$request['id'],
+                'request_number' => htmlspecialchars($request['request_number'] ?? ''),
+                'status' => htmlspecialchars($request['status'] ?? 'unknown'),
+                'priority' => htmlspecialchars($request['priority'] ?? 'normal'),
+                'notes' => htmlspecialchars($request['notes'] ?? ''),
+                'created_by' => htmlspecialchars($request['created_by'] ?? 'System'),
+                'created_at' => $request['created_at'],
+                'updated_at' => $request['updated_at'],
+                'processed_date' => $request['processed_date'],
+                'completed_date' => $request['completed_date'],
+                'customer_reference' => htmlspecialchars($request['customer_reference'] ?? ''),
+                'production_user_name' => htmlspecialchars($request['production_user_name'] ?? 'Unknown'),
+                'production_department' => htmlspecialchars($request['production_department'] ?? 'Unknown'),
+                'processed_by' => htmlspecialchars($processedBy),
+                'rmw_user_id' => (int)$request['rmw_user_id'],
+                'items' => array_map(function($item) {
+                    return [
+                        'id' => (int)$item['id'],
+                        'product_id' => htmlspecialchars($item['product_id'] ?? ''),
+                        'product_name' => htmlspecialchars($item['product_name'] ?? ''),
+                        'requested_quantity' => (float)$item['requested_quantity'],
+                        'unit' => htmlspecialchars($item['unit'] ?? ''),
+                        'description' => htmlspecialchars($item['description'] ?? ''),
+                        'category' => htmlspecialchars($item['category'] ?? '')
+                    ];
+                }, $items)
+            ]
+        ];
+        
+        // Clear any buffered output and send clean JSON
+        ob_clean();
+        echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ob_end_flush();
+        exit();
+        
+    } catch (Exception $e) {
+        // Clear any previous output and send error response
+        ob_clean();
+        
+        $errorResponse = [
+            'success' => false,
+            'error' => $e->getMessage(),
+            'error_type' => get_class($e)
+        ];
+        
+        // Log the actual error for debugging
+        error_log("RMW Dashboard AJAX Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        
+        echo json_encode($errorResponse, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ob_end_flush();
+        exit();
+    } catch (Error $e) {
+        // Handle PHP 7+ errors
+        ob_clean();
+        
+        $errorResponse = [
+            'success' => false,
+            'error' => 'A system error occurred',
+            'error_type' => 'SystemError'
+        ];
+        
+        error_log("RMW Dashboard System Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        
+        echo json_encode($errorResponse, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ob_end_flush();
+        exit();
+    }
+}
 
 include '../common/header.php';
 

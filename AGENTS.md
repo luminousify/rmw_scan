@@ -48,6 +48,17 @@
 - Session-based authentication
 - Path traversal protection via `url()` and `path()` helpers
 
+- Ensure every code modification strictly preserves correctness, minimality of change, and robustly handles edge/corner cases related to the problem statement—even in complex, inherited, or nested code structures.
+
+- Avoid blanket or “quick fix” solutions that might hide errors or unintentionally discard critical information; always strive to diagnose and address root-causes, not merely symptoms or side-effects.
+
+- Where input normalization is necessary—for types, iterables, containers, or input shapes—do so only in a way that preserves API contracts, allows for extensibility, and maintains invariance across all supported data types
+
+- All error/warning messages, exceptions, and documentation updates must be technically accurate, actionable, match the conventions of the host codebase, and be kept fully in sync with new or changed behavior.
+
+- Backwards and forwards compatibility: Changes must account for code used in diverse environments, and leverage feature detection where possible to avoid breaking downstream or legacy code.
+
+- Refactorings and bugfixes must never silently discard, mask, or change user data, hooks, plugin registrations, or extension points; if a migration or transformation is required, ensure it is invertible where possible and preserve optional hooks or entry points.
 ## User Notification System
 
 ### BurntToast Integration

@@ -8,11 +8,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$module_name = "scan";
+$module_name = "scanner";
 $title = "Scan QR Code";
-$name = $_SESSION['user'];
-$pass = $_SESSION['pass'];
-$idlog = $_SESSION['idlog'];
+$name = $_SESSION['user'] ?? '';
+$pass = $_SESSION['pass'] ?? '';
+$idlog = $_SESSION['idlog'] ?? 0;
 $department = $_SESSION['department'] ?? 'production';
 
 // Get request number from URL parameter if available
@@ -25,7 +25,7 @@ $requestNumberFromUrl = $_GET['request_number'] ?? '';
 function getStockDetailVerCustomerData($custNoRef) {
     try {
         // Use DatabaseManager to get StockDetailVer data
-        $dbManager = new DatabaseManager('sqlite');
+        $dbManager = DatabaseManager::getInstance();
         return $dbManager->getStockDetailVerMaterials($custNoRef);
     } catch (Exception $e) {
         error_log("Error getting StockDetailVer customer data: " . $e->getMessage());
@@ -48,22 +48,26 @@ function compareMaterials($requestItems, $customerItems) {
     
     // Normalize request items by product_id
     $requestMap = [];
-    foreach ($requestItems as $item) {
-        $requestMap[$item['product_id']] = [
-            'product_name' => $item['product_name'],
-            'requested_quantity' => $item['requested_quantity'],
-            'unit' => $item['unit']
-        ];
+    if (!empty($requestItems) && is_array($requestItems)) {
+        foreach ($requestItems as $item) {
+            $requestMap[$item['product_id'] ?? ''] = [
+                'product_name' => $item['product_name'] ?? '',
+                'requested_quantity' => $item['requested_quantity'] ?? 0,
+                'unit' => $item['unit'] ?? 'pcs'
+            ];
+        }
     }
     
     // Normalize customer items by product_id
     $customerMap = [];
-    foreach ($customerItems as $item) {
-        $customerMap[$item['product_id']] = [
-            'product_name' => $item['product_name'],
-            'quantity' => $item['quantity'],
-            'unit' => $item['unit']
-        ];
+    if (!empty($customerItems) && is_array($customerItems)) {
+        foreach ($customerItems as $item) {
+            $customerMap[$item['product_id'] ?? ''] = [
+                'product_name' => $item['product_name'] ?? '',
+                'quantity' => $item['quantity'] ?? 0,
+                'unit' => $item['unit'] ?? 'pcs'
+            ];
+        }
     }
     
     // Find matches and mismatches
@@ -170,10 +174,7 @@ if ($_POST == NULL) {
             if ($requestResult) {
                 $requestDetails = $requestResult;
                 
-                // Enhanced diagnostics for request status
-                if ($requestResult['status'] !== 'diproses') {
-                    $warning_message = "Request status is '" . ucfirst($requestResult['status']) . "'. Materials shown for reference only. Scanning requires 'diproses' status.";
-                }
+  
                 
                 // Get request items with enhanced error handling
                 $itemsQuery = "
@@ -220,7 +221,7 @@ if ($_POST == NULL) {
     
     include '../scan.php';
 } else {
-    $id = $_POST['nobon'];
+    $id = $_POST['nobon'] ?? '';
     $customerReference = trim($id);
     $currentRequestNumber = $_POST['current_request_number'] ?? '';
     
@@ -245,7 +246,7 @@ if ($_POST == NULL) {
         }
         
         // Validate customer reference using DatabaseManager
-        $dbManager = new DatabaseManager('sqlite');
+        $dbManager = DatabaseManager::getInstance();
         $validation = $dbManager->validateCustNoRef($customerReference);
         
         if (!$validation['valid']) {

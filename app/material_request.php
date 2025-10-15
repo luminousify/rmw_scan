@@ -108,7 +108,7 @@
             </div>
             <?php endif; ?>
             
-            <!-- Tools section removed - QR Scanner access only through action buttons -->
+    
           </nav>
         </div>
       </aside>
@@ -153,11 +153,10 @@
             
             <!-- Request Details -->
             <div class="mb-6">
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Request Date</label>
-                <input type="text" value="<?= date('Y-m-d H:i:s') ?>" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50" readonly>
-              </div>
+              <p class="text-sm text-gray-600">
+                <i class="bi bi-info-circle mr-1"></i>
+                Request date will be automatically recorded when you submit this form.
+              </p>
             </div>
 
             <div class="mb-6">
@@ -207,7 +206,7 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <?php foreach (array_slice($userRequests, 0, 5) as $request): ?>
+                  <?php foreach ($userRequests as $request): ?>
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <?= htmlspecialchars($request['request_number']) ?>
@@ -231,6 +230,97 @@
                 </tbody>
               </table>
             </div>
+            
+            <!-- Pagination Controls -->
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+              <div class="flex-1 flex justify-between sm:hidden">
+                <!-- Mobile pagination -->
+                <?php if ($currentPage > 1): ?>
+                <a href="?page=<?= $currentPage - 1 ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Previous
+                </a>
+                <?php endif; ?>
+                <?php if ($currentPage < $totalPages): ?>
+                <a href="?page=<?= $currentPage + 1 ?>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Next
+                </a>
+                <?php endif; ?>
+              </div>
+              
+              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm text-gray-700">
+                    Showing 
+                    <span class="font-medium">
+                      <?= ($currentPage - 1) * $limit + 1 ?>
+                    </span>
+                    to 
+                    <span class="font-medium">
+                      <?= min($currentPage * $limit, $totalRequests) ?>
+                    </span>
+                    of 
+                    <span class="font-medium"><?= $totalRequests ?></span>
+                    results
+                  </p>
+                </div>
+                
+                <div>
+                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <!-- Previous button -->
+                    <?php if ($currentPage > 1): ?>
+                    <a href="?page=<?= $currentPage - 1 ?>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                      <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <?php else: ?>
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
+                      <i class="bi bi-chevron-left"></i>
+                    </span>
+                    <?php endif; ?>
+                    
+                    <!-- Page numbers -->
+                    <?php 
+                    $startPage = max(1, $currentPage - 2);
+                    $endPage = min($totalPages, $currentPage + 2);
+                    
+                    if ($startPage > 1) {
+                        echo '<a href="?page=1" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>';
+                        if ($startPage > 2) {
+                            echo '<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>';
+                        }
+                    }
+                    
+                    for ($page = $startPage; $page <= $endPage; $page++) {
+                        if ($page == $currentPage) {
+                            echo '<span aria-current="page" class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">' . $page . '</span>';
+                        } else {
+                            echo '<a href="?page=' . $page . '" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">' . $page . '</a>';
+                        }
+                    }
+                    
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>';
+                        }
+                        echo '<a href="?page=' . $totalPages . '" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">' . $totalPages . '</a>';
+                    }
+                    ?>
+                    
+                    <!-- Next button -->
+                    <?php if ($currentPage < $totalPages): ?>
+                    <a href="?page=<?= $currentPage + 1 ?>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                      <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <?php else: ?>
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
+                      <i class="bi bi-chevron-right"></i>
+                    </span>
+                    <?php endif; ?>
+                  </nav>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
         <?php endif; ?>
