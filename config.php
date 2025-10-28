@@ -8,11 +8,12 @@ function getBaseUrl() {
     $host = $_SERVER['HTTP_HOST'];
     
     // Get the directory path from the document root
-    $scriptPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-    
+    //$scriptPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+        $scriptPath = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+
     // Find the base directory (cku_scan)
     $pathParts = explode('/', $scriptPath);
-    $baseIndex = array_search('cku_scan', $pathParts);
+    $baseIndex = array_search('rmw_scan', $pathParts);
     
     if ($baseIndex !== false) {
         $basePath = implode('/', array_slice($pathParts, 0, $baseIndex + 1));
@@ -64,7 +65,7 @@ define('APP_PATH', path('app'));
 define('APP_BAK_PATH', path('app_bak'));
 
 // Database Configuration
-define('DB_TYPE', 'sqlite'); // 'sqlite' or 'mysql'
+define('DB_TYPE', 'mysql'); // 'sqlite' or 'mysql'
 define('DB_SQLITE_PATH', path('database/rmw.db'));
 define('DB_MYSQL_HOST', 'localhost');
 define('DB_MYSQL_NAME', 'rmw');

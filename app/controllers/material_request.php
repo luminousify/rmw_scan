@@ -9,7 +9,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $module_name = "material_request";
-$title = "Material Request";
+$title = "Permintaan Material";
 $name = $_SESSION['user'];
 $pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 'notes' => $notes
             ])]);
             
-            $success_message = "Material request created successfully! Request Number: " . $requestNumber;
+            $success_message = "Permintaan material berhasil dibuat! Nomor Permintaan: " . $requestNumber;
         }
         
         // Get products for dropdown
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
     } catch (Exception $e) {
-        $error_message = "Error: " . $e->getMessage();
+        $error_message = "Kesalahan: " . $e->getMessage();
         error_log("Material Request Controller Error: " . $e->getMessage());
         // Don't reset pagination variables to 0, keep them unset to maintain existing behavior
         // $totalRequests = 0;
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
     } catch (Exception $e) {
-        $error_message = "Database error: " . $e->getMessage();
+        $error_message = "Kesalahan database: " . $e->getMessage();
         error_log("Material Request Database Error: " . $e->getMessage());
         $products = [];
         $userRequests = [];

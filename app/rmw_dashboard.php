@@ -71,36 +71,7 @@
               <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
             </a>
             
-            <?php if ($department === 'rmw'): ?>
-            <!-- RMW Navigation -->
-            <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
-              
-              <a href="<?php echo url('app/controllers/pending_requests.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'pending_requests' ? 'nav-active-rmw' : 'nav-inactive' ?>"
-                 role="menuitem" aria-current="<?= $module_name == 'pending_requests' ? 'page' : 'false' ?>">
-                <i class="bi bi-clock-fill mr-3 text-lg"></i>
-                <span>Pending Requests</span>
-                <?= $module_name == 'pending_requests' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
-              </a>
-              
-              <a href="<?php echo url('app/controllers/processing_requests.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'processing_requests' ? 'nav-active-rmw' : 'nav-inactive' ?>"
-                 role="menuitem" aria-current="<?= $module_name == 'processing_requests' ? 'page' : 'false' ?>">
-                <i class="bi bi-gear-fill mr-3 text-lg"></i>
-                <span>Processing</span>
-                <?= $module_name == 'processing_requests' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
-              </a>
-              
-              <a href="<?php echo url('app/controllers/generate_qr.php'); ?>" 
-                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'generate_qr' ? 'nav-active-rmw' : 'nav-inactive' ?>"
-                 role="menuitem" aria-current="<?= $module_name == 'generate_qr' ? 'page' : 'false' ?>">
-                <i class="bi bi-qr-code-fill mr-3 text-lg"></i>
-                <span>Generate QR</span>
-                <?= $module_name == 'generate_qr' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
-              </a>
-            </div>
-            <?php endif; ?>
+  
           </nav>
         </div>
       </aside>
@@ -112,7 +83,7 @@
           <!-- Dashboard Title -->
           <div>
             <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p class="text-gray-600 mt-2">Welcome back, <?= $name ?>!</p>
+            <p class="text-gray-600 mt-2">Selamat datang kembali, <?= $name ?>!</p>
           </div>
 
         <!-- Alert Messages -->
@@ -121,7 +92,7 @@
           <div class="flex">
             <i class="bi bi-check-circle text-green-400 text-xl mr-3"></i>
             <div>
-              <h3 class="text-sm font-medium text-green-800">Success!</h3>
+              <h3 class="text-sm font-medium text-green-800">Berhasil!</h3>
               <p class="text-sm text-green-700 mt-1"><?= $success_message ?></p>
             </div>
           </div>
@@ -133,7 +104,7 @@
           <div class="flex">
             <i class="bi bi-exclamation-circle text-red-400 text-xl mr-3"></i>
             <div>
-              <h3 class="text-sm font-medium text-red-800">Error!</h3>
+              <h3 class="text-sm font-medium text-red-800">Kesalahan!</h3>
               <p class="text-sm text-red-700 mt-1"><?= $error_message ?></p>
             </div>
           </div>
@@ -148,7 +119,7 @@
                 <i class="bi bi-clock text-yellow-600 text-xl"></i>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Pending</p>
+                <p class="text-sm font-medium text-gray-600">Menunggu</p>
                 <p class="text-2xl font-bold text-gray-900"><?= $stats['pending'] ?? 0 ?></p>
               </div>
             </div>
@@ -160,7 +131,7 @@
                 <i class="bi bi-gear text-blue-600 text-xl"></i>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Processing</p>
+                <p class="text-sm font-medium text-gray-600">Diproses</p>
                 <p class="text-2xl font-bold text-gray-900"><?= $stats['diproses'] ?? 0 ?></p>
               </div>
             </div>
@@ -172,7 +143,7 @@
                 <i class="bi bi-check-circle text-green-600 text-xl"></i>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Completed</p>
+                <p class="text-sm font-medium text-gray-600">Selesai</p>
                 <p class="text-2xl font-bold text-gray-900"><?= $stats['completed'] ?? 0 ?></p>
               </div>
             </div>
@@ -184,7 +155,7 @@
                 <i class="bi bi-x-circle text-gray-600 text-xl"></i>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Cancelled</p>
+                <p class="text-sm font-medium text-gray-600">Dibatalkan</p>
                 <p class="text-2xl font-bold text-gray-900"><?= $stats['cancelled'] ?? 0 ?></p>
               </div>
             </div>
@@ -195,20 +166,20 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <form method="GET" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-64">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
               <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
-                     placeholder="Search by request number, user, or product..." 
+                     placeholder="Cari berdasarkan nomor permintaan, pengguna, atau produk..." 
                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
             </div>
             
             <div class="min-w-48">
               <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500">
-                <option value="all" <?= ($_GET['status'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Status</option>
-                <option value="pending" <?= ($_GET['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending</option>
-                <option value="diproses" <?= ($_GET['status'] ?? '') === 'diproses' ? 'selected' : '' ?>>Processing</option>
-                <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Completed</option>
-                <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                <option value="all" <?= ($_GET['status'] ?? 'all') === 'all' ? 'selected' : '' ?>>Semua Status</option>
+                <option value="pending" <?= ($_GET['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Menunggu</option>
+                <option value="diproses" <?= ($_GET['status'] ?? '') === 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Selesai</option>
+                <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
               </select>
             </div>
             
@@ -225,19 +196,19 @@
         <!-- Requests Table -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Material Requests</h3>
+            <h3 class="text-lg font-medium text-gray-900">Permintaan Material</h3>
           </div>
           
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request #</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Production User</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Permintaan</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pengguna Produksi</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -255,21 +226,29 @@
                     </td>
     
                     <td class="px-6 py-4 text-sm text-gray-500">
-                      <?= $request['item_count'] ?> items
+                      <?= $request['item_count'] ?> item
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                         <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                            ($request['status'] === 'diproses' ? 'bg-blue-100 text-blue-800' : 
                            ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) ?>">
-                        <?= ucfirst($request['status']) ?>
+                        <?php
+                        $statusIndo = [
+                            'pending' => 'Menunggu',
+                            'diproses' => 'Diproses', 
+                            'completed' => 'Selesai',
+                            'cancelled' => 'Dibatalkan'
+                        ];
+                        echo $statusIndo[$request['status']] ?? ucfirst($request['status']);
+                        ?>
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div class="flex space-x-2">
                         <button onclick="viewRequest(<?= $request['id'] ?>)" 
                                 class="text-blue-600 hover:text-blue-900">
-                          <i class="bi bi-eye"></i> View
+                          <i class="bi bi-eye"></i> Lihat
                         </button>
                         
                         <?php if ($request['status'] === 'pending'): ?>
@@ -278,9 +257,9 @@
                           <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
                           <input type="hidden" name="status" value="diproses">
                           <button type="submit" 
-                                  onclick="return confirm('Change status to Processing?')"
+                                  onclick="return confirm('Ubah status ke Diproses?')"
                                   class="text-green-600 hover:text-green-900">
-                            <i class="bi bi-play-circle"></i> Process
+                            <i class="bi bi-play-circle"></i> Proses
                           </button>
                         </form>
                         <?php elseif ($request['status'] === 'diproses'): ?>
@@ -289,9 +268,9 @@
                           <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
                           <input type="hidden" name="status" value="completed">
                           <button type="submit" 
-                                  onclick="return confirm('Mark as Completed?')"
+                                  onclick="return confirm('Tandai sebagai Selesai?')"
                                   class="text-green-600 hover:text-green-900">
-                            <i class="bi bi-check-circle"></i> Complete
+                            <i class="bi bi-check-circle"></i> Selesaikan
                           </button>
                         </form>
                         <?php endif; ?>
@@ -303,7 +282,7 @@
                   <tr>
                     <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                       <i class="bi bi-inbox text-4xl mb-4 block"></i>
-                      No requests found
+                      Tidak ada permintaan ditemukan
                     </td>
                   </tr>
                 <?php endif; ?>
@@ -380,7 +359,7 @@
                     background: #f9fafb !important;
                 ">
                     <h3 style="font-size: 20px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 !important;">
-                        Request Details
+                        Detail Permintaan
                     </h3>
                     <button onclick="this.closest('#requestModal').remove()" style="
                         background: none !important;
@@ -410,14 +389,14 @@
                         animation: spin 1s linear infinite !important;
                         margin-bottom: 16px !important;
                     "></div>
-                    <p style="color: #6b7280 !important; margin: 0 !important;">Loading request details...</p>
+                    <p style="color: #6b7280 !important; margin: 0 !important;">Memuat detail permintaan...</p>
                 </div>
                 
                 <!-- Error State -->
                 <div id="modalError" style="display: none !important; padding: 60px !important; text-align: center !important;">
                     <div style="font-size: 48px !important; color: #ef4444 !important; margin-bottom: 16px !important;">⚠️</div>
-                    <h4 style="font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 8px !important;">Error Loading Details</h4>
-                    <p id="modalErrorMessage" style="color: #6b7280 !important; margin-bottom: 16px !important;">Failed to load request details</p>
+                    <h4 style="font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 8px !important;">Kesalahan Memuat Detail</h4>
+                    <p id="modalErrorMessage" style="color: #6b7280 !important; margin-bottom: 16px !important;">Gagal memuat detail permintaan</p>
                     <button onclick="this.closest('#requestModal').remove()" style="
                         background: #6b7280 !important;
                         color: white !important;
@@ -425,7 +404,7 @@
                         border: none !important;
                         border-radius: 6px !important;
                         cursor: pointer !important;
-                    ">Close</button>
+                    ">Tutup</button>
                 </div>
                 
                 <!-- Request Details Content -->
@@ -442,7 +421,7 @@
                         border: none !important;
                         border-radius: 6px !important;
                         cursor: pointer !important;
-                    ">Close</button>
+                    ">Tutup</button>
                 </div>
             </div>
         `;
@@ -608,7 +587,7 @@
               border: 1px solid #e5e7eb !important;
             ">
               <div>
-                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Request Number</h4>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Nomor Permintaan</h4>
                 <p style="font-size: 16px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 !important;">${request.request_number}</p>
               </div>
               <div>
@@ -640,7 +619,7 @@
                 </span>
               </div>
               <div>
-                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Customer Reference</h4>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Referensi Pelanggan</h4>
                 <p style="font-size: 16px !important; font-weight: 500 !important; color: #111827 !important; margin: 0 !important;">${request.customer_reference || '-'}</p>
               </div>
             </div>
@@ -648,37 +627,37 @@
             <!-- Request Information -->
             <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important;">
               <div style="padding: 20px !important; background: white !important; border-radius: 8px !important; border: 1px solid #e5e7eb !important;">
-                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Production Information</h4>
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Informasi Produksi</h4>
                 <div style="display: flex !important; flex-direction: column !important; gap: 12px !important;">
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">User:</span>
-                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_user_name || 'Unknown'}</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Pengguna:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_user_name || 'Tidak diketahui'}</span>
                   </div>
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">Department:</span>
-                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_department || 'Unknown'}</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Departemen:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.production_department || 'Tidak diketahui'}</span>
                   </div>
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">Created:</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Dibuat:</span>
                     <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${new Date(request.created_at).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
               
               <div style="padding: 20px !important; background: white !important; border-radius: 8px !important; border: 1px solid #e5e7eb !important;">
-                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Processing Information</h4>
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Informasi Pemrosesan</h4>
                 <div style="display: flex !important; flex-direction: column !important; gap: 12px !important;">
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">Processed By:</span>
-                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_by || 'Not processed'}</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Diproses Oleh:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_by || 'Belum diproses'}</span>
                   </div>
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">Processed Date:</span>
-                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_date ? new Date(request.processed_date).toLocaleString() : 'Not processed'}</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Tanggal Diproses:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.processed_date ? new Date(request.processed_date).toLocaleString() : 'Belum diproses'}</span>
                   </div>
                   <div style="display: flex !important; justify-content: space-between !important;">
-                    <span style="font-size: 14px !important; color: #6b7280 !important;">Completed Date:</span>
-                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.completed_date ? new Date(request.completed_date).toLocaleString() : 'Not completed'}</span>
+                    <span style="font-size: 14px !important; color: #6b7280 !important;">Tanggal Selesai:</span>
+                    <span style="font-size: 14px !important; font-weight: 500 !important; color: #111827 !important;">${request.completed_date ? new Date(request.completed_date).toLocaleString() : 'Belum selesai'}</span>
                   </div>
                 </div>
               </div>
@@ -687,23 +666,23 @@
             <!-- Notes -->
             ${request.notes ? `
               <div style="padding: 20px !important; background: #f0f9ff !important; border-radius: 8px !important; border: 1px solid #bae6fd !important;">
-                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 12px !important;">Notes</h4>
+                <h4 style="font-size: 14px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 12px !important;">Catatan</h4>
                 <p style="font-size: 14px !important; color: #374151 !important; margin: 0 !important; line-height: 1.5 !important;">${request.notes}</p>
               </div>
             ` : ''}
             
             <!-- Items Table -->
             <div>
-              <h4 style="font-size: 16px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Requested Items</h4>
+              <h4 style="font-size: 16px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 16px !important;">Item yang Diminta</h4>
               <div style="border: 1px solid #e5e7eb !important; border-radius: 8px !important; overflow: hidden !important;">
                 <table style="width: 100% !important; border-collapse: collapse !important;">
                   <thead style="background: #f9fafb !important;">
                     <tr>
-                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Product ID</th>
-                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Product Name</th>
-                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Quantity</th>
-                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Unit</th>
-                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Description</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">ID Produk</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Nama Produk</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Jumlah</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Satuan</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Deskripsi</th>
                     </tr>
                   </thead>
                   <tbody>

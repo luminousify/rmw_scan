@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 $module_name = "my_requests";
-$title = "My Requests";
+$title = "Permintaan Saya";
 $name = $_SESSION['user'];
 $pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
@@ -67,7 +67,7 @@ try {
     
 } catch (Exception $e) {
     error_log("MaterialRequestService Error: " . $e->getMessage());
-    $error_message = "Unable to load your requests. Please try again.";
+    $error_message = "Tidak dapat memuat permintaan Anda. Silakan coba lagi.";
     $userRequests = [];
     $stats = [];
 }

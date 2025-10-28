@@ -212,11 +212,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 'request_number' => $requestNumber
             ])]);
             
-            $success_message = "Request status updated to " . ucfirst($newStatus);
+            $statusIndo = [
+                'pending' => 'Menunggu',
+                'diproses' => 'Diproses', 
+                'completed' => 'Selesai',
+                'cancelled' => 'Dibatalkan'
+            ];
+            $success_message = "Status permintaan diperbarui menjadi " . ($statusIndo[$newStatus] ?? ucfirst($newStatus));
         }
         
     } catch (Exception $e) {
-        $error_message = "Error: " . $e->getMessage();
+        $error_message = "Kesalahan: " . $e->getMessage();
     }
 }
 
@@ -299,7 +305,7 @@ try {
     }
     
 } catch (Exception $e) {
-    $error_message = "Database error: " . $e->getMessage();
+    $error_message = "Kesalahan database: " . $e->getMessage();
     $requests = [];
     $stats = [];
 }

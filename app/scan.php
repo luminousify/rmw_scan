@@ -1082,12 +1082,12 @@
                 detailsHTML += `
                     <div class="bg-white rounded p-3 border border-yellow-100">
                         <div class="flex items-center justify-between">
-                            <span class="font-mono text-sm font-medium">${item.product_id}</span>
+                            <span class="font-mono text-sm font-medium">${item.product_id || 'N/A'}</span>
                             <span class="text-xs text-yellow-600">Different Names</span>
                         </div>
                         <div class="mt-2 text-sm">
-                            <div class="text-gray-600">Request: <span class="font-medium">${item.request_name}</span></div>
-                            <div class="text-gray-600">Customer: <span class="font-medium">${item.customer_name}</span></div>
+                            <div class="text-gray-600">Request: <span class="font-medium">${item.request_name || 'Unknown'}</span></div>
+                            <div class="text-gray-600">Customer: <span class="font-medium">${item.customer_name || 'Unknown'}</span></div>
                         </div>
                     </div>
                 `;
@@ -1114,14 +1114,14 @@
                 detailsHTML += `
                     <div class="bg-white rounded p-3 border border-orange-100">
                         <div class="flex items-center justify-between">
-                            <span class="font-mono text-sm font-medium">${item.product_id}</span>
+                            <span class="font-mono text-sm font-medium">${item.product_id || 'N/A'}</span>
                             <span class="text-xs text-orange-600">Different Quantities</span>
                         </div>
                         <div class="mt-2 text-sm">
-                            <div class="text-gray-900 font-medium">${item.product_name}</div>
+                            <div class="text-gray-900 font-medium">${item.product_name || 'Unknown Product'}</div>
                             <div class="flex justify-between mt-1">
-                                <span class="text-gray-600">Request: <span class="font-medium text-orange-600">${item.request_quantity}</span></span>
-                                <span class="text-gray-600">Customer: <span class="font-medium text-orange-600">${item.customer_quantity}</span></span>
+                                <span class="text-gray-600">Request: <span class="font-medium text-orange-600">${item.request_quantity || 0}</span></span>
+                                <span class="text-gray-600">Customer: <span class="font-medium text-orange-600">${item.customer_quantity || 0}</span></span>
                             </div>
                         </div>
                     </div>
@@ -1149,12 +1149,12 @@
                 detailsHTML += `
                     <div class="bg-white rounded p-3 border border-red-100">
                         <div class="flex items-center justify-between">
-                            <span class="font-mono text-sm font-medium">${item.product_id}</span>
+                            <span class="font-mono text-sm font-medium">${item.product_id || 'N/A'}</span>
                             <span class="text-xs text-red-600">Missing</span>
                         </div>
                         <div class="mt-2 text-sm">
-                            <div class="text-gray-900 font-medium">${item.product_name}</div>
-                            <div class="text-gray-600">Quantity: ${item.requested_quantity} ${item.unit}</div>
+                            <div class="text-gray-900 font-medium">${item.product_name || 'Unknown Product'}</div>
+                            <div class="text-gray-600">Quantity: ${item.requested_quantity || 0} ${item.unit || 'pcs'}</div>
                         </div>
                     </div>
                 `;
@@ -1168,6 +1168,7 @@
         
         // Extra items
         if (comparisonData.extra_in_customer.length > 0) {
+            console.log('Processing extra items:', comparisonData.extra_in_customer);
             detailsHTML += `
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h4 class="font-semibold text-blue-800 mb-3 flex items-center">
@@ -1181,12 +1182,12 @@
                 detailsHTML += `
                     <div class="bg-white rounded p-3 border border-blue-100">
                         <div class="flex items-center justify-between">
-                            <span class="font-mono text-sm font-medium">${item.product_id}</span>
+                            <span class="font-mono text-sm font-medium">${item.product_id || 'N/A'}</span>
                             <span class="text-xs text-blue-600">Extra</span>
                         </div>
                         <div class="mt-2 text-sm">
-                            <div class="text-gray-900 font-medium">${item.product_name}</div>
-                            <div class="text-gray-600">Quantity: ${item.quantity} ${item.unit}</div>
+                            <div class="text-gray-900 font-medium">${item.product_name || 'Unknown Product'}</div>
+                            <div class="text-gray-600">Quantity: ${item.quantity || 0} ${item.unit || 'pcs'}</div>
                         </div>
                     </div>
                 `;

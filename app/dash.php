@@ -25,11 +25,11 @@
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
-                  Settings
+                  Pengaturan
                 </a>
                 <a href="<?php echo url('app/logout.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-box-arrow-right mr-2"></i>
-                  Logout
+                  Keluar
                 </a>
               </div>
             </div>
@@ -54,9 +54,9 @@
             </div>
             <div class="text-center">
               <h3 class="text-lg font-bold text-gray-900 capitalize">
-                <?= ($department === 'rmw' ? 'Raw Material Warehouse' : 'Production Department') ?>
+                <?= ($department === 'rmw' ? 'Gudang Bahan Baku' : 'Departemen Produksi') ?>
               </h3>
-              <p class="text-sm text-gray-500 mt-1">Management System</p>
+              <p class="text-sm text-gray-500 mt-1">Sistem Manajemen</p>
             </div>
           </div>
           
@@ -74,13 +74,13 @@
             <?php if ($department === 'production'): ?>
             <!-- Production Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Production</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Produksi</h4>
               
               <a href="<?php echo url('app/controllers/material_request.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'material_request' ? 'page' : 'false' ?>">
                 <i class="bi bi-plus-circle-fill mr-3 text-lg"></i>
-                <span>Create Request</span>
+                <span>Buat Permintaan</span>
                 <?= $module_name == 'material_request' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
               
@@ -88,7 +88,7 @@
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'my_requests' ? 'page' : 'false' ?>">
                 <i class="bi bi-list-task mr-3 text-lg"></i>
-                <span>My Requests</span>
+                <span>Permintaan Saya</span>
                 <?= $module_name == 'my_requests' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -96,13 +96,13 @@
             <?php else: ?>
             <!-- RMW Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gudang</h4>
               
               <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
                 <i class="bi bi-box-seam-fill mr-3 text-lg"></i>
-                <span>Warehouse Dashboard</span>
+                <span>Dashboard Gudang</span>
                 <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -123,9 +123,9 @@
   <!-- Dashboard Title -->
   <div>
     <h1 class="text-3xl font-bold text-gray-900">
-      <?= ($department === 'rmw' ? 'Warehouse Dashboard' : 'Production Dashboard') ?>
+      <?= ($department === 'rmw' ? 'Dashboard Gudang' : 'Dashboard Produksi') ?>
     </h1>
-    <p class="text-gray-600 mt-2">Welcome back, <?= $name ?>! Here's your activity overview.</p>
+    <p class="text-gray-600 mt-2">Selamat datang kembali, <?= $name ?>! Berikut ringkasan aktivitas Anda.</p>
   </div>
 
   <!-- Stats Cards -->
@@ -137,7 +137,7 @@
           <i class="bi bi-file-text text-blue-600 text-xl"></i>
         </div>
         <div class="ml-4">
-          <p class="text-sm font-medium text-gray-600">Total Requests</p>
+          <p class="text-sm font-medium text-gray-600">Total Permintaan</p>
           <p class="text-2xl font-bold text-gray-900" id="totalRequests">0</p>
         </div>
       </div>
@@ -150,7 +150,7 @@
           <i class="bi bi-clock text-yellow-600 text-xl"></i>
         </div>
         <div class="ml-4">
-          <p class="text-sm font-medium text-gray-600">Pending</p>
+          <p class="text-sm font-medium text-gray-600">Menunggu</p>
           <p class="text-2xl font-bold text-gray-900" id="pendingRequests">0</p>
         </div>
       </div>
@@ -163,7 +163,7 @@
           <i class="bi bi-check-circle text-green-600 text-xl"></i>
         </div>
         <div class="ml-4">
-          <p class="text-sm font-medium text-gray-600">Approved</p>
+          <p class="text-sm font-medium text-gray-600">Disetujui</p>
           <p class="text-2xl font-bold text-gray-900" id="approvedRequests">0</p>
         </div>
       </div>
@@ -176,7 +176,7 @@
           <i class="bi bi-qr-code text-purple-600 text-xl"></i>
         </div>
         <div class="ml-4">
-          <p class="text-sm font-medium text-gray-600">Items Scanned</p>
+          <p class="text-sm font-medium text-gray-600">Item Dipindai</p>
           <p class="text-2xl font-bold text-gray-900" id="scannedItems">0</p>
         </div>
       </div>
@@ -187,7 +187,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Request Trends Chart -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Trends (Last 7 Days)</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Tren Permintaan (7 Hari Terakhir)</h3>
       <div class="aspect-video">
         <canvas id="requestTrendsChart" class="w-full h-full"></canvas>
       </div>
@@ -195,7 +195,7 @@
 
     <!-- Request Status Distribution -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Status Distribution</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Distribusi Status Permintaan</h3>
       <div class="aspect-video">
         <canvas id="statusChart" class="w-full h-full"></canvas>
       </div>
@@ -206,7 +206,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Recent Activity -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Aktivitas Terkini</h3>
       <div class="space-y-3 max-h-96 overflow-y-auto" id="recentActivity">
         <!-- Activity items will be populated by JavaScript -->
       </div>
@@ -214,7 +214,7 @@
 
     <!-- Top Requested Products -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Requested Products</h3>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Produk Paling Banyak Diminta</h3>
       <div class="space-y-3 max-h-96 overflow-y-auto" id="topProducts">
         <!-- Product items will be populated by JavaScript -->
       </div>
@@ -240,7 +240,7 @@
           data: <?= json_encode(getRequestTrends()) ?>
         },
         statusDistribution: {
-          labels: ['Pending', 'Approved', 'Rejected', 'Completed'],
+          labels: ['Menunggu', 'Disetujui', 'Ditolak', 'Selesai'],
           data: [
             <?= getRequestsByStatus('pending') ?>,
             <?= getRequestsByStatus('approved') ?>,
@@ -266,7 +266,7 @@
           data: {
             labels: dashboardData.requestTrends.labels,
             datasets: [{
-              label: 'Daily Requests',
+              label: 'Permintaan Harian',
               data: dashboardData.requestTrends.data,
               fill: true,
               borderColor: 'rgb(59, 130, 246)',
@@ -335,7 +335,7 @@
         if (!container) return;
 
         if (dashboardData.recentActivity.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 text-sm">No recent activity</p>';
+          container.innerHTML = '<p class="text-gray-500 text-sm">Tidak ada aktivitas terkini</p>';
           return;
         }
 
@@ -360,7 +360,7 @@
         if (!container) return;
 
         if (dashboardData.topProducts.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 text-sm">No product data available</p>';
+          container.innerHTML = '<p class="text-gray-500 text-sm">Tidak ada data produk tersedia</p>';
           return;
         }
 
@@ -377,7 +377,7 @@
             </div>
             <div class="text-right">
               <p class="text-sm font-semibold text-gray-900">${product.request_count}</p>
-              <p class="text-xs text-gray-500">requests</p>
+              <p class="text-xs text-gray-500">permintaan</p>
             </div>
           </div>
         `).join('');
@@ -403,10 +403,10 @@
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins} min ago`;
-        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-        if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        if (diffMins < 1) return 'Baru saja';
+        if (diffMins < 60) return `${diffMins} menit yang lalu`;
+        if (diffHours < 24) return `${diffHours} jam yang lalu`;
+        if (diffDays < 7) return `${diffDays} hari yang lalu`;
         return date.toLocaleDateString();
       }
 

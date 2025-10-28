@@ -1,4 +1,4 @@
-<body class="min-h-screen bg-gray-50" style="position: relative; overflow-x: hidden;">
+<body class="min-h-screen bg-gray-50" style="position: relative;">
     <!-- Mobile menu backdrop -->
     <div id="mobileMenuBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden" onclick="closeMobileMenu()"></div>
     
@@ -51,11 +51,11 @@
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 lg:origin-top-right lg:scale-100 transition-transform">
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
-                  Settings
+                  Pengaturan
                 </a>
                 <a href="<?php echo url('app/logout.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-box-arrow-right mr-2"></i>
-                  Logout
+                  Keluar
                 </a>
               </div>
             </div>
@@ -66,7 +66,7 @@
 
     <div class="flex">
       <!-- Sidebar -->
-      <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:z-auto">
+      <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 lg:left-0 lg:z-30">
         <div class="p-6">
           <!-- Enhanced Logo Area -->
           <div class="flex flex-col items-center space-y-4 mb-8 pb-6 border-b border-gray-100">
@@ -80,9 +80,9 @@
             </div>
             <div class="text-center">
               <h3 class="text-lg font-bold text-gray-900 capitalize">
-                <?= ($department === 'rmw' ? 'Raw Material Warehouse' : 'Production Department') ?>
+                <?= ($department === 'rmw' ? 'Gudang Bahan Baku' : 'Departemen Produksi') ?>
               </h3>
-              <p class="text-sm text-gray-500 mt-1">Management System</p>
+              <p class="text-sm text-gray-500 mt-1">Sistem Manajemen</p>
             </div>
           </div>
           
@@ -93,20 +93,20 @@
                class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'nav-active' : 'nav-inactive' ?>"
                role="menuitem" aria-current="<?= $module_name == 'dashboard' ? 'page' : 'false' ?>">
               <i class="bi bi-house-fill mr-3 text-lg"></i>
-              <span>Dashboard</span>
+              <span>Dasbor</span>
               <?= $module_name == 'dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
             </a>
             
             <?php if ($department === 'production'): ?>
             <!-- Production Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Production</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Produksi</h4>
               
               <a href="<?php echo url('app/controllers/material_request.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'material_request' ? 'page' : 'false' ?>">
                 <i class="bi bi-plus-circle-fill mr-3 text-lg"></i>
-                <span>Create Request</span>
+                <span>Buat Permintaan</span>
                 <?= $module_name == 'material_request' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
               
@@ -114,7 +114,7 @@
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'my_requests' ? 'page' : 'false' ?>">
                 <i class="bi bi-list-task mr-3 text-lg"></i>
-                <span>My Requests</span>
+                <span>Permintaan Saya</span>
                 <?= $module_name == 'my_requests' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -122,13 +122,13 @@
             <?php else: ?>
             <!-- RMW Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gudang</h4>
               
               <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
                 <i class="bi bi-box-seam-fill mr-3 text-lg"></i>
-                <span>Warehouse Dashboard</span>
+                <span>Dasbor Gudang</span>
                 <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -140,12 +140,12 @@
       </aside>
 
       <!-- Main content -->
-      <main id="main-content" class="flex-1 min-h-screen lg:ml-0" role="main">
-        <div class="px-4 sm:px-6 lg:px-8 py-6">
+      <main id="main-content" class="flex-1 min-h-screen" role="main">
+        <div class="px-4 sm:px-6 lg:px-8 py-6 max-w-full">
           <!-- Page Header -->
           <div class="mb-6">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">My Material Requests</h1>
-            <p class="text-gray-600 mt-2 text-sm sm:text-lg">View and track your material requests</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Permintaan Material Saya</h1>
+            <p class="text-gray-600 mt-2 text-sm sm:text-lg">Lihat dan lacak permintaan material Anda</p>
           </div>
 
         <!-- Alert Messages -->
@@ -154,7 +154,7 @@
           <div class="flex">
             <i class="bi bi-exclamation-circle text-red-400 text-xl mr-3 flex-shrink-0" aria-hidden="true"></i>
             <div>
-              <h3 class="text-sm font-medium text-red-800">Error!</h3>
+              <h3 class="text-sm font-medium text-red-800">Kesalahan!</h3>
               <p class="text-sm text-red-700 mt-1"><?= $error_message ?></p>
             </div>
             <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600 transition-colors" aria-label="Dismiss error">
@@ -169,7 +169,7 @@
           <div class="flex">
             <i class="bi bi-check-circle text-green-400 text-xl mr-3 flex-shrink-0" aria-hidden="true"></i>
             <div>
-              <h3 class="text-sm font-medium text-green-800">Success!</h3>
+              <h3 class="text-sm font-medium text-green-800">Berhasil!</h3>
               <p class="text-sm text-green-700 mt-1" id="successMessage"></p>
             </div>
             <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-green-400 hover:text-green-600 transition-colors" aria-label="Dismiss success">
@@ -183,14 +183,14 @@
             <form method="GET" id="filterForm" class="space-y-4">
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="sm:col-span-2 lg:col-span-2">
-                  <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">Cari</label>
                   <div class="relative">
                     <input 
                       type="text" 
                       id="searchInput"
                       name="search" 
                       value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
-                      placeholder="Search by request number or product..." 
+                      placeholder="Cari berdasarkan nomor permintaan atau produk..." 
                       class="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base"
                       autocomplete="off">
                     <i class="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" aria-hidden="true"></i>
@@ -206,11 +206,11 @@
                     id="statusSelect"
                     name="status" 
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base">
-                    <option value="all" <?= ($_GET['status'] ?? 'all') === 'all' ? 'selected' : '' ?>>All Status</option>
-                    <option value="pending" <?= ($_GET['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending</option>
-                    <option value="diproses" <?= ($_GET['status'] ?? '') === 'diproses' ? 'selected' : '' ?>>Processing</option>
-                    <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Completed</option>
-                    <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                    <option value="all" <?= ($_GET['status'] ?? 'all') === 'all' ? 'selected' : '' ?>>Semua Status</option>
+                    <option value="pending" <?= ($_GET['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Menunggu</option>
+                    <option value="diproses" <?= ($_GET['status'] ?? '') === 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                    <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Selesai</option>
+                    <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
                   </select>
                 </div>
                 
@@ -231,123 +231,131 @@
             </form>
           </div>
 
-        <!-- Requests Table -->
+        <!-- Optimized Requests Table -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-medium text-gray-900">My Material Requests</h3>
+              <h3 class="text-base font-medium text-gray-900">Permintaan Material</h3>
               <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500">
+                <span class="text-xs text-gray-500">
                   <?php if (!empty($userRequests)): ?>
-                    Showing <?= min((($page - 1) * $limit) + 1, $totalRequests) ?>-<?= min($page * $limit, $totalRequests) ?> of <?= $totalRequests ?> request<?= $totalRequests > 1 ? 's' : '' ?>
+                    <?= $totalRequests ?> permintaan
                   <?php endif; ?>
                 </span>
               </div>
             </div>
           </div>
           
-        <!-- Loading State -->
-        <div id="tableLoading" class="hidden">
-          <div class="px-8 py-6 space-y-4">
-            <?php for ($i = 0; $i < 3; $i++): ?>
-            <div class="animate-pulse">
-              <div class="flex space-x-8 items-center">
-                <div class="h-5 bg-gray-200 rounded w-24"></div>
-                <div class="h-5 bg-gray-200 rounded w-28"></div>
-                <div class="h-5 bg-gray-200 rounded w-20"></div>
-                <div class="h-5 bg-gray-200 rounded w-16"></div>
-                <div class="h-5 bg-gray-200 rounded w-24"></div>
-                <div class="h-5 bg-gray-200 rounded w-40"></div>
-                <div class="h-5 bg-gray-200 rounded w-32"></div>
+          <!-- Loading State -->
+          <div id="tableLoading" class="hidden">
+            <div class="px-4 py-3 space-y-3">
+              <?php for ($i = 0; $i < 3; $i++): ?>
+              <div class="animate-pulse">
+                <div class="flex space-x-4 items-center p-3 border border-gray-100 rounded-lg">
+                  <div class="h-4 bg-gray-200 rounded w-20"></div>
+                  <div class="h-4 bg-gray-200 rounded w-24"></div>
+                  <div class="h-4 bg-gray-200 rounded w-16"></div>
+                  <div class="h-4 bg-gray-200 rounded w-12"></div>
+                  <div class="h-4 bg-gray-200 rounded w-20 flex-1"></div>
+                  <div class="h-8 bg-gray-200 rounded w-16"></div>
+                </div>
               </div>
+              <?php endfor; ?>
             </div>
-            <?php endfor; ?>
           </div>
-        </div>
           
-          <!-- Desktop Table View -->
-          <div class="hidden lg:block overflow-x-auto">
-            <table class="w-full divide-y divide-gray-200" role="table" aria-label="Material requests">
-              <thead class="bg-gray-50">
+          <!-- Responsive Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full" role="table" aria-label="Material requests">
+              <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Request #</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Date & Created By</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Items</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Notes</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Actions</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" scope="col">Permintaan</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" scope="col">Detail</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider hidden sm:table-cell" scope="col">Item</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" scope="col">Status</th>
+                  <th class="px-4 py-2 text-right text-xs font-medium text-gray-600 uppercase tracking-wider" scope="col">Aksi</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200" id="requestsTableBody">
+              <tbody class="divide-y divide-gray-100" id="requestsTableBody">
                 <?php if (!empty($userRequests)): ?>
                   <?php foreach ($userRequests as $request): ?>
-                  <tr class="hover:bg-gray-50 transition-colors duration-150" data-request-id="<?= $request['id'] ?>">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-semibold text-gray-900 font-mono"><?= htmlspecialchars($request['request_number']) ?></div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="text-sm text-gray-600">
-                        <span class="inline-flex items-center">
-                          <i class="bi bi-person-circle mr-2 text-gray-400" aria-hidden="true"></i>
-                          <span class="font-medium"><?= htmlspecialchars($request['created_by'] ?? 'System') ?></span>
-                        </span>
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        <time datetime="<?= $request['created_at'] ?>"><?= date('M d, Y H:i', strtotime($request['created_at'])) ?></time>
+                  <tr class="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100" data-request-id="<?= $request['id'] ?>">
+                    <!-- Request Number & Date -->
+                    <td class="px-4 py-3">
+                      <div class="min-w-0">
+                        <div class="text-sm font-semibold text-gray-900 font-mono"><?= htmlspecialchars($request['request_number']) ?></div>
+                        <div class="text-xs text-gray-500 mt-1">
+                          <time datetime="<?= $request['created_at'] ?>"><?= date('M j, Y', strtotime($request['created_at'])) ?></time>
+                        </div>
                       </div>
                     </td>
-                    <td class="px-6 py-4">
-                      <div class="text-sm text-gray-600">
-                        <span class="inline-flex items-center">
-                          <i class="bi bi-box-seam mr-2 text-gray-400" aria-hidden="true"></i>
-                          <span class="font-medium"><?= $request['item_count'] ?></span>
-                          <span class="ml-1">items</span>
-                        </span>
+                    
+                    <!-- Created By & Notes -->
+                    <td class="px-4 py-3">
+                      <div class="min-w-0">
+                        <div class="text-sm text-gray-700 flex items-center">
+                          <i class="bi bi-person-circle text-gray-400 mr-1.5" aria-hidden="true"></i>
+                          <span class="font-medium truncate"><?= htmlspecialchars($request['created_by'] ?? 'System') ?></span>
+                        </div>
+                        <?php if (!empty($request['notes'])): ?>
+                        <div class="text-xs text-gray-500 mt-1 truncate max-w-xs" title="<?= htmlspecialchars($request['notes']) ?>">
+                          <?= htmlspecialchars($request['notes']) ?>
+                        </div>
+                        <?php endif; ?>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 inline-flex text-xs font-medium rounded-full transition-all duration-200
+                    
+                    <!-- Item Count (hidden on mobile) -->
+                    <td class="px-4 py-3 hidden sm:table-cell">
+                      <div class="text-sm text-gray-700 flex items-center">
+                        <i class="bi bi-box-seam text-gray-400 mr-1.5" aria-hidden="true"></i>
+                        <span class="font-medium"><?= $request['item_count'] ?></span>
+                        <span class="text-xs text-gray-500 ml-1">item</span>
+                      </div>
+                    </td>
+                    
+                    <!-- Status Badge -->
+                    <td class="px-4 py-3">
+                      <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full transition-all duration-200
                         <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                            ($request['status'] === 'diproses' ? 'bg-blue-100 text-blue-800' : 
                            ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) ?>">
                         <?= ucfirst($request['status']) ?>
                       </span>
                     </td>
-                    <td class="px-6 py-4">
-                      <div class="text-sm text-gray-600 max-w-xs">
-                        <div class="truncate" title="<?= htmlspecialchars($request['notes'] ?? '') ?>">
-                          <?= htmlspecialchars($request['notes'] ?? 'No notes') ?>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center space-x-2">
+                    
+                    <!-- Actions -->
+                    <td class="px-4 py-3">
+                      <div class="flex items-center justify-end space-x-1">
+                        <!-- View Button (always visible) -->
                         <button 
                           onclick="viewRequest(<?= $request['id'] ?>)" 
-                          class="inline-flex items-center px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                          aria-label="View details for request <?= htmlspecialchars($request['request_number']) ?>"
-                          title="View request details">
-                          <i class="bi bi-eye mr-1" aria-hidden="true"></i> View
+                          class="inline-flex items-center justify-center w-8 h-8 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                          aria-label="View request <?= htmlspecialchars($request['request_number']) ?>"
+                          title="View details">
+                          <i class="bi bi-eye text-sm" aria-hidden="true"></i>
                         </button>
                         
+                        <!-- Scan Button (for processing requests) -->
                         <?php if ($request['status'] === 'diproses'): ?>
                         <button 
                           onclick="scanQRForRequest('<?= htmlspecialchars($request['request_number']) ?>')" 
-                          class="inline-flex items-center px-2.5 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                          aria-label="Scan QR code for request <?= htmlspecialchars($request['request_number']) ?>"
-                          title="Open QR scanner for this request">
-                          <i class="bi bi-upc-scan mr-1" aria-hidden="true"></i> Scan
+                          class="inline-flex items-center justify-center w-8 h-8 bg-green-50 hover:bg-green-100 text-green-700 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                          aria-label="Scan request <?= htmlspecialchars($request['request_number']) ?>"
+                          title="Scan QR code">
+                          <i class="bi bi-upc-scan text-sm" aria-hidden="true"></i>
                         </button>
                         <?php endif; ?>
                         
+                        <!-- Cancel Button (for pending requests) -->
                         <?php if ($request['status'] === 'pending'): ?>
                         <button 
-                          class="cancel-request-btn inline-flex items-center px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                          class="cancel-request-btn inline-flex items-center justify-center w-8 h-8 bg-red-50 hover:bg-red-100 text-red-700 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                           data-request-id="<?= $request['id'] ?>"
                           data-request-number="<?= htmlspecialchars($request['request_number']) ?>"
                           aria-label="Cancel request <?= htmlspecialchars($request['request_number']) ?>"
-                          title="Cancel this request (only available for pending requests)">
-                          <i class="bi bi-x-circle mr-1" aria-hidden="true"></i> Cancel
+                          title="Cancel request">
+                          <i class="bi bi-x-lg text-sm" aria-hidden="true"></i>
                         </button>
                         <?php endif; ?>
                       </div>
@@ -356,17 +364,17 @@
                   <?php endforeach; ?>
                 <?php else: ?>
                   <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                      <div class="space-y-4">
-                        <i class="bi bi-inbox text-6xl text-gray-300 block mx-auto" aria-hidden="true"></i>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                      <div class="space-y-3">
+                        <i class="bi bi-inbox text-4xl text-gray-300 block mx-auto" aria-hidden="true"></i>
                         <div>
-                          <h4 class="text-lg font-semibold text-gray-900 mb-2">No requests found</h4>
-                          <p class="text-gray-600 mb-4 text-sm">Get started by creating your first material request</p>
+                          <h4 class="text-base font-semibold text-gray-900 mb-1">Tidak ada permintaan ditemukan</h4>
+                          <p class="text-gray-600 text-sm mb-3">Buat permintaan material pertama Anda untuk memulai</p>
                           <a 
                             href="<?php echo url('app/controllers/material_request.php'); ?>" 
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <i class="bi bi-plus-circle mr-2" aria-hidden="true"></i>
-                            <span>Create Request</span>
+                            class="inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            <i class="bi bi-plus-circle mr-1.5" aria-hidden="true"></i>
+                            Buat Permintaan
                           </a>
                         </div>
                       </div>
@@ -377,101 +385,18 @@
             </table>
           </div>
           
-          <!-- Mobile Card View -->
-          <div class="lg:hidden space-y-4" id="mobileRequestsView">
-            <?php if (!empty($userRequests)): ?>
-              <?php foreach ($userRequests as $request): ?>
-              <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200" data-request-id="<?= $request['id'] ?>">
-                <div class="flex items-start justify-between mb-3">
-                  <div class="flex-1 min-w-0">
-                    <h3 class="text-sm font-semibold text-gray-900 font-mono truncate"><?= htmlspecialchars($request['request_number']) ?></h3>
-                    <div class="flex items-center mt-1 text-xs text-gray-500">
-                      <i class="bi bi-person-circle mr-1" aria-hidden="true"></i>
-                      <span><?= htmlspecialchars($request['created_by'] ?? 'System') ?></span>
-                      <span class="mx-1">•</span>
-                      <time datetime="<?= $request['created_at'] ?>"><?= date('M d, Y', strtotime($request['created_at'])) ?></time>
-                    </div>
-                  </div>
-                  <span class="px-2 py-1 inline-flex text-xs font-medium rounded-full flex-shrink-0
-                    <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                       ($request['status'] === 'diproses' ? 'bg-blue-100 text-blue-800' : 
-                       ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) ?>">
-                    <?= ucfirst($request['status']) ?>
-                  </span>
-                </div>
-                
-                <div class="space-y-2 mb-3">
-                  <div class="flex items-center text-sm text-gray-600">
-                    <i class="bi bi-box-seam mr-2 text-gray-400" aria-hidden="true"></i>
-                    <span><?= $request['item_count'] ?> items</span>
-                  </div>
-                  
-                  <?php if (!empty($request['notes'])): ?>
-                  <div class="text-sm text-gray-600">
-                    <div class="line-clamp-2" title="<?= htmlspecialchars($request['notes']) ?>">
-                      <?= htmlspecialchars($request['notes']) ?>
-                    </div>
-                  </div>
-                  <?php endif; ?>
-                </div>
-                
-                <div class="flex items-center space-x-2 pt-3 border-t border-gray-100">
-                  <button 
-                    onclick="viewRequest(<?= $request['id'] ?>)" 
-                    class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    <i class="bi bi-eye mr-1" aria-hidden="true"></i> View
-                  </button>
-                  
-                  <?php if ($request['status'] === 'diproses'): ?>
-                  <button 
-                    onclick="scanQRForRequest('<?= htmlspecialchars($request['request_number']) ?>')" 
-                    class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                    <i class="bi bi-upc-scan mr-1" aria-hidden="true"></i> Scan
-                  </button>
-                  <?php endif; ?>
-                  
-                  <?php if ($request['status'] === 'pending'): ?>
-                  <button 
-                    class="cancel-request-btn flex-1 inline-flex items-center justify-center px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-md text-xs font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    data-request-id="<?= $request['id'] ?>"
-                    data-request-number="<?= htmlspecialchars($request['request_number']) ?>">
-                    <i class="bi bi-x-circle mr-1" aria-hidden="true"></i> Cancel
-                  </button>
-                  <?php endif; ?>
-                </div>
-              </div>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <div class="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500">
-                <div class="space-y-4">
-                  <i class="bi bi-inbox text-6xl text-gray-300 block mx-auto" aria-hidden="true"></i>
-                  <div>
-                    <h4 class="text-lg font-semibold text-gray-900 mb-2">No requests found</h4>
-                    <p class="text-gray-600 mb-4 text-sm">Get started by creating your first material request</p>
-                    <a 
-                      href="<?php echo url('app/controllers/material_request.php'); ?>" 
-                      class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                      <i class="bi bi-plus-circle mr-2" aria-hidden="true"></i>
-                      <span>Create Request</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            <?php endif; ?>
-          </div>
-          
           <!-- Pagination -->
           <?php if ($totalPages > 1): ?>
           <div class="px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div class="text-sm text-gray-700 text-center sm:text-left">
-                Showing 
+                Menampilkan 
                 <span class="font-medium"><?= min((($page - 1) * $limit) + 1, $totalRequests) ?></span> 
-                to 
+                hingga 
                 <span class="font-medium"><?= min($page * $limit, $totalRequests) ?></span> 
-                of 
+                dari 
                 <span class="font-medium"><?= $totalRequests ?></span> 
-                results
+                hasil
               </div>
               
               <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
@@ -479,12 +404,12 @@
                 <?php if ($page > 1): ?>
                   <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>" 
                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    <span class="sr-only">Previous</span>
+                    <span class="sr-only">Sebelumnya</span>
                     <i class="bi bi-chevron-left"></i>
                   </a>
                 <?php else: ?>
                   <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
-                    <span class="sr-only">Previous</span>
+                    <span class="sr-only">Sebelumnya</span>
                     <i class="bi bi-chevron-left"></i>
                   </span>
                 <?php endif; ?>
@@ -528,12 +453,12 @@
                 <?php if ($page < $totalPages): ?>
                   <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>" 
                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                    <span class="sr-only">Next</span>
+                    <span class="sr-only">Selanjutnya</span>
                     <i class="bi bi-chevron-right"></i>
                   </a>
                 <?php else: ?>
                   <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-300 cursor-not-allowed">
-                    <span class="sr-only">Next</span>
+                    <span class="sr-only">Selanjutnya</span>
                     <i class="bi bi-chevron-right"></i>
                   </span>
                 <?php endif; ?>
@@ -553,7 +478,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-slide-up">
           <!-- Modal Header -->
           <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
-            <h3 id="modalTitle" class="text-xl font-semibold text-gray-900">Request Details</h3>
+            <h3 id="modalTitle" class="text-xl font-semibold text-gray-900">Detail Permintaan</h3>
             <button 
               onclick="closeModal()" 
               class="text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-lg p-2"
@@ -568,7 +493,7 @@
             <div id="modalLoading" class="hidden">
               <div class="flex flex-col items-center justify-center py-12 space-y-4">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p class="text-gray-600">Loading request details...</p>
+                <p class="text-gray-600">Memuat detail permintaan...</p>
               </div>
             </div>
             
@@ -577,8 +502,8 @@
               <div class="flex flex-col items-center justify-center py-12 space-y-4">
                 <i class="bi bi-exclamation-triangle text-red-500 text-5xl" aria-hidden="true"></i>
                 <div class="text-center">
-                  <h4 class="text-lg font-medium text-gray-900 mb-2">Error Loading Details</h4>
-                  <p class="text-gray-600" id="modalErrorMessage">Failed to load request details</p>
+                  <h4 class="text-lg font-medium text-gray-900 mb-2">Kesalahan Memuat Detail</h4>
+                  <p class="text-gray-600" id="modalErrorMessage">Gagal memuat detail permintaan</p>
                   <button 
                     onclick="closeModal()" 
                     class="mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
@@ -600,7 +525,7 @@
               <button 
                 onclick="closeModal()" 
                 class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                Close
+                Tutup
               </button>
             </div>
           </div>
@@ -615,22 +540,22 @@
           <div class="modal-icon">
             <i class="bi bi-exclamation-triangle"></i>
           </div>
-          <h3 id="confirmTitle">Confirm Cancellation</h3>
+          <h3 id="confirmTitle">Konfirmasi Pembatalan</h3>
         </div>
-        <p id="confirmMessage">Are you sure you want to cancel this request?</p>
+        <p id="confirmMessage">Apakah Anda yakin ingin membatalkan permintaan ini?</p>
         <div class="modal-actions">
           <button 
             id="confirmCancel"
             type="button"
             onclick="closeConfirmModal()" 
             class="btn btn-secondary">
-            No, Keep Request
+            Tidak, Simpan Permintaan
           </button>
           <button 
             id="confirmAction"
             type="button"
             class="btn btn-danger">
-            Yes, Cancel Request
+            Ya, Batalkan Permintaan
           </button>
         </div>
       </div>
@@ -862,6 +787,11 @@
         overflow: hidden;
       }
       
+      /* Main content transition for mobile sidebar */
+      #main-content {
+        transition: transform 0.3s ease-in-out;
+      }
+      
       /* Line clamp utility for mobile view */
       .line-clamp-2 {
         display: -webkit-box;
@@ -880,6 +810,37 @@
         .button-responsive-xs {
           padding: 0.5rem 0.75rem;
           font-size: 0.75rem;
+        }
+      }
+      
+      /* Ensure proper responsive layout */
+      @media (min-width: 1024px) {
+        /* Desktop: sidebar is visible, content has proper margin */
+        #main-content {
+          margin-left: 16rem; /* 64 * 0.25rem = 16rem */
+        }
+        
+        header {
+          margin-left: 16rem; /* Match main content margin */
+        }
+        
+        body {
+          overflow-x: auto;
+        }
+      }
+      
+      @media (max-width: 1023px) {
+        /* Mobile/tablet: sidebar is hidden by default */
+        #main-content {
+          margin-left: 0;
+        }
+        
+        header {
+          margin-left: 0;
+        }
+        
+        body {
+          overflow-x: hidden;
         }
       }
     </style>
@@ -946,19 +907,29 @@
       function openMobileMenu() {
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('mobileMenuBackdrop');
+        const mainContent = document.getElementById('main-content');
         
         sidebar.classList.remove('-translate-x-full');
         backdrop.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // On mobile, slide content to the right when sidebar opens
+        if (window.innerWidth < 1024) {
+          mainContent.style.transform = 'translateX(16rem)';
+        }
       }
       
       function closeMobileMenu() {
         const sidebar = document.getElementById('sidebar');
         const backdrop = document.getElementById('mobileMenuBackdrop');
+        const mainContent = document.getElementById('main-content');
         
         sidebar.classList.add('-translate-x-full');
         backdrop.classList.add('hidden');
         document.body.style.overflow = '';
+        
+        // Reset content position
+        mainContent.style.transform = '';
       }
       
       // Close mobile menu when window is resized to desktop size

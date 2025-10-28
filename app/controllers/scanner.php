@@ -250,8 +250,16 @@ if ($_POST == NULL) {
         $validation = $dbManager->validateCustNoRef($customerReference);
         
         if (!$validation['valid']) {
-            throw new Exception($validation['message']);
+            // Enhanced error message with debugging information
+            $errorMsg = $validation['message'];
+            if (strpos($errorMsg, 'not found') !== false) {
+                $errorMsg .= " (Scanned: '$customerReference'). Please check if the customer reference exists in the StockDetailVer table.";
+            }
+            throw new Exception($errorMsg);
         }
+        
+        // Log successful validation for debugging
+        error_log("Customer reference validation successful: '$customerReference' - " . $validation['message']);
         
         // Get request details (no status restriction for comparison)
         $requestQuery = "

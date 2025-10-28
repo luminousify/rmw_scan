@@ -25,11 +25,11 @@
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
-                  Settings
+                  Pengaturan
                 </a>
                 <a href="<?php echo url('app/logout.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-box-arrow-right mr-2"></i>
-                  Logout
+                  Keluar
                 </a>
               </div>
             </div>
@@ -54,9 +54,9 @@
             </div>
             <div class="text-center">
               <h3 class="text-lg font-bold text-gray-900 capitalize">
-                <?= ($department === 'rmw' ? 'Raw Material Warehouse' : 'Production Department') ?>
+                <?= ($department === 'rmw' ? 'Gudang Bahan Baku' : 'Departemen Produksi') ?>
               </h3>
-              <p class="text-sm text-gray-500 mt-1">Management System</p>
+              <p class="text-sm text-gray-500 mt-1">Sistem Manajemen</p>
             </div>
           </div>
           
@@ -67,20 +67,20 @@
                class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'nav-active' : 'nav-inactive' ?>"
                role="menuitem" aria-current="<?= $module_name == 'dashboard' ? 'page' : 'false' ?>">
               <i class="bi bi-house-fill mr-3 text-lg"></i>
-              <span>Dashboard</span>
+              <span>Dasbor</span>
               <?= $module_name == 'dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
             </a>
             
             <?php if ($department === 'production'): ?>
             <!-- Production Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Production</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Produksi</h4>
               
               <a href="<?php echo url('app/controllers/material_request.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'material_request' ? 'page' : 'false' ?>">
                 <i class="bi bi-plus-circle-fill mr-3 text-lg"></i>
-                <span>Create Request</span>
+                <span>Buat Permintaan</span>
                 <?= $module_name == 'material_request' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
               
@@ -88,7 +88,7 @@
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'my_requests' ? 'page' : 'false' ?>">
                 <i class="bi bi-list-task mr-3 text-lg"></i>
-                <span>My Requests</span>
+                <span>Permintaan Saya</span>
                 <?= $module_name == 'my_requests' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -96,13 +96,13 @@
             <?php else: ?>
             <!-- RMW Navigation -->
             <div class="pt-2">
-              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Warehouse</h4>
+              <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gudang</h4>
               
               <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
                  class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
                 <i class="bi bi-box-seam-fill mr-3 text-lg"></i>
-                <span>Warehouse Dashboard</span>
+                <span>Dasbor Gudang</span>
                 <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
@@ -117,8 +117,8 @@
       <main class="flex-1 p-6">
         <!-- Page Header -->
         <div class="mb-6">
-          <h1 class="text-3xl font-bold text-gray-900">Create Material Request</h1>
-          <p class="text-gray-600 mt-2">Request raw materials for production</p>
+          <h1 class="text-3xl font-bold text-gray-900">Buat Permintaan Material</h1>
+          <p class="text-gray-600 mt-2">Minta bahan baku untuk produksi</p>
         </div>
 
         <!-- Alert Messages -->
@@ -127,7 +127,7 @@
           <div class="flex">
             <i class="bi bi-check-circle text-green-400 text-xl mr-3"></i>
             <div>
-              <h3 class="text-sm font-medium text-green-800">Success!</h3>
+              <h3 class="text-sm font-medium text-green-800">Berhasil!</h3>
               <p class="text-sm text-green-700 mt-1"><?= $success_message ?></p>
             </div>
           </div>
@@ -139,7 +139,7 @@
           <div class="flex">
             <i class="bi bi-exclamation-circle text-red-400 text-xl mr-3"></i>
             <div>
-              <h3 class="text-sm font-medium text-red-800">Error!</h3>
+              <h3 class="text-sm font-medium text-red-800">Kesalahan!</h3>
               <p class="text-sm text-red-700 mt-1"><?= $error_message ?></p>
             </div>
           </div>
@@ -155,21 +155,21 @@
             <div class="mb-6">
               <p class="text-sm text-gray-600">
                 <i class="bi bi-info-circle mr-1"></i>
-                Request date will be automatically recorded when you submit this form.
+                Tanggal permintaan akan dicatat secara otomatis saat Anda mengirim formulir ini.
               </p>
             </div>
 
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-              <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Additional notes or special instructions..."></textarea>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
+              <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Catatan tambahan atau instruksi khusus..."></textarea>
             </div>
 
             <!-- Items Section -->
             <div class="mb-6">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Request Items</h3>
+                <h3 class="text-lg font-medium text-gray-900">Item Permintaan</h3>
                 <button type="button" onclick="addItem()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                  <i class="bi bi-plus mr-2"></i>Add Item
+                  <i class="bi bi-plus mr-2"></i>Tambah Item
                 </button>
               </div>
 
@@ -184,7 +184,7 @@
                 Reset
               </button>
               <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium">
-                <i class="bi bi-check-circle mr-2"></i>Create Request
+                <i class="bi bi-check-circle mr-2"></i>Buat Permintaan
               </button>
             </div>
           </form>
@@ -193,15 +193,15 @@
         <!-- Recent Requests -->
         <?php if (!empty($userRequests)): ?>
         <div class="mt-8">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Requests</h3>
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Permintaan Terbaru</h3>
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request #</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Permintaan</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   </tr>
                 </thead>
@@ -216,7 +216,7 @@
                     </td>
   
                     <td class="px-6 py-4 text-sm text-gray-500">
-                      <?= $request['item_count'] ?> items
+                      <?= $request['item_count'] ?> item
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -238,12 +238,12 @@
                 <!-- Mobile pagination -->
                 <?php if ($currentPage > 1): ?>
                 <a href="?page=<?= $currentPage - 1 ?>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  Previous
+                  Sebelumnya
                 </a>
                 <?php endif; ?>
                 <?php if ($currentPage < $totalPages): ?>
                 <a href="?page=<?= $currentPage + 1 ?>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  Next
+                  Selanjutnya
                 </a>
                 <?php endif; ?>
               </div>
@@ -251,17 +251,17 @@
               <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                   <p class="text-sm text-gray-700">
-                    Showing 
+                    Menampilkan 
                     <span class="font-medium">
                       <?= ($currentPage - 1) * $limit + 1 ?>
                     </span>
-                    to 
+                    hingga 
                     <span class="font-medium">
                       <?= min($currentPage * $limit, $totalRequests) ?>
                     </span>
-                    of 
+                    dari 
                     <span class="font-medium"><?= $totalRequests ?></span>
-                    results
+                    hasil
                   </p>
                 </div>
                 
@@ -346,23 +346,23 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Product</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Produk</label>
                 <select name="items[${itemCounter}][product_id]" onchange="updateProductInfo(${itemCounter})" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                  <option value="">Select Product</option>
+                  <option value="">Pilih Produk</option>
                   ${products.map(p => `<option value="${p.product_id}" data-name="${p.product_name}" data-unit="${p.unit}">${p.product_id} - ${p.product_name}</option>`).join('')}
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kuantitas</label>
                 <input type="number" name="items[${itemCounter}][quantity]" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
                 <input type="text" name="items[${itemCounter}][unit]" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100" readonly>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <input type="text" name="items[${itemCounter}][description]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Optional">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                <input type="text" name="items[${itemCounter}][description]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Opsional">
               </div>
             </div>
             <input type="hidden" name="items[${itemCounter}][product_name]">

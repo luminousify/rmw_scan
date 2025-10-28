@@ -1,50 +1,49 @@
 <?php
 /**
- * Database Connection Configuration
+ * Unified Database Connection Wrapper
  * 
- * Establishes connection to Microsoft Access database using PDO ODBC
+ * This file provides database connection based on DB_TYPE configuration
+ * Routes to SQLite or MySQL connection as needed
  */
 
-date_default_timezone_set('Asia/Bangkok');
-
-// Initialize logging
-$logFile = __DIR__ . '/conn.log';
-$logMessage = '[' . date('Y-m-d H:i:s') . '] ';
-
-// Database configuration
-$mdbFile = 'Z:\FGW ALL2021_be.mdb'; //prod
-//$mdbFile = 'Z:\FGW_ALL2021_be.mdb'; //dev
-//$mdbFile = 'C:\Users\User\Downloads\FGW ALL2021_be.mdb'; //local
-$dsn = "odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=" . $mdbFile . ";";
-
-// Log connection attempt
-file_put_contents($logFile, $logMessage . "Attempting to connect to database at $mdbFile\n", FILE_APPEND);
-
-// Connection options
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_TIMEOUT => 15,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES => true
-];
+require_once __DIR__ . '/DatabaseManager.php';
 
 try {
-    // Validate database file accessibility
-    if (!file_exists($mdbFile)) {
-        throw new Exception("Database file not found or not accessible");
-    }
-
-    // Create PDO instance
-    $pdo = new PDO($dsn, '', '', $options);
-    file_put_contents($logFile, $logMessage . "Successfully connected to database\n", FILE_APPEND);
+    // Get database instance and connection based on DB_TYPE
+    $dbManager = DatabaseManager::getInstance();
+    $pdo = $dbManager->getConnection();
     
-} catch (PDOException $e) {
-    $errorMsg = "Connection failed: " . $e->getMessage();
-    file_put_contents($logFile, $logMessage . $errorMsg . "\n", FILE_APPEND);
-    die("Connection Error: Unable to connect to the database. Please contact system administrator. Cause: ".$e->getMessage());
+    // Log successful connection
+    $logMessage = '[' . date('Y-m-d H:i:s') . '] DatabaseManager connected successfully\n';
+    file_put_contents(__DIR__ . '/conn.log', $logMessage, FILE_APPEND);
     
 } catch (Exception $e) {
-    $errorMsg = "System error: " . $e->getMessage();
-    file_put_contents($logFile, $logMessage . $errorMsg . "\n", FILE_APPEND);
-    die("System Error: An unexpected error occurred. Please contact system administrator.");
+    // Log error
+    $logMessage = '[' . date('Y-m-d H:i:s') . '] DatabaseManager connection failed: ' . $e->getMessage() . "\n";
+    file_put_contents(__DIR__ . '/conn.log', $logMessage, FILE_APPEND);
+    throw new Exception("Database connection failed: " . $e->getMessage());
+}
+
+// Helper function for compatibility
+if (!function_exists('getDBType')) {
+    function getDBType() {
+        return DB_TYPE;
+    }
+}
+
+// Helper function to get table prefix (for future multi-db support)
+if (!function_exists('getTablePrefix')) {
+    function getTablePrefix() {
+        return '';
+    }
+}
+
+// Helper function for date formatting
+if (!function_exists('formatDBDate')) {
+    function formatDBDate($date = null) {
+        if ($date === null) {
+            $date = new DateTime();
+        }
+        return $date->format('Y-m-d H:i:s');
+    }
 }
