@@ -36,6 +36,13 @@ Thumbs.db
 *.mdb
 *.accdb
 
+# Large executables
+*.exe
+
+# Access database engine
+**/accessdatabaseengine_*/
+accessdatabaseengine_X64.exe
+
 # Temporary files
 *.tmp
 *.temp
