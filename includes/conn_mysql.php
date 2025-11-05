@@ -42,7 +42,9 @@ try {
 }
 
 // Helper function for compatibility
-function getDBType() {
-    return 'mysql';
+if (!function_exists('getDBType')) {
+    function getDBType() {
+        return 'mysql';
+    }
 }
 ?>

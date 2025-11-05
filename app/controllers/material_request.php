@@ -15,6 +15,12 @@ $pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'] ?? 'production';
 
+// Get user's division
+require_once '../../includes/DatabaseManager.php';
+$db = DatabaseManager::getInstance();
+$stmt = $db->query("SELECT division FROM users WHERE id = ?", [$idlog]);
+$userDivision = $stmt->fetchColumn();
+
 // Pagination setup
 $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $limit = 10;

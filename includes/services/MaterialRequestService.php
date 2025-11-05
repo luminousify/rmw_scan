@@ -20,42 +20,47 @@ class MaterialRequestService
      */
     public function getUserRequests($userId, $filters = [])
     {
-        $whereConditions = ["mr.production_user_id = ?"];
-        $params = [$userId];
-        
+        // Get user's division for filtering
+        $stmt = $this->dbManager->query("SELECT division FROM users WHERE id = ?", [$userId]);
+        $userDivision = $stmt->fetchColumn();
+
+        $whereConditions = ["mr.production_user_id = ?", "u.division = ?"];
+        $params = [$userId, $userDivision];
+
         if (!empty($filters['status']) && $filters['status'] !== 'all') {
             $whereConditions[] = "mr.status = ?";
             $params[] = $filters['status'];
         }
-        
+
         if (!empty($filters['search'])) {
             $whereConditions[] = "(mr.request_number LIKE ? OR mri.product_name LIKE ?)";
             $searchParam = "%{$filters['search']}%";
             $params[] = $searchParam;
             $params[] = $searchParam;
         }
-        
+
         $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
-        
+
         // Add pagination
         $limit = $filters['limit'] ?? 20;
         $offset = $filters['offset'] ?? 0;
-        
+
         $query = "
-            SELECT 
+            SELECT
                 mr.*,
                 COUNT(mri.id) as item_count
             FROM material_requests mr
+            LEFT JOIN users u ON mr.production_user_id = u.id
             LEFT JOIN material_request_items mri ON mr.id = mri.request_id
             $whereClause
             GROUP BY mr.id
             ORDER BY mr.created_at DESC
             LIMIT ? OFFSET ?
         ";
-        
+
         $params[] = $limit;
         $params[] = $offset;
-        
+
         $stmt = $this->dbManager->query($query, $params);
         return $stmt->fetchAll();
     }
@@ -65,25 +70,29 @@ class MaterialRequestService
      */
     public function getUserRequestsCount($userId, $filters = [])
     {
-        $whereConditions = ["mr.production_user_id = ?"];
-        $params = [$userId];
-        
+        // Get user's division for filtering
+        $stmt = $this->dbManager->query("SELECT division FROM users WHERE id = ?", [$userId]);
+        $userDivision = $stmt->fetchColumn();
+
+        $whereConditions = ["mr.production_user_id = ?", "u.division = ?"];
+        $params = [$userId, $userDivision];
+
         if (!empty($filters['status']) && $filters['status'] !== 'all') {
             $whereConditions[] = "mr.status = ?";
             $params[] = $filters['status'];
         }
-        
+
         if (!empty($filters['search'])) {
             $whereConditions[] = "mr.request_number LIKE ?";
             $params[] = "%{$filters['search']}%";
         }
-        
+
         $whereClause = 'WHERE ' . implode(' AND ', $whereConditions);
-        
-        $query = "SELECT COUNT(*) as total FROM material_requests mr $whereClause";
+
+        $query = "SELECT COUNT(*) as total FROM material_requests mr LEFT JOIN users u ON mr.production_user_id = u.id $whereClause";
         $stmt = $this->dbManager->query($query, $params);
         $result = $stmt->fetch();
-        
+
         return $result['total'] ?? 0;
     }
 

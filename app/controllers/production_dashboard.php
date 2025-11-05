@@ -50,25 +50,30 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_request_details') {
             throw new Exception('Invalid request ID provided');
         }
         
-        // Production users can view all requests (no user restriction)
+        // Get user's division for access control
+        $stmt = $pdo->prepare("SELECT division FROM users WHERE id = ?");
+        $stmt->execute([$idlog]);
+        $userDivision = $stmt->fetchColumn();
+
+        // Production users can only view requests from their own division
         $query = "
-            SELECT mr.*, u.full_name as production_user_name, u.department as production_department
+            SELECT mr.*, u.full_name as production_user_name, u.department as production_department, u.division as production_division
             FROM material_requests mr
             LEFT JOIN users u ON mr.production_user_id = u.id
-            WHERE mr.id = ?
+            WHERE mr.id = ? AND u.division = ?
         ";
-        
+
         $stmt = $pdo->prepare($query);
         if (!$stmt) {
             throw new Exception('Failed to prepare database query');
         }
-        
-        $stmt->execute([$requestId]);
+
+        $stmt->execute([$requestId, $userDivision]);
         $request = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$request) {
-            http_response_code(404);
-            throw new Exception('Request not found');
+            http_response_code(403);
+            throw new Exception('Request not found or access denied');
         }
         
         // Get request items with proper error handling
@@ -175,6 +180,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_request_details') {
 
 include '../common/header.php';
 
+// Get user's division
+require_once '../../includes/DatabaseManager.php';
+$db = DatabaseManager::getInstance();
+$stmt = $db->query("SELECT division FROM users WHERE id = ?", [$idlog]);
+$userDivision = $stmt->fetchColumn();
+
 // Handle status updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
@@ -229,20 +240,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 try {
     include '../../includes/conn_sqlite.php';
-    
+
+    // Get user's division for filtering
+    $stmt = $pdo->prepare("SELECT division FROM users WHERE id = ?");
+    $stmt->execute([$idlog]);
+    $userDivision = $stmt->fetchColumn();
+
     // Get filter parameters
     $status = $_GET['status'] ?? 'all';
     $search = $_GET['search'] ?? '';
-    
+    $divisionFilter = $_GET['division'] ?? $userDivision; // Use user's division by default
+
     // Build query based on filters
     $whereConditions = [];
     $params = [];
-    
+
+    // Division-based isolation: Only show requests from user's division
+    if (!empty($divisionFilter)) {
+        $whereConditions[] = "u.division = ?";
+        $params[] = $divisionFilter;
+    }
+
     if ($status !== 'all') {
         $whereConditions[] = "mr.status = ?";
         $params[] = $status;
     }
-    
+
     if (!empty($search)) {
         $whereConditions[] = "(mr.request_number LIKE ? OR u.full_name LIKE ? OR mri.product_name LIKE ?)";
         $searchParam = "%$search%";
@@ -250,14 +273,15 @@ try {
         $params[] = $searchParam;
         $params[] = $searchParam;
     }
-    
+
     $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
-    
-    // Get requests with details
+
+    // Get requests with details - filtered by division
     $query = "
-        SELECT 
+        SELECT
             mr.*,
             u.full_name as production_user_name,
+            u.division as production_division,
             COUNT(mri.id) as item_count
         FROM material_requests mr
         LEFT JOIN users u ON mr.production_user_id = u.id

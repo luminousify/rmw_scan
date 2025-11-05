@@ -56,7 +56,14 @@
               <h3 class="text-lg font-bold text-gray-900 capitalize">
                 <?= ($department === 'rmw' ? 'Gudang Bahan Baku' : 'Departemen Produksi') ?>
               </h3>
-              <p class="text-sm text-gray-500 mt-1">Sistem Manajemen</p>
+              <div class="mt-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                  <?= $department === 'rmw' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' ?>">
+                  <i class="bi bi-diagram-3 mr-1"></i>
+                  <?= htmlspecialchars($userDivision ?? 'Unassigned') ?>
+                </span>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">Sistem Manajemen</p>
             </div>
           </div>
           

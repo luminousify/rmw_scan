@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     department ENUM('production', 'rmw', 'admin') NOT NULL,
+    division VARCHAR(50),
     full_name VARCHAR(100),
     email VARCHAR(100),
     is_active TINYINT(1) DEFAULT 1,
@@ -144,25 +145,31 @@ CREATE TABLE IF NOT EXISTS StockDetailVer (
     INDEX idx_Verifikasi (Verifikasi)
 );
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_material_requests_status ON material_requests(status);
-CREATE INDEX IF NOT EXISTS idx_material_requests_user ON material_requests(production_user_id);
-CREATE INDEX IF NOT EXISTS idx_material_request_items_request ON material_request_items(request_id);
-CREATE INDEX IF NOT EXISTS idx_qr_tracking_code ON qr_tracking(qr_code);
-CREATE INDEX IF NOT EXISTS idx_qr_tracking_status ON qr_tracking(status);
-CREATE INDEX IF NOT EXISTS idx_activity_log_user ON activity_log(user_id);
-CREATE INDEX IF NOT EXISTS idx_activity_log_date ON activity_log(created_at);
-CREATE INDEX IF NOT EXISTS idx_stockdetailver_custnoref ON StockDetailVer(CustNoRef);
+-- Create indexes for better performance (MySQL 5.7 compatible)
+-- Note: MySQL 5.7 doesn't support IF NOT EXISTS or IF EXISTS for INDEX operations
+-- These indexes may already exist from the table definitions above
+
+-- Additional indexes for better query performance
+CREATE INDEX idx_material_requests_status ON material_requests(status);
+CREATE INDEX idx_material_requests_user ON material_requests(production_user_id);
+CREATE INDEX idx_material_request_items_request ON material_request_items(request_id);
+CREATE INDEX idx_qr_tracking_code ON qr_tracking(qr_code);
+CREATE INDEX idx_qr_tracking_status ON qr_tracking(status);
+CREATE INDEX idx_activity_log_user ON activity_log(user_id);
+CREATE INDEX idx_activity_log_date ON activity_log(created_at);
+CREATE INDEX idx_stockdetailver_custnoref ON StockDetailVer(CustNoRef);
+CREATE INDEX idx_users_department ON users(department);
+CREATE INDEX idx_users_division ON users(division);
 
 -- Insert test users for all roles
-INSERT IGNORE INTO users (username, password, department, full_name) VALUES 
-('prod', 'prod123', 'production', 'Production User'),
-('prod1', 'prod123', 'production', 'Production Worker 1'),
-('prod2', 'prod123', 'production', 'Production Worker 2'),
-('rmw', 'rmw123', 'rmw', 'RMW Administrator'),
-('rmw1', 'rmw123', 'rmw', 'RMW Staff 1'),
-('rmw2', 'rmw123', 'rmw', 'RMW Staff 2'),
-('admin', 'admin123', 'admin', 'System Administrator');
+INSERT IGNORE INTO users (username, password, department, division, full_name) VALUES
+('prod', 'prod123', 'production', 'Assembly', 'Production User'),
+('prod1', 'prod123', 'production', 'Quality Control', 'Production Worker 1'),
+('prod2', 'prod123', 'production', 'Packaging', 'Production Worker 2'),
+('rmw', 'rmw123', 'rmw', 'Receiving', 'RMW Administrator'),
+('rmw1', 'rmw123', 'rmw', 'Warehousing', 'RMW Staff 1'),
+('rmw2', 'rmw123', 'rmw', 'Shipping', 'RMW Staff 2'),
+('admin', 'admin123', 'admin', 'Management', 'System Administrator');
 
 -- Insert sample products
 INSERT IGNORE INTO products (product_id, product_name, category, unit, description) VALUES

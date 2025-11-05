@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     department VARCHAR(20) NOT NULL CHECK (department IN ('production', 'rmw')),
+    division VARCHAR(50),
     full_name VARCHAR(100),
     email VARCHAR(100),
     is_active BOOLEAN DEFAULT 1,
@@ -95,14 +96,14 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Insert test users for all roles
-INSERT OR IGNORE INTO users (username, password, department, full_name) VALUES 
-('prod', 'prod123', 'production', 'Production User'),
-('prod1', 'prod123', 'production', 'Production Worker 1'),
-('prod2', 'prod123', 'production', 'Production Worker 2'),
-('rmw', 'rmw123', 'rmw', 'RMW Administrator'),
-('rmw1', 'rmw123', 'rmw', 'RMW Staff 1'),
-('rmw2', 'rmw123', 'rmw', 'RMW Staff 2'),
-('admin', 'admin123', 'admin', 'System Administrator');
+INSERT OR IGNORE INTO users (username, password, department, division, full_name) VALUES
+('prod', 'prod123', 'production', 'Assembly', 'Production User'),
+('prod1', 'prod123', 'production', 'Quality Control', 'Production Worker 1'),
+('prod2', 'prod123', 'production', 'Packaging', 'Production Worker 2'),
+('rmw', 'rmw123', 'rmw', 'Receiving', 'RMW Administrator'),
+('rmw1', 'rmw123', 'rmw', 'Warehousing', 'RMW Staff 1'),
+('rmw2', 'rmw123', 'rmw', 'Shipping', 'RMW Staff 2'),
+('admin', 'admin123', 'admin', 'Management', 'System Administrator');
 
 -- Insert sample products
 INSERT OR IGNORE INTO products (product_id, product_name, category, unit, description) VALUES
@@ -170,3 +171,7 @@ CREATE INDEX IF NOT EXISTS idx_stockdetailver_stockdate ON StockDetailVer(StockD
 CREATE INDEX IF NOT EXISTS idx_stockdetailver_stockrefno ON StockDetailVer(StockRefNo);
 CREATE INDEX IF NOT EXISTS idx_stockdetailver_status ON StockDetailVer(status);
 CREATE INDEX IF NOT EXISTS idx_stockdetailver_verifikasi ON StockDetailVer(Verifikasi);
+
+-- Users indexes
+CREATE INDEX IF NOT EXISTS idx_users_department ON users(department);
+CREATE INDEX IF NOT EXISTS idx_users_division ON users(division);

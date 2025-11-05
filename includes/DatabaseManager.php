@@ -217,6 +217,14 @@ class DatabaseManager
             throw $e;
         }
     }
+
+    /**
+     * Prepare SQL statement
+     */
+    public function prepare($sql)
+    {
+        return $this->getConnection()->prepare($sql);
+    }
     
     /**
      * Begin transaction
@@ -423,6 +431,184 @@ class DatabaseManager
         }
     }
     
+    /**
+     * Get users by department and optional division
+     *
+     * @param string $department Department name (production, rmw, admin)
+     * @param string|null $division Division name (optional)
+     * @return array Array of users
+     */
+    public function getUsersByDepartment($department, $division = null)
+    {
+        try {
+            if ($division === null) {
+                $stmt = $this->query(
+                    "SELECT id, username, full_name, department, division, email, is_active
+                     FROM users
+                     WHERE department = ? AND is_active = 1
+                     ORDER BY full_name",
+                    [$department]
+                );
+            } else {
+                $stmt = $this->query(
+                    "SELECT id, username, full_name, department, division, email, is_active
+                     FROM users
+                     WHERE department = ? AND division = ? AND is_active = 1
+                     ORDER BY full_name",
+                    [$department, $division]
+                );
+            }
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            $this->logError("Error getting users by department: " . $e->getMessage(), [
+                'department' => $department,
+                'division' => $division
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get all divisions for a department
+     *
+     * @param string $department Department name
+     * @return array Array of unique divisions
+     */
+    public function getDivisionsByDepartment($department)
+    {
+        try {
+            $stmt = $this->query(
+                "SELECT DISTINCT division
+                 FROM users
+                 WHERE department = ? AND (division IS NOT NULL AND division != '')
+                 ORDER BY division",
+                [$department]
+            );
+
+            $divisions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            return $divisions ?: [];
+        } catch (Exception $e) {
+            $this->logError("Error getting divisions: " . $e->getMessage(), ['department' => $department]);
+            return [];
+        }
+    }
+
+    /**
+     * Get all users grouped by department and division
+     *
+     * @return array Array of users organized by department and division
+     */
+    public function getUsersGroupedByDivision()
+    {
+        try {
+            $stmt = $this->query(
+                "SELECT id, username, full_name, department, division, email, is_active
+                 FROM users
+                 WHERE is_active = 1
+                 ORDER BY department, division, full_name"
+            );
+
+            $users = $stmt->fetchAll();
+            $grouped = [];
+
+            foreach ($users as $user) {
+                $dept = $user['department'];
+                $div = $user['division'] ?? 'Unassigned';
+
+                if (!isset($grouped[$dept])) {
+                    $grouped[$dept] = [];
+                }
+                if (!isset($grouped[$dept][$div])) {
+                    $grouped[$dept][$div] = [];
+                }
+
+                $grouped[$dept][$div][] = $user;
+            }
+
+            return $grouped;
+        } catch (Exception $e) {
+            $this->logError("Error grouping users by division: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Update user's division
+     *
+     * @param int $userId User ID
+     * @param string $division Division name
+     * @return bool Success status
+     */
+    public function updateUserDivision($userId, $division)
+    {
+        try {
+            $stmt = $this->prepare("UPDATE users SET division = ? WHERE id = ?");
+            return $stmt->execute([$division, $userId]);
+        } catch (Exception $e) {
+            $this->logError("Error updating user division: " . $e->getMessage(), [
+                'userId' => $userId,
+                'division' => $division
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Get division statistics
+     *
+     * @return array Statistics about users by department and division
+     */
+    public function getDivisionStatistics()
+    {
+        try {
+            $stmt = $this->query(
+                "SELECT
+                    department,
+                    COALESCE(division, 'Unassigned') as division,
+                    COUNT(*) as user_count
+                 FROM users
+                 GROUP BY department, division
+                 ORDER BY department, division"
+            );
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            $this->logError("Error getting division statistics: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get material requests with user division information
+     *
+     * @return array Material requests with division details
+     */
+    public function getMaterialRequestsWithDivision()
+    {
+        try {
+            $stmt = $this->query(
+                "SELECT
+                    mr.*,
+                    pu.full_name as production_user_name,
+                    pu.department as production_department,
+                    pu.division as production_division,
+                    ru.full_name as rmw_user_name,
+                    ru.department as rmw_department,
+                    ru.division as rmw_division
+                 FROM material_requests mr
+                 LEFT JOIN users pu ON mr.production_user_id = pu.id
+                 LEFT JOIN users ru ON mr.rmw_user_id = ru.id
+                 ORDER BY mr.request_date DESC"
+            );
+
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            $this->logError("Error getting material requests with division: " . $e->getMessage());
+            return [];
+        }
+    }
+
     // Prevent cloning and unserialization
     private function __clone() {}
     public function __wakeup() {}

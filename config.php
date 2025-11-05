@@ -67,10 +67,10 @@ define('APP_BAK_PATH', path('app_bak'));
 // Database Configuration
 define('DB_TYPE', 'mysql'); // 'sqlite' or 'mysql'
 define('DB_SQLITE_PATH', path('database/rmw.db'));
-define('DB_MYSQL_HOST', 'localhost');
-define('DB_MYSQL_NAME', 'rmw');
-define('DB_MYSQL_USER', 'root');
-define('DB_MYSQL_PASS', '');
+define('DB_MYSQL_HOST', '36.92.174.141:3333');
+define('DB_MYSQL_NAME', 'rmw_scan');
+define('DB_MYSQL_USER', 'endang');
+define('DB_MYSQL_PASS', 'endangthea0');
 
 // Application Configuration
 define('APP_NAME', 'RMW System');

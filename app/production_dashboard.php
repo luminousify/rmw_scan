@@ -56,7 +56,14 @@
               <h3 class="text-lg font-bold text-gray-900 capitalize">
                 <?= ($department === 'production' ? 'Production Department' : 'Raw Material Warehouse') ?>
               </h3>
-              <p class="text-sm text-gray-500 mt-1">Management System</p>
+              <div class="mt-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                  <?= $department === 'production' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' ?>">
+                  <i class="bi bi-diagram-3 mr-1"></i>
+                  <?= htmlspecialchars($userDivision ?? 'Unassigned') ?>
+                </span>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">Management System</p>
             </div>
           </div>
           
@@ -219,7 +226,10 @@
                       <?= htmlspecialchars($request['request_number']) ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <?= htmlspecialchars($request['production_user_name'] ?? 'Unknown') ?>
+                      <div>
+                        <div class="font-medium text-gray-900"><?= htmlspecialchars($request['production_user_name'] ?? 'Unknown') ?></div>
+                        <div class="text-xs text-gray-500"><?= htmlspecialchars($request['production_division'] ?? 'Unassigned') ?></div>
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <?= date('M d, Y H:i', strtotime($request['created_at'])) ?>
