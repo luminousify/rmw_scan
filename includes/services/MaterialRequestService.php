@@ -220,7 +220,7 @@ class MaterialRequestService
         $validated = [];
         
         // Status validation
-        $validStatuses = ['all', 'pending', 'diproses', 'completed', 'cancelled'];
+        $validStatuses = ['all', 'pending', 'approved', 'ready', 'completed', 'cancelled'];
         if (!empty($filters['status']) && in_array($filters['status'], $validStatuses)) {
             $validated['status'] = $filters['status'];
         }
