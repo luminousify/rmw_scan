@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 try {
     // Test database connection
-    $conn = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+    $conn = new PDO("mysql:host=" . DB_MYSQL_HOST . ";dbname=" . DB_MYSQL_NAME, DB_MYSQL_USER, DB_MYSQL_PASS);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     echo json_encode([

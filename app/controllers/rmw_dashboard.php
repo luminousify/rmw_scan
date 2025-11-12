@@ -207,14 +207,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $requestNumber = $requestDetails['request_number'];
             
             $processedBy = $_SESSION['full_name'] ?? $_SESSION['user'];
-      $stmt = $pdo->prepare("
-                UPDATE material_requests 
-                SET status = ?, rmw_user_id = ?, processed_date = ?, processed_by = ?, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            ");
             
-            $processedDate = ($newStatus === 'diproses') ? date('Y-m-d H:i:s') : null;
-            $stmt->execute([$newStatus, $idlog, $processedDate, $processedBy, $requestId]);
+            // Handle different status updates with appropriate fields
+            if ($newStatus === 'approved') {
+                $stmt = $pdo->prepare("
+                    UPDATE material_requests 
+                    SET status = ?, rmw_user_id = ?, processed_date = ?, processed_by = ?, approved_by = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $processedDate = date('Y-m-d H:i:s');
+                $stmt->execute([$newStatus, $idlog, $processedDate, $processedBy, $processedBy, $requestId]);
+            } elseif ($newStatus === 'ready') {
+                $stmt = $pdo->prepare("
+                    UPDATE material_requests 
+                    SET status = ?, rmw_user_id = ?, ready_date = ?, ready_by = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $readyDate = date('Y-m-d H:i:s');
+                $stmt->execute([$newStatus, $idlog, $readyDate, $processedBy, $requestId]);
+            } else {
+                $stmt = $pdo->prepare("
+                    UPDATE material_requests 
+                    SET status = ?, rmw_user_id = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $stmt->execute([$newStatus, $idlog, $requestId]);
+            }
             
             // Log activity
             $stmt = $pdo->prepare("
@@ -229,7 +247,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             $statusIndo = [
                 'pending' => 'Menunggu',
-                'diproses' => 'Diproses', 
+                'approved' => 'Disetujui',
+                'ready' => 'Sudah Siap',
                 'completed' => 'Selesai',
                 'cancelled' => 'Dibatalkan'
             ];

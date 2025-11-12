@@ -241,12 +241,14 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                         <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                           ($request['status'] === 'diproses' ? 'bg-blue-100 text-blue-800' : 
-                           ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) ?>">
+                           ($request['status'] === 'approved' ? 'bg-blue-100 text-blue-800' : 
+                           ($request['status'] === 'ready' ? 'bg-purple-100 text-purple-800' : 
+                           ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'))) ?>">
                         <?php
                         $statusIndo = [
                             'pending' => 'Menunggu',
-                            'diproses' => 'Diproses', 
+                            'approved' => 'Disetujui',
+                            'ready' => 'Sudah Siap',
                             'completed' => 'Selesai',
                             'cancelled' => 'Dibatalkan'
                         ];
@@ -265,22 +267,22 @@
                         <form method="POST" style="display: inline;">
                           <input type="hidden" name="action" value="update_status">
                           <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
-                          <input type="hidden" name="status" value="diproses">
+                          <input type="hidden" name="status" value="approved">
                           <button type="submit" 
-                                  onclick="return confirm('Ubah status ke Diproses?')"
+                                  onclick="return confirm('Setujui permintaan ini?')"
                                   class="text-green-600 hover:text-green-900">
-                            <i class="bi bi-play-circle"></i> Proses
+                            <i class="bi bi-check-circle"></i> Setujui
                           </button>
                         </form>
-                        <?php elseif ($request['status'] === 'diproses'): ?>
+                        <?php elseif ($request['status'] === 'approved'): ?>
                         <form method="POST" style="display: inline;">
                           <input type="hidden" name="action" value="update_status">
                           <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
-                          <input type="hidden" name="status" value="completed">
+                          <input type="hidden" name="status" value="ready">
                           <button type="submit" 
-                                  onclick="return confirm('Tandai sebagai Selesai?')"
-                                  class="text-green-600 hover:text-green-900">
-                            <i class="bi bi-check-circle"></i> Selesaikan
+                                  onclick="return confirm('Tandai sebagai Sudah Siap?')"
+                                  class="text-purple-600 hover:text-purple-900">
+                            <i class="bi bi-check2-circle"></i> Sudah Siap
                           </button>
                         </form>
                         <?php endif; ?>

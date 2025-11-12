@@ -354,6 +354,180 @@ if ($_POST == NULL) {
         $comparisonResults = null;
     }
     
+    // Handle completion action (only for production users, only when status is 'ready')
+    // Allow completion regardless of comparison differences
+    if (isset($_POST['action']) && $_POST['action'] === 'complete_request' && $department === 'production') {
+        try {
+            if (empty($currentRequestNumber)) {
+                throw new Exception("No request number specified");
+            }
+            
+            // Verify request status is 'ready'
+            $stmt = $pdo->prepare("SELECT id, status FROM material_requests WHERE request_number = ?");
+            $stmt->execute([$currentRequestNumber]);
+            $requestCheck = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$requestCheck) {
+                throw new Exception("Request not found");
+            }
+            
+            if ($requestCheck['status'] !== 'ready') {
+                throw new Exception("Request must be in 'ready' status to complete. Current status: " . $requestCheck['status']);
+            }
+            
+            // Get scanned reference from POST (may be empty if no scan was done)
+            $scannedReference = $_POST['nobon'] ?? '';
+            
+            // Start transaction for atomic operations
+            $pdo->beginTransaction();
+            
+            $completedBy = $_SESSION['full_name'] ?? $_SESSION['user'];
+            $stockDetailVerUpdated = 0;
+            $lpbSjNumbersUpdated = [];
+            $itemsApproved = 0;
+            
+            try {
+                // 1. Update StockDetailVer Verifikasi = 1 for records with matching LPB_SJ_No
+                if (!empty($scannedReference)) {
+                    // Get LPB_SJ_No from StockDetailVer records matching the customer reference
+                    $stmt = $pdo->prepare("
+                        SELECT DISTINCT LPB_SJ_No 
+                        FROM StockDetailVer 
+                        WHERE CustNoRef = ? AND LPB_SJ_No IS NOT NULL AND LPB_SJ_No != ''
+                    ");
+                    $stmt->execute([$scannedReference]);
+                    $lpbSjNumbersUpdated = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    
+                    if (!empty($lpbSjNumbersUpdated)) {
+                        // Update Verifikasi = 1 for all records with matching LPB_SJ_No
+                        foreach ($lpbSjNumbersUpdated as $lpbSjNo) {
+                            $stmt = $pdo->prepare("
+                                UPDATE StockDetailVer 
+                                SET Verifikasi = 1 
+                                WHERE LPB_SJ_No = ?
+                            ");
+                            $stmt->execute([$lpbSjNo]);
+                            $stockDetailVerUpdated += $stmt->rowCount();
+                        }
+                    }
+                }
+                
+                // 2. Approve all items in material_request_items
+                $stmt = $pdo->prepare("
+                    UPDATE material_request_items 
+                    SET status = 'approved',
+                        approved_quantity = requested_quantity
+                    WHERE request_id = ? AND status != 'approved'
+                ");
+                $stmt->execute([$requestCheck['id']]);
+                $itemsApproved = $stmt->rowCount();
+                
+                // 3. Update material_requests status to completed
+                $stmt = $pdo->prepare("
+                    UPDATE material_requests 
+                    SET status = 'completed', 
+                        completed_date = CURRENT_TIMESTAMP, 
+                        completed_by = ?,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE request_number = ?
+                ");
+                $stmt->execute([$completedBy, $currentRequestNumber]);
+                
+                // Commit transaction
+                $pdo->commit();
+                
+            } catch (Exception $e) {
+                // Rollback on error
+                $pdo->rollBack();
+                throw $e;
+            }
+            
+            // Prepare activity log data
+            $activityData = [
+                'status' => 'completed',
+                'completed_by' => $completedBy,
+                'request_number' => $currentRequestNumber,
+                'scanned_reference' => !empty($scannedReference) ? $scannedReference : null,
+                'completed_without_scan' => empty($scannedReference),
+                'stockdetailver_updated' => $stockDetailVerUpdated,
+                'lpb_sj_numbers' => $lpbSjNumbersUpdated,
+                'items_approved' => $itemsApproved
+            ];
+            
+            // Include comparison results if available (even with differences)
+            // Note: comparisonResults may not be available in this scope if completion is done separately
+            // This is fine - we allow completion regardless
+            if (isset($comparisonResults)) {
+                $activityData['comparison_results'] = [
+                    'identical' => $comparisonResults['summary']['identical'] ?? false,
+                    'has_differences' => !($comparisonResults['summary']['identical'] ?? true),
+                    'matched_items' => $comparisonResults['summary']['matched_items'] ?? 0,
+                    'total_issues' => $comparisonResults['summary']['total_issues'] ?? 0,
+                    'mismatched_names_count' => count($comparisonResults['mismatched_names'] ?? []),
+                    'mismatched_quantities_count' => count($comparisonResults['mismatched_quantities'] ?? []),
+                    'missing_items_count' => count($comparisonResults['missing_in_customer'] ?? []),
+                    'extra_items_count' => count($comparisonResults['extra_in_customer'] ?? [])
+                ];
+                $activityData['completed_with_differences'] = !($comparisonResults['summary']['identical'] ?? true);
+            }
+            
+            // Log activity
+            $stmt = $pdo->prepare("
+                INSERT INTO activity_log (user_id, action, table_name, record_id, new_values) 
+                VALUES (?, 'COMPLETE_REQUEST', 'material_requests', ?, ?)
+            ");
+            $stmt->execute([$idlog, $requestCheck['id'], json_encode($activityData)]);
+            
+            // Success message with details
+            $success_message = "Request completed successfully! ";
+            $details = [];
+            
+            if ($itemsApproved > 0) {
+                $details[] = "{$itemsApproved} item(s) approved";
+            }
+            
+            if ($stockDetailVerUpdated > 0) {
+                $details[] = "{$stockDetailVerUpdated} StockDetailVer record(s) verified";
+                if (!empty($lpbSjNumbersUpdated)) {
+                    $details[] = "LPB_SJ_No: " . implode(', ', $lpbSjNumbersUpdated);
+                }
+            }
+            
+            if (!empty($details)) {
+                $success_message .= implode(', ', $details) . ". ";
+            }
+            
+            if (isset($comparisonResults) && !$comparisonResults['summary']['identical']) {
+                $success_message .= "Note: Differences were found during scan. Please verify materials manually.";
+            }
+            
+            // Refresh request details
+            $refreshQuery = "
+                SELECT 
+                    mr.id as request_id,
+                    mr.request_number,
+                    mr.status,
+                    mr.priority,
+                    mr.notes,
+                    mr.customer_reference,
+                    u.full_name as production_user
+                FROM material_requests mr
+                LEFT JOIN users u ON mr.production_user_id = u.id
+                WHERE mr.request_number = ?
+            ";
+            $stmt = $pdo->prepare($refreshQuery);
+            $stmt->execute([$currentRequestNumber]);
+            $requestDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Clear comparison results after completion to prevent re-display
+            $comparisonResults = null;
+            $customerReferenceData = null;
+            
+        } catch (Exception $e) {
+            $error_message = "Error completing request: " . $e->getMessage();
+        }
+    }
+    
     include '../scan.php';
 }
 

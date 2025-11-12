@@ -4,11 +4,12 @@
  * This is a fallback when SQLite is not available
  */
 
-// Database configuration
-$host = 'localhost';
-$dbname = 'rmw_system';
-$username = 'root';
-$password = '';
+// Database configuration - use config.php constants
+require_once __DIR__ . '/../config.php';
+$host = DB_MYSQL_HOST;
+$dbname = DB_MYSQL_NAME;
+$username = DB_MYSQL_USER;
+$password = DB_MYSQL_PASS;
 
 // Connection options
 $options = [

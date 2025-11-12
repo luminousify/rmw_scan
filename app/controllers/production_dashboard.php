@@ -226,7 +226,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             $statusIndo = [
                 'pending' => 'Menunggu',
-                'diproses' => 'Diproses', 
+                'approved' => 'Disetujui',
+                'ready' => 'Sudah Siap',
                 'completed' => 'Selesai',
                 'cancelled' => 'Dibatalkan'
             ];

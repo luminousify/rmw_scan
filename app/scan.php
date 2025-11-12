@@ -839,6 +839,49 @@
             <i class="bi bi-info-circle mr-1"></i>
             Customer reference data is sourced from StockDetailVer table.
           </div>
+          
+        </div>
+        <?php endif; ?>
+        
+        <!-- Complete Button (Production users only, when status is 'ready') -->
+        <!-- Always visible when status is ready, regardless of comparison results -->
+        <?php if ($department === 'production' && isset($requestDetails) && $requestDetails['status'] === 'ready'): ?>
+        <div class="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-5 shadow-sm">
+          <?php if (isset($comparisonResults) && !$comparisonResults['summary']['identical']): ?>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+            <div class="flex items-start">
+              <i class="bi bi-exclamation-triangle text-yellow-600 text-lg mr-2 mt-0.5"></i>
+              <div class="flex-1">
+                <h4 class="text-sm font-medium text-yellow-800 mb-1">Perbedaan Ditemukan</h4>
+                <p class="text-xs text-yellow-700">
+                  Terdapat perbedaan pada nama part atau jumlah material. Anda tetap dapat menyelesaikan permintaan ini setelah memverifikasi material secara manual.
+                </p>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+          
+          <form method="POST" id="completeForm">
+            <input type="hidden" name="action" value="complete_request">
+            <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
+            <input type="hidden" name="nobon" value="<?= htmlspecialchars($nobon ?? '') ?>">
+            <button 
+              type="submit" 
+              onclick="return confirm('<?= isset($comparisonResults) && !$comparisonResults['summary']['identical'] ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.' : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.' ?>')"
+              class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-gray-900 font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-3"
+            >
+              <i class="bi bi-check-circle text-xl text-gray-900"></i>
+              <span>Selesaikan Permintaan</span>
+            </button>
+            <p class="text-xs text-gray-600 mt-2 text-center">
+              <i class="bi bi-info-circle mr-1"></i>
+              <?php if (isset($comparisonResults) && !$comparisonResults['summary']['identical']): ?>
+                Anda dapat menyelesaikan meskipun ada perbedaan. Pastikan material sudah diverifikasi secara manual.
+              <?php else: ?>
+                Pastikan semua material sudah diverifikasi sebelum menyelesaikan
+              <?php endif; ?>
+            </p>
+          </form>
         </div>
         <?php endif; ?>
 

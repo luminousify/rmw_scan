@@ -215,7 +215,8 @@
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base">
                     <option value="all" <?= ($_GET['status'] ?? 'all') === 'all' ? 'selected' : '' ?>>Semua Status</option>
                     <option value="pending" <?= ($_GET['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Menunggu</option>
-                    <option value="diproses" <?= ($_GET['status'] ?? '') === 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                    <option value="approved" <?= ($_GET['status'] ?? '') === 'approved' ? 'selected' : '' ?>>Disetujui</option>
+                    <option value="ready" <?= ($_GET['status'] ?? '') === 'ready' ? 'selected' : '' ?>>Sudah Siap</option>
                     <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Selesai</option>
                     <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Dibatalkan</option>
                   </select>
@@ -325,9 +326,19 @@
                     <td class="px-4 py-3">
                       <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full transition-all duration-200
                         <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                           ($request['status'] === 'diproses' ? 'bg-blue-100 text-blue-800' : 
-                           ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) ?>">
-                        <?= ucfirst($request['status']) ?>
+                           ($request['status'] === 'approved' ? 'bg-blue-100 text-blue-800' : 
+                           ($request['status'] === 'ready' ? 'bg-purple-100 text-purple-800' : 
+                           ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'))) ?>">
+                        <?php
+                        $statusIndo = [
+                            'pending' => 'Menunggu',
+                            'approved' => 'Disetujui',
+                            'ready' => 'Sudah Siap',
+                            'completed' => 'Selesai',
+                            'cancelled' => 'Dibatalkan'
+                        ];
+                        echo $statusIndo[$request['status']] ?? ucfirst($request['status']);
+                        ?>
                       </span>
                     </td>
                     
@@ -344,7 +355,7 @@
                         </button>
                         
                         <!-- Scan Button (for processing requests) -->
-                        <?php if ($request['status'] === 'diproses'): ?>
+                        <?php if ($request['status'] === 'ready'): ?>
                         <button 
                           onclick="scanQRForRequest('<?= htmlspecialchars($request['request_number']) ?>')" 
                           class="inline-flex items-center justify-center w-8 h-8 bg-green-50 hover:bg-green-100 text-green-700 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
@@ -1177,7 +1188,8 @@
         `).join('');
         
         const statusColor = request.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                           request.status === 'diproses' ? 'background: #dbeafe !important; color: #1e40af !important;' :
+                           request.status === 'approved' ? 'background: #dbeafe !important; color: #1e40af !important;' :
+                           request.status === 'ready' ? 'background: #e9d5ff !important; color: #6b21a8 !important;' :
                            request.status === 'completed' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
                            'background: #fee2e2 !important; color: #991b1b !important;';
         
