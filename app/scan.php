@@ -116,27 +116,16 @@
       <!-- Main content -->
       <main class="flex-1 p-6">
         <!-- Page Header -->
-        <div class="mb-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <i class="bi bi-upc-scan text-white text-xl"></i>
-                </div>
-                <div>
-                  <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Material Scanner</h1>
-                  <p class="text-gray-600 mt-1">Scan and verify customer reference materials</p>
-                </div>
-              </div>
-            </div>
+        <div class="border-b border-gray-200 pb-4 mb-6">
+          <div>
             <div class="flex items-center space-x-3">
-              <div class="text-sm text-gray-500 flex items-center">
-                <i class="bi bi-clock mr-1" aria-hidden="true"></i>
-                Last updated: <span id="lastUpdated"><?= date('H:i') ?></span>
+              <div class="w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center">
+                <i class="bi bi-upc-scan text-gray-700 text-xl"></i>
               </div>
-              <button onclick="refreshPage()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Refresh">
-                <i class="bi bi-arrow-clockwise"></i>
-              </button>
+              <div>
+                <h1 class="text-2xl font-bold text-gray-900">Material Scanner</h1>
+                <p class="text-gray-500">Scan and verify customer reference materials</p>
+              </div>
             </div>
           </div>
         </div>
@@ -163,704 +152,144 @@
       <!-- Scanner Content -->
       <div class="space-y-6">
 
-      <!-- Request Number Alert (shown when request number is passed from URL) -->
+      <!-- Active Request Alert -->
       <?php if (!empty($_GET['request_number']) && $nobon != ''): ?>
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 animate-fade-in">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <i class="bi bi-upc-scan text-white" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="ml-4">
+      <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
               <h3 class="text-sm font-medium text-blue-900">Active Request</h3>
               <p class="text-lg font-semibold text-blue-900 mt-1">
                 <?= htmlspecialchars($nobon) ?>
               </p>
-              <p class="text-sm text-blue-700 mt-1">Scanning materials for this production request</p>
             </div>
-          </div>
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-  
             <a href="<?php echo url('app/controllers/scanner.php'); ?>" 
-               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
-              <i class="bi bi-arrow-clockwise mr-2" aria-hidden="true"></i>
+               class="text-sm font-medium text-blue-700 hover:text-blue-800">
               New Scan
             </a>
-          </div>
         </div>
       </div>
       <?php endif; ?>
 
-      <!-- Scanner Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <i class="bi bi-upc-scan text-white text-lg"></i>
-              </div>
-              <div>
-                <h2 class="text-xl font-semibold text-gray-900">Material Scanner</h2>
-                <p class="text-sm text-gray-600">Scan customer reference QR codes</p>
-              </div>
-            </div>
-            <?php if ($dat!=""): ?>
-            <div class="flex items-center space-x-3">
-              <div class="text-right">
-                <div class="text-sm text-gray-500">Current Scan</div>
-                <div class="text-lg font-semibold text-gray-900"><?=$nobon?></div>
-              </div>
-            </div>
-            <?php endif; ?>
-          </div>
-        </div>
-        </div>
-
-        <!-- Warning Message for non-diproses status -->
-          <?php if (isset($warning_message)): ?>
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 animate-fade-in">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
-                    <i class="bi bi-exclamation-triangle text-white"></i>
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <h3 class="text-sm font-medium text-yellow-900">Status Warning</h3>
-                  <p class="text-yellow-800 mt-1"><?= htmlspecialchars($warning_message) ?></p>
-                </div>
-              </div>
-              <div class="flex-shrink-0">
-                <a href="<?php echo url('app/controllers/my_requests.php'); ?>" 
-                   class="inline-flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-medium transition-colors">
-                  <i class="bi bi-list-task mr-2"></i>
-                  View Requests
-                </a>
-              </div>
-            </div>
+      <!-- Scanner Form -->
+      <div class="bg-white border border-gray-200 rounded-md p-6 mb-6">
+        <form name="form1" action="#" method="post" id="scannerForm">
+          <?php if (!empty($currentRequestNumber)): ?>
+          <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
+          <?php else: ?>
+          <div class="mb-4">
+            <label for="request_number_input" class="block text-sm font-medium text-gray-700 mb-2">Request Number</label>
+            <input 
+              id="request_number_input" 
+              type="text" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 font-mono" 
+              name="request_number_input" 
+              placeholder="REQ-20241201-1234" 
+              required>
           </div>
           <?php endif; ?>
           
-          <!-- Info Message for requests with no materials -->
-          <?php if (isset($info_message)): ?>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 animate-fade-in">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <i class="bi bi-info-circle text-white"></i>
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <h3 class="text-sm font-medium text-blue-900">Request Information</h3>
-                  <p class="text-blue-800 mt-1"><?= htmlspecialchars($info_message) ?></p>
-                </div>
-              </div>
-              <div class="flex-shrink-0">
-                <a href="<?php echo url('app/controllers/my_requests.php'); ?>" 
-                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
-                  <i class="bi bi-plus-circle mr-2"></i>
-                  Add Materials
-                </a>
-              </div>
+          <div class="flex gap-2">
+            <div class="flex-1">
+              <label for="lot_material_bc" class="block text-sm font-medium text-gray-700 mb-2">Customer Reference</label>
+              <input 
+                id="lot_material_bc" 
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 font-mono text-lg" 
+                name="nobon" 
+                placeholder="e.g., INJ/FG/1887-1" 
+                value="<?= htmlspecialchars($nobon) ?>"
+                required 
+                <?php echo empty($nobon) ? 'autofocus' : ''; ?>
+              >
             </div>
-          </div>
-          <?php endif; ?>
-
-        <!-- Enhanced Scanner Input -->
-        <div class="p-6">
-          <form name="form1" action="#" method="post" id="scannerForm">
-            <?php if (!empty($currentRequestNumber)): ?>
-            <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
-            <?php else: ?>
-            <!-- Enhanced Request Number Selection -->
-            <div class="mb-8">
-              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                <label class="block text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                    <i class="bi bi-clipboard-check text-white text-sm"></i>
-                  </div>
-                  Production Request Number
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <i class="bi bi-clipboard-data text-gray-400 text-lg"></i>
-                  </div>
-                  <input 
-                    id="request_number_input" 
-                    type="text" 
-                    class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500 text-lg font-mono transition-all duration-200" 
-                    name="request_number_input" 
-                    placeholder="REQ-20241201-1234" 
-                    required
-                    oninput="validateRequestNumber(this)"
-                  >
-                  <div id="requestNumberValidation" class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                    <div class="hidden" id="requestNumberStatus"></div>
-                  </div>
-                </div>
-                <div class="mt-3 flex items-center justify-between">
-                  <div class="text-sm text-gray-600 flex items-center">
-                    <i class="bi bi-info-circle mr-2 text-blue-500"></i>
-                    Enter the production request number to compare with RMW data
-                  </div>
-                  <div id="requestNumberFormat" class="text-xs text-gray-500">
-                    Format: REQ-YYYYMMDD-XXXX
-                  </div>
-                </div>
-              </div>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Enhanced QR Code Scanner -->
-            <div class="mb-8">
-              <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-                <label class="block text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
-                    <i class="bi bi-qr-code-scan text-white text-sm"></i>
-                  </div>
-                  Customer Reference QR Code
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <i class="bi bi-box-seam text-gray-400 text-lg"></i>
-                  </div>
-                  <input 
-                    id="lot_material_bc" 
-                    type="text" 
-                    class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 text-lg font-mono transition-all duration-200" 
-                    name="nobon" 
-                    placeholder="Enter Customer Reference (e.g., INJ/FG/1887-1)" 
-                    value="<?= htmlspecialchars($nobon) ?>"
-                    required 
-                    oninput="validateCustomerReference(this)"
-                    <?php 
-                    echo empty($nobon) ? 'autofocus' : '';
-                    ?>
-                  >
-                  <div id="customerReferenceValidation" class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                    <div class="hidden" id="customerReferenceStatus"></div>
-                  </div>
-                </div>
-                <div class="mt-3 flex items-center justify-between">
-                  <div class="text-sm text-gray-600 flex items-center">
-                    <i class="bi bi-upc-scan mr-2 text-green-500"></i>
-                    Scan or type RMW Customer Reference QR Code
-                  </div>
-                  <div id="scanStatus" class="text-xs text-gray-500">
-                    Ready to scan
-                  </div>
-                </div>
-                
-                <!-- Scanner Status Indicator -->
-                <div class="mt-4 flex items-center space-x-3">
-                  <div class="flex items-center">
-                    <div id="scannerIndicator" class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="ml-2 text-sm text-gray-600">Scanner Active</span>
-                  </div>
-                  <button type="button" onclick="clearScannerInput()" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
-                    <i class="bi bi-x-circle mr-1"></i>
-                    Clear
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex items-end">
               <button 
                 type="submit" 
-                id="submitScan"
-                class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-3"
-                onclick="showLoading()"
-              >
-                <i class="bi bi-search text-xl"></i>
-                <span>Process Scanner Data</span>
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+                onclick="showLoading()">
+                Process
               </button>
-              <?php if (!empty($nobon)): ?>
-              <?php endif; ?>
             </div>
-            
-
-          </form>
-        </div>
+          </div>
+        </form>
+      </div>
         <!-- Material Request Details -->
         <?php if (!empty($dat)): ?>
-        <!-- Request Header Card -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 sm:p-5 mb-4 shadow-sm">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
-              <i class="bi bi-clipboard-data mr-3 text-blue-600"></i>
-              Material Request Details (Baseline)
-            </h2>
-            <div class="flex items-center space-x-2">
-              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium">
-                <?= count($dat) ?> Items
-              </span>
-              <a href="<?php echo url('app/controllers/my_requests.php'); ?>" class="px-4 py-1.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-lg text-sm font-medium transition-colors">
-                <i class="bi bi-arrow-left mr-2"></i>Back to Requests
-              </a>
-            </div>
-          </div>
-          
-          <?php if (isset($currentRequestNumber)): ?>
-          <div class="bg-blue-100 border border-blue-200 rounded-lg p-3 mb-3">
-            <div class="flex items-center text-sm text-blue-800">
-              <i class="bi bi-info-circle mr-2"></i>
-              This is the baseline material list for request <strong><?= htmlspecialchars($currentRequestNumber) ?></strong>. 
-              Customer reference materials will be compared against these items.
-            </div>
-          </div>
-          <?php endif; ?>
-          
-          <?php if (isset($requestDetails)): ?>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-            <div class="bg-white rounded-lg p-3 border border-blue-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-upc-scan mr-2"></i>
-                Request Number
-              </div>
-              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['request_number'] ?? 'N/A') ?></div>
-            </div>
-            
-            <div class="bg-white rounded-lg p-3 border border-blue-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-flag mr-2"></i>
-                Status
-              </div>
-              <div>
-                <?php 
-                $requestStatus = $requestDetails['status'] ?? 'pending';
-                $requestStatusClass = ($requestStatus === 'pending') ? 'bg-yellow-100 text-yellow-800' : 
-                                     (($requestStatus === 'diproses') ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800');
-                ?>
-                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $requestStatusClass ?>">
-                  <?= ucfirst(htmlspecialchars($requestStatus)) ?>
-                </span>
+        <!-- Request Details & Materials Table -->
+        <div class="bg-white border border-gray-200 rounded-md overflow-hidden">
+          <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold text-gray-900">Request Details (Baseline)</h3>
+              <div class="text-sm text-gray-500">
+                <?= count($dat) ?> items
               </div>
             </div>
-            
-            <div class="bg-white rounded-lg p-3 border border-blue-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-person mr-2"></i>
-                Requested By
-              </div>
-              <div class="font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['production_user'] ?? 'System') ?></div>
-            </div>
-            
-            <?php if (!empty($requestDetails['customer_reference'] ?? '')): ?>
-            <div class="bg-white rounded-lg p-3 border border-blue-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-tag mr-2"></i>
-                Customer Reference
-              </div>
-              <div class="font-semibold text-gray-900"><?= htmlspecialchars($requestDetails['customer_reference'] ?? 'N/A') ?></div>
+            <?php if (isset($requestDetails)): ?>
+            <div class="text-xs text-gray-600 mt-2">
+              <span class="font-mono font-semibold"><?= htmlspecialchars($requestDetails['request_number'] ?? 'N/A') ?></span>
+              <?php if (!empty($requestDetails['customer_reference'] ?? '')): ?>
+               | Cust Ref: <span class="font-semibold"><?= htmlspecialchars($requestDetails['customer_reference'] ?? 'N/A') ?></span>
+              <?php endif; ?>
             </div>
             <?php endif; ?>
           </div>
-          
-          <?php if (!empty($requestDetails['notes'] ?? '')): ?>
-          <div class="mt-3 bg-white rounded-lg p-3 border border-blue-100">
-            <div class="flex items-center text-gray-500 mb-2 text-sm">
-              <i class="bi bi-sticky-note mr-2"></i>
-              Notes
-            </div>
-            <div class="text-gray-900"><?= htmlspecialchars($requestDetails['notes'] ?? '') ?></div>
-          </div>
-          <?php endif; ?>
-          <?php endif; ?>
-        </div>
 
-        <!-- Enhanced Materials Table -->
-        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <!-- Table Header with Search -->
-          <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <i class="bi bi-box-seam text-blue-600"></i>
-                  </div>
-                  Requested Materials
-                </h3>
-                <p class="text-sm text-gray-600 mt-1">Baseline materials for comparison</p>
-              </div>
-              <div class="flex items-center space-x-3">
-                <!-- Search Box -->
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="bi bi-search text-gray-400"></i>
-                  </div>
-                  <input 
-                    type="text" 
-                    id="materialSearch"
-                    placeholder="Search materials..."
-                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    oninput="filterMaterials()"
-                  >
-                </div>
-                <!-- Item Count -->
-                <div class="bg-white px-3 py-2 rounded-lg border border-gray-200">
-                  <span class="text-sm text-gray-600">Items: </span>
-                  <span id="itemCount" class="text-sm font-semibold text-gray-900"><?= count($dat) ?></span>
-                </div>
-                <!-- Export Button -->
-                <button 
-                  onclick="exportMaterials()"
-                  class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2"
-                >
-                  <i class="bi bi-download"></i>
-                  <span>Export</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200" id="materialsTable">
-              <thead class="bg-gray-50 sticky top-0 z-10">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div class="flex items-center space-x-1">
-                      <span>No.</span>
-                      <button onclick="sortTable(0)" class="text-gray-400 hover:text-gray-600">
-                        <i class="bi bi-arrow-down-up text-xs"></i>
-                      </button>
-                    </div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div class="flex items-center space-x-1">
-                      <span>Product ID</span>
-                      <button onclick="sortTable(1)" class="text-gray-400 hover:text-gray-600">
-                        <i class="bi bi-arrow-down-up text-xs"></i>
-                      </button>
-                    </div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div class="flex items-center space-x-1">
-                      <span>Product Name</span>
-                      <button onclick="sortTable(2)" class="text-gray-400 hover:text-gray-600">
-                        <i class="bi bi-arrow-down-up text-xs"></i>
-                      </button>
-                    </div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div class="flex items-center justify-center space-x-1">
-                      <span>Quantity</span>
-                      <button onclick="sortTable(4)" class="text-gray-400 hover:text-gray-600">
-                        <i class="bi bi-arrow-down-up text-xs"></i>
-                      </button>
-                    </div>
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product ID</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                  <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Qty</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200" id="materialsTableBody">
+              <tbody class="bg-white divide-y divide-gray-200">
                 <?php $no = 1; foreach($dat as $d): ?>
-                <tr class="hover:bg-gray-50 transition-colors material-row" data-searchable="<?php echo strtolower(htmlspecialchars($d['product_id'] ?? '') . ' ' . htmlspecialchars($d['product_name'] ?? '') . ' ' . htmlspecialchars($d['description'] ?? '')); ?>">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <span class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full text-xs font-semibold">
-                      <?php echo $no++; ?>
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center space-x-2">
-                      <span class="text-sm font-mono font-semibold text-gray-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
-                        <?php echo htmlspecialchars($d['product_id'] ?? 'N/A'); ?>
-                      </span>
-                      <button onclick="copyToClipboard('<?php echo htmlspecialchars($d['product_id'] ?? ''); ?>')" class="text-gray-400 hover:text-gray-600 transition-colors" title="Copy">
-                        <i class="bi bi-clipboard text-xs"></i>
-                      </button>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm font-medium text-gray-900 max-w-xs truncate" title="<?php echo htmlspecialchars($d['product_name'] ?? ''); ?>">
-                      <?php echo htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?>
-                    </div>
-                    <?php if (!empty($d['description'])): ?>
-                    <div class="text-xs text-gray-500 mt-1 max-w-xs truncate" title="<?php echo htmlspecialchars($d['description'] ?? ''); ?>">
-                      <?php echo htmlspecialchars($d['description'] ?? ''); ?>
-                    </div>
-                    <?php endif; ?>
-                  </td>
-                  <td class="px-6 py-4 text-sm text-gray-500">
-                    <div class="max-w-xs" title="<?php echo htmlspecialchars($d['description'] ?? ''); ?>">
-                      <?php echo htmlspecialchars($d['description'] ?? 'No description'); ?>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="flex items-center justify-center space-x-2">
-                      <span class="text-lg font-bold text-gray-900">
-                        <?php echo number_format($d['requested_quantity'] ?? 0, 0, '', ','); ?>
-                      </span>
-                      <div class="flex flex-col items-center">
-                        <button onclick="adjustQuantity(<?php echo $d['item_id'] ?? 0; ?>, 1)" class="text-green-600 hover:text-green-700 transition-colors" title="Increase">
-                          <i class="bi bi-chevron-up text-xs"></i>
-                        </button>
-                        <button onclick="adjustQuantity(<?php echo $d['item_id'] ?? 0; ?>, -1)" class="text-red-600 hover:text-red-700 transition-colors" title="Decrease">
-                          <i class="bi bi-chevron-down text-xs"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center space-x-2">
-                      <span class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">
-                        <?php echo htmlspecialchars($d['unit'] ?? 'pcs'); ?>
-                      </span>
-                      <select onchange="updateUnit(<?php echo $d['item_id'] ?? 0; ?>, this.value)" class="text-xs border border-gray-200 rounded px-2 py-1">
-                        <option value="pcs" <?php echo ($d['unit'] ?? 'pcs') === 'pcs' ? 'selected' : ''; ?>>pcs</option>
-                        <option value="kg" <?php echo ($d['unit'] ?? '') === 'kg' ? 'selected' : ''; ?>>kg</option>
-                        <option value="m" <?php echo ($d['unit'] ?? '') === 'm' ? 'selected' : ''; ?>>m</option>
-                        <option value="l" <?php echo ($d['unit'] ?? '') === 'l' ? 'selected' : ''; ?>>l</option>
-                      </select>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                    <?php 
-                    $itemStatus = $d['item_status'] ?? 'pending';
-                    if ($itemStatus === 'pending') {
-                        $statusClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-                        $statusIcon = 'bi-clock';
-                    } elseif ($itemStatus === 'approved') {
-                        $statusClass = 'bg-green-100 text-green-800 border-green-200';
-                        $statusIcon = 'bi-check-circle';
-                    } else {
-                        $statusClass = 'bg-red-100 text-red-800 border-red-200';
-                        $statusIcon = 'bi-x-circle';
-                    }
-                    ?>
-                    <div class="flex items-center justify-center space-x-2">
-                      <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full border <?php echo $statusClass; ?>">
-                        <i class="bi <?php echo $statusIcon; ?> mr-1"></i>
-                        <?php echo ucfirst(htmlspecialchars($itemStatus)); ?>
-                      </span>
-                      <button onclick="toggleItemStatus(<?php echo $d['item_id'] ?? 0; ?>)" class="text-gray-400 hover:text-gray-600 transition-colors" title="Change Status">
-                        <i class="bi bi-pencil-square text-xs"></i>
-                      </button>
-                    </div>
-                  </td>
+                <tr>
+                  <td class="px-3 py-2 font-mono text-xs text-gray-500"><?php echo $no++; ?></td>
+                  <td class="px-3 py-2 font-mono text-xs text-gray-900"><?= htmlspecialchars($d['product_id'] ?? 'N/A'); ?></td>
+                  <td class="px-3 py-2 text-xs text-gray-900" title="<?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?>"><?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?></td>
+                  <td class="px-3 py-2 text-xs text-center text-gray-900"><?= number_format($d['requested_quantity'] ?? 0, 0, '', ','); ?></td>
+                  <td class="px-3 py-2 text-xs text-gray-500"><?= htmlspecialchars($d['unit'] ?? 'pcs'); ?></td>
                 </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
           </div>
-          
-          <!-- Summary Footer -->
-          <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-600">
-                <i class="bi bi-box-seam mr-1"></i>
-                <?= count($dat) ?> material<?= count($dat) > 1 ? 's' : '' ?>
-              </div>
-              <div class="text-sm text-gray-600">
-                <i class="bi bi-calculator mr-1"></i>
-                Total Quantity: 
-                <span class="font-semibold text-gray-900">
-                  <?php 
-                  $totalQuantity = 0;
-                  foreach ($dat as $item) {
-                    $qty = isset($item['requested_quantity']) ? (int)$item['requested_quantity'] : 0;
-                    $totalQuantity += $qty;
-                  }
-                  echo number_format($totalQuantity, 0, '', ',');
-                  ?> items
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <?php if (isset($customerReferenceData) && isset($comparisonResults)): ?>
-        <!-- Customer Reference Comparison Results -->
-        <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4 sm:p-5 mb-4 shadow-sm">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
-              <i class="bi bi-arrow-left-right mr-3 text-purple-600"></i>
-              Comparison Results
-            </h2>
-            <div class="flex items-center space-x-2">
-              <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-lg text-sm font-medium">
-                <?= $comparisonResults['summary']['identical'] ? 'Perfect Match' : 'Differences Found' ?>
+      <!-- Comparison Results -->
+        <?php if (isset($customerReferenceData) && isset($comparisonResults)): ?>
+        <div class="border border-gray-200 rounded-md overflow-hidden mb-6">
+          <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold text-gray-900">Comparison Results</h3>
+              <span class="px-2 py-1 text-xs font-medium rounded <?=$comparisonResults['summary']['identical'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'?>">
+                <?= $comparisonResults['summary']['identical'] ? 'Match' : 'Mismatch' ?>
               </span>
             </div>
           </div>
-          
-          <!-- Customer Reference Details -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mb-5">
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-upc-scan mr-2"></i>
-                Customer Reference
+          <div class="p-4">
+            <div class="text-sm font-mono text-gray-600 mb-3">Cust Ref: <?= htmlspecialchars($customerReferenceData['customer_reference'] ?? 'N/A') ?></div>
+            <div class="text-sm space-y-1 text-gray-700">
+              <div>Matched Items: <span class="font-semibold"><?= $comparisonResults['summary']['matched_items'] ?></span></div>
+              <?php if (!$comparisonResults['summary']['identical']): ?>
+              <div class="text-red-600 font-semibold">
+                Issues Found: <?= $comparisonResults['summary']['total_issues'] ?>
               </div>
-              <div class="font-mono font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_reference'] ?? 'N/A') ?></div>
-            </div>
-            
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <div class="flex items-center text-gray-500 mb-1">
-                <i class="bi bi-building mr-2"></i>
-                Customer Name
-              </div>
-              <div class="font-semibold text-gray-900"><?= htmlspecialchars($customerReferenceData['customer_name'] ?? 'N/A') ?></div>
+              <?php endif; ?>
             </div>
           </div>
-          
-  
-          
-          <!-- Customer Reference Materials Table -->
-          <div class="mb-3">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2.5 flex items-center">
-              <i class="bi bi-list-ul mr-2 text-purple-600"></i>
-              Customer Reference Materials
-            </h3>
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product ID</th>
-                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                    <th class="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th class="px-4 py-2.5 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <?php $no = 1; foreach($customerReferenceData['items'] as $item): ?>
-                  <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-medium"><?php echo $no++; ?></td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                      <span class="text-sm font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                        <?php echo htmlspecialchars($item['product_id'] ?? 'N/A'); ?>
-                      </span>
-                    </td>
-                    <td class="px-4 py-3">
-                      <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($item['product_name'] ?? 'Unknown Product'); ?></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                      <div class="text-sm text-gray-900"><?php echo number_format($item['quantity'] ?? 0); ?> <?php echo htmlspecialchars($item['unit'] ?? ''); ?></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                      <?php 
-                      $itemStatus = 'ok';
-                      $statusClass = 'bg-green-100 text-green-800';
-                      $statusText = 'Match';
-                      
-                      // Check for mismatches - with defensive array checks
-                      if (!empty($comparisonResults['mismatched_names'])) {
-                        foreach($comparisonResults['mismatched_names'] as $mismatch) {
-                          if ($mismatch['product_id'] === ($item['product_id'] ?? null)) {
-                            $itemStatus = 'name_mismatch';
-                            $statusClass = 'bg-yellow-100 text-yellow-800';
-                            $statusText = 'Name Diff';
-                            break;
-                          }
-                        }
-                      }
-                      
-                      if (!empty($comparisonResults['mismatched_quantities'])) {
-                        foreach($comparisonResults['mismatched_quantities'] as $mismatch) {
-                          if ($mismatch['product_id'] === ($item['product_id'] ?? null)) {
-                            $itemStatus = 'quantity_mismatch';
-                            $statusClass = 'bg-orange-100 text-orange-800';
-                            $statusText = 'Qty Diff';
-                            break;
-                          }
-                        }
-                      }
-                      
-                      if (!empty($comparisonResults['extra_in_customer'])) {
-                        foreach($comparisonResults['extra_in_customer'] as $extra) {
-                          if (($extra['product_id'] ?? null) === ($item['product_id'] ?? null)) {
-                            $itemStatus = 'extra';
-                            $statusClass = 'bg-blue-100 text-blue-800';
-                            $statusText = 'Extra';
-                            break;
-                          }
-                        }
-                      }
-                      ?>
-                      <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $statusClass ?>">
-                        <?= $statusText ?>
-                      </span>
-                    </td>
-                  </tr>
-                  <?php endforeach; ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          <!-- Mismatch Details -->
-          <?php if (!$comparisonResults['summary']['identical']): ?>
-          <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-            <h4 class="text-sm font-medium text-red-800 mb-2">
-              <i class="bi bi-exclamation-triangle mr-1"></i>
-              Difference Details
-            </h4>
-            <ul class="text-sm text-red-700 space-y-1">
-              <?php if (!empty($comparisonResults['mismatched_names'])): ?>
-              <li><strong>Name Mismatches:</strong></li>
-              <?php foreach($comparisonResults['mismatched_names'] as $mismatch): ?>
-              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_id'] ?? 'N/A') ?>: Request has "<?= htmlspecialchars($mismatch['request_name'] ?? 'Unknown') ?>" but customer has "<?= htmlspecialchars($mismatch['customer_name'] ?? 'Unknown') ?>"</li>
-              <?php endforeach; ?>
-              <?php endif; ?>
-              
-              <?php if (!empty($comparisonResults['mismatched_quantities'])): ?>
-              <li><strong>Quantity Differences:</strong></li>
-              <?php foreach($comparisonResults['mismatched_quantities'] as $mismatch): ?>
-              <li class="ml-4">• <?= htmlspecialchars($mismatch['product_name'] ?? 'Unknown Product') ?>: Request has <?= $mismatch['request_quantity'] ?? 0 ?> but customer has <?= $mismatch['customer_quantity'] ?? 0 ?></li>
-              <?php endforeach; ?>
-              <?php endif; ?>
-              
-              <?php if (!empty($comparisonResults['missing_in_customer'])): ?>
-              <li><strong>Missing in Customer Reference:</strong></li>
-              <?php foreach($comparisonResults['missing_in_customer'] as $missing): ?>
-              <li class="ml-4">• <?= htmlspecialchars($missing['product_name'] ?? 'Unknown Product') ?> (<?= $missing['requested_quantity'] ?? 0 ?> <?= $missing['unit'] ?? 'pcs' ?>)</li>
-              <?php endforeach; ?>
-              <?php endif; ?>
-              
-              <?php if (!empty($comparisonResults['extra_in_customer'])): ?>
-              <li><strong>Extra in Customer Reference:</strong></li>
-              <?php foreach($comparisonResults['extra_in_customer'] as $extra): ?>
-              <li class="ml-4">• <?= htmlspecialchars($extra['product_name'] ?? 'Unknown Product') ?> (<?= $extra['quantity'] ?? 0 ?> <?= $extra['unit'] ?? 'pcs' ?>)</li>
-              <?php endforeach; ?>
-              <?php endif; ?>
-            </ul>
-          </div>
-          <?php endif; ?>
-          
-          <div class="mt-3 text-sm text-gray-500">
-            <i class="bi bi-info-circle mr-1"></i>
-            Customer reference data is sourced from StockDetailVer table.
-          </div>
-          
         </div>
         <?php endif; ?>
+        <?php endif; ?>
         
-        <!-- Complete Button (Production users only, when status is 'ready') -->
-        <!-- Always visible when status is ready, regardless of comparison results -->
+        <!-- Complete Request Button -->
         <?php if ($department === 'production' && isset($requestDetails) && $requestDetails['status'] === 'ready'): ?>
-        <div class="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-5 shadow-sm">
-          <?php if (isset($comparisonResults) && !$comparisonResults['summary']['identical']): ?>
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-            <div class="flex items-start">
-              <i class="bi bi-exclamation-triangle text-yellow-600 text-lg mr-2 mt-0.5"></i>
-              <div class="flex-1">
-                <h4 class="text-sm font-medium text-yellow-800 mb-1">Perbedaan Ditemukan</h4>
-                <p class="text-xs text-yellow-700">
-                  Terdapat perbedaan pada nama part atau jumlah material. Anda tetap dapat menyelesaikan permintaan ini setelah memverifikasi material secara manual.
-                </p>
-              </div>
-            </div>
-          </div>
-          <?php endif; ?>
-          
+        <div class="mt-6 p-4 border-l-4 border-orange-500 bg-orange-50">
           <form method="POST" id="completeForm">
             <input type="hidden" name="action" value="complete_request">
             <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
@@ -868,9 +297,9 @@
             <button 
               type="submit" 
               onclick="return confirm('<?= isset($comparisonResults) && !$comparisonResults['summary']['identical'] ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.' : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.' ?>')"
-              class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-gray-900 font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-3"
+              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-3 border-t border-green-400"
             >
-              <i class="bi bi-check-circle text-xl text-gray-900"></i>
+              <i class="bi bi-check-circle-fill text-2xl"></i>
               <span>Selesaikan Permintaan</span>
             </button>
             <p class="text-xs text-gray-600 mt-2 text-center">
