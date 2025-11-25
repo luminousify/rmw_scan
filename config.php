@@ -65,8 +65,7 @@ define('APP_PATH', path('app'));
 define('APP_BAK_PATH', path('app_bak'));
 
 // Database Configuration
-define('DB_TYPE', 'mysql'); // 'sqlite' or 'mysql'
-define('DB_SQLITE_PATH', path('database/rmw.db'));
+define('DB_TYPE', 'mysql');
 define('DB_MYSQL_HOST', '36.92.174.141:3333');
 define('DB_MYSQL_NAME', 'rmw_system');
 define('DB_MYSQL_USER', 'endang');

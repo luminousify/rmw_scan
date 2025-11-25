@@ -82,74 +82,11 @@ class DatabaseManager
      */
     private function createConnection()
     {
-        if ($this->config['type'] === 'sqlite') {
-            $this->createSQLiteConnection();
-        } elseif ($this->config['type'] === 'mysql') {
+        if ($this->config['type'] === 'mysql') {
             $this->createMySQLConnection();
         } else {
             throw new Exception("Unsupported database type: {$this->config['type']}");
         }
-    }
-    
-    /**
-     * Create SQLite connection
-     */
-    private function createSQLiteConnection()
-    {
-        $dbFile = $this->config['sqlite_path'];
-        
-        // Ensure database directory exists
-        $dbDir = dirname($dbFile);
-        if (!is_dir($dbDir)) {
-            mkdir($dbDir, 0755, true);
-        }
-        
-        // Check file permissions
-        if (file_exists($dbFile) && !is_writable($dbFile)) {
-            throw new Exception("Database file is not writable: {$dbFile}");
-        }
-        
-        if (!is_writable($dbDir)) {
-            throw new Exception("Database directory is not writable: {$dbDir}");
-        }
-        
-        $dsn = "sqlite:" . $dbFile;
-        
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_TIMEOUT => $this->config['timeout'],
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
-        ];
-        
-        $this->pdo = new PDO($dsn, '', '', $options);
-        
-        // Enable foreign key constraints
-        $this->pdo->exec('PRAGMA foreign_keys = ON');
-        
-        // Initialize database if needed
-        $this->initializeDatabase();
-    }
-    
-    /**
-     * Initialize database schema if needed
-     */
-    private function initializeDatabase()
-    {
-        if ($this->config['type'] === 'sqlite') {
-            $stmt = $this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
-            if (!$stmt->fetch()) {
-                $schemaFile = __DIR__ . '/../database/schema.sql';
-                if (file_exists($schemaFile)) {
-                    $schema = file_get_contents($schemaFile);
-                    $this->pdo->exec($schema);
-                    $this->logMessage("Database schema initialized");
-                } else {
-                    throw new Exception("Schema file not found: {$schemaFile}");
-                }
-            }
-        }
-        // For MySQL, schema should be pre-created via migration script
     }
     
     /**
