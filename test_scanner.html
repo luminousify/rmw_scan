@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Input Handler Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .info {
+            background-color: #d9edf7;
+            color: #31708f;
+        }
+        .warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scanner Input Handler Test</h1>
+    
+    <div class="container">
+        <h2>Scanner Input Test</h2>
+        <div class="input-group">
+            <label for="scannerInput">Scanner Input:</label>
+            <input type="text" id="scannerInput" placeholder="Scan a barcode or type text here">
+        </div>
+        <div class="input-group">
+            <button onclick="simulateScan('REQ-20241201-1234')">Simulate Scan 1</button>
+            <button onclick="simulateScan('INJ/FG/1887-1')">Simulate Scan 2</button>
+            <button onclick="simulateScan('PROD/TEST/5678')">Simulate Scan 3</button>
+            <button onclick="clearInput()">Clear Input</button>
+        </div>
+        <div id="status" class="status info">Ready to scan</div>
+    </div>
+    
+    <div class="container">
+        <h2>Scanner Status</h2>
+        <div class="input-group">
+            <label>Buffer Content:</label>
+            <div id="bufferContent" class="log">Empty</div>
+        </div>
+        <div class="input-group">
+            <label>Event Log:</label>
+            <div id="eventLog" class="log">No events yet</div>
+        </div>
+    </div>
+
+    <script src="includes/js/scanner.js"></script>
+    <script>
+        // Initialize scanner with custom options
+        document.addEventListener('DOMContentLoaded', function() {
+            window.scannerHandler = new ScannerInputHandler({
+                inputSelector: '#scannerInput',
+                timeoutDuration: 1000,
+                debugMode: true,
+                onScanComplete: function(scanData, handler) {
+                    updateStatus('Scan completed: ' + scanData, 'success');
+                    logEvent('Scan completed: ' + scanData);
+                },
+                onScanBufferUpdate: function(buffer) {
+                    document.getElementById('bufferContent').textContent = buffer || 'Empty';
+                    logEvent('Buffer updated: ' + buffer);
+                }
+            });
+            
+            logEvent('Scanner initialized');
+        });
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+        
+        function logEvent(message) {
+            const logEl = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent = '[' + timestamp + '] ' + message + '\n' + logEl.textContent;
+        }
+        
+        function simulateScan(scanData) {
+            if (window.scannerHandler) {
+                window.scannerHandler.triggerScan(scanData);
+            }
+        }
+        
+        function clearInput() {
+            const input = document.getElementById('scannerInput');
+            input.value = '';
+            input.focus();
+            
+            if (window.scannerHandler) {
+                window.scannerHandler.resetBuffer();
+            }
+            
+            updateStatus('Input cleared', 'info');
+            logEvent('Input cleared manually');
+        }
+    </script>
+</body>
+</html>

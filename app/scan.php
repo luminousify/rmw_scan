@@ -437,6 +437,7 @@
 </div>
 
 <script src="<?php echo url('includes/js/main.js'); ?>"></script>
+<script src="<?php echo url('includes/js/scanner.js'); ?>"></script>
     <style>
       @keyframes fade-in {
         from { opacity: 0; transform: translateY(-10px); }
@@ -739,36 +740,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         checkComparisonResults();
     });
-
-    const inputField = document.getElementById('lot_material_bc');  // Get the input field
-    let typingTimeout;
-
-    // Function to simulate an action after 1 second of input
-    function simulateEnter() {
-        clearTimeout(typingTimeout);  // Clear any existing timeout to avoid multiple triggers
-        typingTimeout = setTimeout(() => {
-            // Simulate the action you want after 1 second of input
-            // For example, submitting the form or triggering an event
-            // Here, I'm using a log statement, but you can replace this with form submission or other actions
-            console.log("Input entered: ", inputField.value);
-            document.forms['form1'].submit();
-            // For example, you can submit the form (if applicable)
-            // document.forms['form1'].submit();
-
-            // Alternatively, you could simulate the button press by clicking the "Input Data" button
-            // document.getElementById('inputButton').click();
-        }, 1000); // 1000ms = 1 second delay
-    }
-
-    // Add event listener to monitor the input field
-    inputField.addEventListener('input', simulateEnter);
     
     // Auto-focus behavior when request number is pre-filled
     document.addEventListener('DOMContentLoaded', function() {
+        const inputField = document.getElementById('lot_material_bc');
         // If request number is pre-filled, focus on the input for scanning additional items
         <?php if (!empty($nobon)): ?>
-        inputField.focus();
-        inputField.select();
+        if (inputField) {
+            inputField.focus();
+            inputField.select();
+        }
         <?php endif; ?>
     });
 
@@ -1274,6 +1255,26 @@
           qrInput.focus();
         } else if (requestInput && requestInput.value === '') {
           requestInput.focus();
+        }
+        
+        // Integrate with scanner handler if available
+        if (window.scannerHandler) {
+          // Override the default scan handler to use our toast system
+          window.scannerHandler.options.onScanComplete = function(scanData, handler) {
+            console.log('Scan completed:', scanData);
+            
+            // Show processing toast
+            toast.show('Processing scanner data...', 'info', 0);
+            
+            // Show loading overlay
+            showLoading();
+            
+            // Submit the form
+            const form = qrInput.form;
+            if (form) {
+              form.submit();
+            }
+          };
         }
       });
 
