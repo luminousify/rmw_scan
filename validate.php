@@ -9,7 +9,7 @@ $authSuccess = false;
 
 // Try MySQL
 if (in_array('mysql', PDO::getAvailableDrivers())) {
-  
+  try {
     include 'includes/conn_mysql.php';
     $query = "SELECT * FROM users WHERE username=:user AND password=:pass AND is_active=1";
     $stmt = $pdo->prepare($query);
