@@ -38,7 +38,7 @@ include '../common/header.php';
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
-        include '../../includes/conn_sqlite.php';
+        include '../../includes/conn_mysql.php';
         
         if ($_POST['action'] === 'create_request') {
             // Create new material request
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 } else {
     try {
-        include '../../includes/conn_sqlite.php';
+        include '../../includes/conn_mysql.php';
         
         // Get products for dropdown
         $stmt = $pdo->query("SELECT product_id, product_name, unit FROM products WHERE is_active = 1 ORDER BY product_name");

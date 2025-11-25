@@ -15,7 +15,7 @@ $department = $_SESSION['department'] ?? 'production';
 include '../common/header.php';
 
 try {
-    include '../includes/conn_sqlite.php';
+    include '../includes/conn_mysql.php';
     
     // Get recent activity log entries
     $query = "

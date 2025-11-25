@@ -8,7 +8,7 @@
  */
 
 require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../includes/conn_sqlite.php';
+require_once __DIR__ . '/../../includes/conn_mysql.php';
 
 echo "Starting migration 003: Add missing columns to material_requests table\n";
 echo "================================================================\n\n";

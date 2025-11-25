@@ -25,7 +25,7 @@ $userDivision = $stmt->fetchColumn();
 include '../common/header.php';
 
 try {
-    include '../../includes/conn_sqlite.php';
+    include '../../includes/conn_mysql.php';
     $materialRequestService = new MaterialRequestService();
     
     // Pagination parameters

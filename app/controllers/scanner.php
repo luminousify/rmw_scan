@@ -150,7 +150,7 @@ if ($_POST == NULL) {
         $currentRequestNumber = $requestNumberFromUrl; // Store for hidden field
         
         try {
-            include '../../includes/conn_sqlite.php';
+            include '../../includes/conn_mysql.php';
             
             // Check if request exists
             $requestQuery = "
@@ -238,7 +238,7 @@ if ($_POST == NULL) {
     $comparisonResults = null;
     
     try {
-        include '../../includes/conn_sqlite.php';
+        include '../../includes/conn_mysql.php';
         
         // Validate request number
         if (empty($currentRequestNumber)) {

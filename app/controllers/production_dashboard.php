@@ -40,7 +40,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_request_details') {
         ini_set('display_errors', 0);
         error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
         
-        include '../../includes/conn_sqlite.php';
+        include '../../includes/conn_mysql.php';
         
         $requestId = $_GET['id'] ?? null;
         
@@ -189,7 +189,7 @@ $userDivision = $stmt->fetchColumn();
 // Handle status updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
-        include '../../includes/conn_sqlite.php';
+        include '../../includes/conn_mysql.php';
         
         if ($_POST['action'] === 'update_status') {
             $requestId = $_POST['request_id'];
@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 try {
-    include '../../includes/conn_sqlite.php';
+    include '../../includes/conn_mysql.php';
 
     // Get user's division for filtering
     $stmt = $pdo->prepare("SELECT division FROM users WHERE id = ?");

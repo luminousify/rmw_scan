@@ -11,7 +11,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 header('Content-Type: application/json');
 
 try {
-    include '../../includes/conn_sqlite.php';
+    include '../../includes/conn_mysql.php';
     
     $requestId = $_GET['id'] ?? null;
     

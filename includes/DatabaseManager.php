@@ -43,7 +43,6 @@ class DatabaseManager
     {
         $this->config = [
             'type' => DB_TYPE,
-            'sqlite_path' => DB_SQLITE_PATH,
             'mysql_host' => DB_MYSQL_HOST,
             'mysql_name' => DB_MYSQL_NAME,
             'mysql_user' => DB_MYSQL_USER,
