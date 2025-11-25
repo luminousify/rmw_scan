@@ -153,13 +153,13 @@
       <div class="space-y-6">
 
       <!-- Active Request Alert -->
-      <?php if (!empty($_GET['request_number']) && $nobon != ''): ?>
+      <?php if (!empty($_GET['request_number'])): ?>
       <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
         <div class="flex items-center justify-between">
             <div>
               <h3 class="text-sm font-medium text-blue-900">Active Request</h3>
               <p class="text-lg font-semibold text-blue-900 mt-1">
-                <?= htmlspecialchars($nobon) ?>
+                <?= htmlspecialchars($_GET['request_number']) ?>
               </p>
             </div>
             <a href="<?php echo url('app/controllers/scanner.php'); ?>" 

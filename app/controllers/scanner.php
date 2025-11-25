@@ -140,13 +140,13 @@ include '../common/header.php';
 
 if ($_POST == NULL) {
     $dat = '';
-    $nobon = '';
+    $nobon = ''; // Keep this empty for QR code scanning
     $requestDetails = null;
     $currentRequestNumber = ''; // Store request number for hidden field
     
     // If request number is passed via URL, pre-populate and auto-process
     if (!empty($requestNumberFromUrl)) {
-        $nobon = $requestNumberFromUrl;
+        // Don't set $nobon to the request number - keep it empty for QR scanning
         $currentRequestNumber = $requestNumberFromUrl; // Store for hidden field
         
         try {
