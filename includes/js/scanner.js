@@ -11,7 +11,7 @@ class ScannerInputHandler {
             timeoutDuration: options.timeoutDuration || 1000, // 1 second default
             minScanLength: options.minScanLength || 3,
             debugMode: options.debugMode || false,
-            onScanComplete: options.onScanComplete || this.defaultScanHandler,
+            onScanComplete: options.onScanComplete || this.defaultScanHandler.bind(this),
             onScanBufferUpdate: options.onScanBufferUpdate || null
         };
         
@@ -48,14 +48,19 @@ class ScannerInputHandler {
      * Set up event listeners for the input element
      */
     setupEventListeners() {
+        // Store bound handler references for proper removal later
+        this.boundHandleInput = (e) => this.handleInput(e);
+        this.boundHandleKeyDown = (e) => this.handleKeyDown(e);
+        this.boundHandlePaste = (e) => this.handlePaste(e);
+        
         // Listen for input events
-        this.inputElement.addEventListener('input', (e) => this.handleInput(e));
+        this.inputElement.addEventListener('input', this.boundHandleInput);
         
         // Listen for keydown events to detect special keys
-        this.inputElement.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        this.inputElement.addEventListener('keydown', this.boundHandleKeyDown);
         
         // Listen for paste events (for manual testing)
-        this.inputElement.addEventListener('paste', (e) => this.handlePaste(e));
+        this.inputElement.addEventListener('paste', this.boundHandlePaste);
     }
     
     /**
@@ -264,9 +269,9 @@ class ScannerInputHandler {
         
         // Remove event listeners
         if (this.inputElement) {
-            this.inputElement.removeEventListener('input', this.handleInput);
-            this.inputElement.removeEventListener('keydown', this.handleKeyDown);
-            this.inputElement.removeEventListener('paste', this.handlePaste);
+            this.inputElement.removeEventListener('input', this.boundHandleInput);
+            this.inputElement.removeEventListener('keydown', this.boundHandleKeyDown);
+            this.inputElement.removeEventListener('paste', this.boundHandlePaste);
         }
         
         this.log('Scanner handler destroyed');
