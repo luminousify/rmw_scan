@@ -1,234 +1,309 @@
 /**
- * Scanner Input Handler
+ * Simple Scanner Input Handler
  * Handles rapid barcode/QR code scanning with input buffering and timeout detection
  */
 
-class ScannerHandler {
+class ScannerInputHandler {
     constructor(options = {}) {
         // Configuration options
         this.options = {
-            bufferTimeout: options.bufferTimeout || 500, // ms to wait before considering scan complete
-            minScanLength: options.minScanLength || 3,   // minimum characters for valid scan
-            maxScanLength: options.maxScanLength || 50,  // maximum characters for valid scan
-            onScanComplete: options.onScanComplete || null, // callback when scan is complete
-            onScanError: options.onScanError || null     // callback for scan errors
+            inputSelector: options.inputSelector || '#lot_material_bc',
+            timeoutDuration: options.timeoutDuration || 1000, // 1 second default
+            minScanLength: options.minScanLength || 3,
+            debugMode: options.debugMode || false,
+            onScanComplete: options.onScanComplete || this.defaultScanHandler,
+            onScanBufferUpdate: options.onScanBufferUpdate || null
         };
         
         // Internal state
-        this.inputBuffer = '';
-        this.bufferTimer = null;
+        this.inputElement = null;
+        this.scanBuffer = '';
+        this.scanTimeout = null;
         this.isProcessing = false;
+        this.lastScanTime = 0;
         
-        // Initialize event listeners
+        // Initialize the scanner
         this.init();
     }
     
     /**
-     * Initialize the scanner handler by setting up keyboard event listeners
+     * Initialize the scanner handler
      */
     init() {
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
-        console.log('Scanner handler initialized');
+        // Find the input element
+        this.inputElement = document.querySelector(this.options.inputSelector);
+        
+        if (!this.inputElement) {
+            console.error(`ScannerInputHandler: Input element not found: ${this.options.inputSelector}`);
+            return;
+        }
+        
+        // Set up event listeners
+        this.setupEventListeners();
+        
+        this.log('Scanner input handler initialized');
     }
     
     /**
-     * Handle keyboard events for scanner input
-     * @param {KeyboardEvent} event - The keyboard event
+     * Set up event listeners for the input element
+     */
+    setupEventListeners() {
+        // Listen for input events
+        this.inputElement.addEventListener('input', (e) => this.handleInput(e));
+        
+        // Listen for keydown events to detect special keys
+        this.inputElement.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        
+        // Listen for paste events (for manual testing)
+        this.inputElement.addEventListener('paste', (e) => this.handlePaste(e));
+    }
+    
+    /**
+     * Handle input events from the scanner
+     */
+    handleInput(event) {
+        if (this.isProcessing) return;
+        
+        const currentValue = event.target.value;
+        
+        // If the input is empty, reset the buffer
+        if (!currentValue) {
+            this.resetBuffer();
+            return;
+        }
+        
+        // Add to buffer
+        this.addToBuffer(currentValue);
+    }
+    
+    /**
+     * Handle keydown events to detect special scanner keys
      */
     handleKeyDown(event) {
-        // Skip if we're already processing a scan
-        if (this.isProcessing) {
-            return;
-        }
+        // Some scanners send a specific key combination to indicate scan completion
+        // This is scanner-dependent and may need customization
         
-        // Most scanners send characters as keydown events followed by Enter
-        // We'll capture all characters and process when Enter is detected or timeout occurs
-        
-        // Ignore modifier keys
-        if (event.ctrlKey || event.altKey || event.metaKey) {
-            return;
-        }
-        
-        // Handle Enter key (common scanner termination)
-        if (event.key === 'Enter') {
+        // Tab or Enter often indicates scan completion
+        if (event.key === 'Tab' || event.key === 'Enter') {
             event.preventDefault();
             this.processScan();
-            return;
-        }
-        
-        // Handle Escape key to clear buffer
-        if (event.key === 'Escape') {
-            this.clearBuffer();
-            return;
-        }
-        
-        // Handle Tab key (some scanners use Tab instead of Enter)
-        if (event.key === 'Tab') {
-            event.preventDefault();
-            this.processScan();
-            return;
-        }
-        
-        // Regular character input
-        if (event.key && event.key.length === 1) {
-            event.preventDefault();
-            this.addToBuffer(event.key);
         }
     }
     
     /**
-     * Add a character to the input buffer and reset the timeout
-     * @param {string} char - The character to add to the buffer
+     * Handle paste events (for manual testing)
      */
-    addToBuffer(char) {
-        this.inputBuffer += char;
-        
-        // Reset the timer to detect when scanning is complete
-        this.resetBufferTimer();
-        
-        // If buffer exceeds maximum length, process immediately
-        if (this.inputBuffer.length >= this.options.maxScanLength) {
+    handlePaste(event) {
+        // Allow paste for testing but process it immediately
+        setTimeout(() => {
             this.processScan();
-        }
+        }, 100);
     }
     
     /**
-     * Reset the buffer timeout timer
+     * Add input to the scan buffer
      */
-    resetBufferTimer() {
-        // Clear existing timer
-        if (this.bufferTimer) {
-            clearTimeout(this.bufferTimer);
+    addToBuffer(value) {
+        this.scanBuffer = value;
+        this.lastScanTime = Date.now();
+        
+        // Reset the timeout
+        this.resetTimeout();
+        
+        // Notify callback if provided
+        if (this.options.onScanBufferUpdate) {
+            this.options.onScanBufferUpdate(this.scanBuffer);
         }
         
-        // Set new timer
-        this.bufferTimer = setTimeout(() => {
-            this.processScan();
-        }, this.options.bufferTimeout);
+        this.log(`Buffer updated: ${this.scanBuffer}`);
     }
     
     /**
-     * Process the current buffer as a complete scan
+     * Reset the scan timeout
+     */
+    resetTimeout() {
+        // Clear existing timeout
+        if (this.scanTimeout) {
+            clearTimeout(this.scanTimeout);
+        }
+        
+        // Set new timeout
+        this.scanTimeout = setTimeout(() => {
+            this.processScan();
+        }, this.options.timeoutDuration);
+    }
+    
+    /**
+     * Process the current scan
      */
     processScan() {
-        // Clear the timer
-        if (this.bufferTimer) {
-            clearTimeout(this.bufferTimer);
-            this.bufferTimer = null;
+        if (this.isProcessing) return;
+        
+        // Clear timeout
+        if (this.scanTimeout) {
+            clearTimeout(this.scanTimeout);
+            this.scanTimeout = null;
         }
         
         // Get the scan data
-        const scanData = this.inputBuffer.trim();
-        
-        // Clear the buffer
-        this.clearBuffer();
+        const scanData = this.scanBuffer.trim();
         
         // Validate scan data
         if (!this.validateScan(scanData)) {
+            this.resetBuffer();
             return;
         }
         
         // Set processing flag
         this.isProcessing = true;
         
+        this.log(`Processing scan: ${scanData}`);
+        
+        // Call the scan handler
         try {
-            // Process the scan data
-            this.processScanData(scanData);
+            this.options.onScanComplete(scanData, this);
         } catch (error) {
-            console.error('Error processing scan:', error);
-            if (this.options.onScanError) {
-                this.options.onScanError(error, scanData);
-            }
-        } finally {
-            // Reset processing flag
-            this.isProcessing = false;
+            console.error('Error in scan handler:', error);
         }
+        
+        // Reset after processing
+        setTimeout(() => {
+            this.resetBuffer();
+            this.isProcessing = false;
+        }, 500);
     }
     
     /**
      * Validate the scan data
-     * @param {string} scanData - The scan data to validate
-     * @returns {boolean} - True if valid, false otherwise
      */
     validateScan(scanData) {
         // Check minimum length
         if (scanData.length < this.options.minScanLength) {
-            console.warn('Scan too short:', scanData);
-            if (this.options.onScanError) {
-                this.options.onScanError(new Error('Scan too short'), scanData);
-            }
+            this.log(`Scan too short: ${scanData}`);
             return false;
         }
         
-        // Check maximum length
-        if (scanData.length > this.options.maxScanLength) {
-            console.warn('Scan too long:', scanData);
-            if (this.options.onScanError) {
-                this.options.onScanError(new Error('Scan too long'), scanData);
-            }
-            return false;
-        }
+        // Additional validation can be added here
+        // For example, check for specific patterns
         
         return true;
     }
     
     /**
-     * Process the validated scan data
-     * @param {string} scanData - The validated scan data
+     * Reset the scan buffer
      */
-    processScanData(scanData) {
-        console.log('Processing scan:', scanData);
+    resetBuffer() {
+        this.scanBuffer = '';
         
-        // Call the callback if provided
-        if (this.options.onScanComplete) {
-            this.options.onScanComplete(scanData);
+        // Clear timeout
+        if (this.scanTimeout) {
+            clearTimeout(this.scanTimeout);
+            this.scanTimeout = null;
         }
         
-        // Default processing can be added here
-        // For now, we just log the scan data
+        // Clear input field
+        if (this.inputElement) {
+            this.inputElement.value = '';
+        }
+        
+        this.log('Buffer reset');
     }
     
     /**
-     * Clear the input buffer
+     * Default scan handler
      */
-    clearBuffer() {
-        this.inputBuffer = '';
+    defaultScanHandler(scanData) {
+        this.log(`Default handler processed: ${scanData}`);
+        
+        // Submit the form if it exists
+        const form = this.inputElement.form;
+        if (form) {
+            form.submit();
+        }
     }
     
     /**
-     * Destroy the scanner handler and clean up event listeners
+     * Log messages if debug mode is enabled
+     */
+    log(message) {
+        if (this.options.debugMode) {
+            console.log(`[Scanner] ${message}`);
+        }
+    }
+    
+    /**
+     * Public method to manually trigger a scan
+     */
+    triggerScan(scanData) {
+        this.scanBuffer = scanData;
+        this.processScan();
+    }
+    
+    /**
+     * Public method to get current buffer content
+     */
+    getBuffer() {
+        return this.scanBuffer;
+    }
+    
+    /**
+     * Public method to check if currently processing
+     */
+    isScanning() {
+        return this.isProcessing;
+    }
+    
+    /**
+     * Destroy the scanner handler
      */
     destroy() {
-        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
-        
-        if (this.bufferTimer) {
-            clearTimeout(this.bufferTimer);
-            this.bufferTimer = null;
+        // Clear timeout
+        if (this.scanTimeout) {
+            clearTimeout(this.scanTimeout);
         }
         
-        this.clearBuffer();
-        console.log('Scanner handler destroyed');
+        // Remove event listeners
+        if (this.inputElement) {
+            this.inputElement.removeEventListener('input', this.handleInput);
+            this.inputElement.removeEventListener('keydown', this.handleKeyDown);
+            this.inputElement.removeEventListener('paste', this.handlePaste);
+        }
+        
+        this.log('Scanner handler destroyed');
     }
 }
+
+// Auto-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if scanner input exists on the page
+    const scannerInput = document.querySelector('#lot_material_bc');
+    
+    if (scannerInput) {
+        // Initialize scanner with default options
+        window.scannerHandler = new ScannerInputHandler({
+            debugMode: true, // Enable debug mode for development
+            onScanComplete: function(scanData, handler) {
+                console.log('Scan completed:', scanData);
+                
+                // Show loading indicator
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('hidden');
+                }
+                
+                // Submit the form
+                const form = scannerInput.form;
+                if (form) {
+                    form.submit();
+                }
+            }
+        });
+        
+        console.log('Scanner input handler initialized');
+    }
+});
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ScannerHandler;
+    module.exports = ScannerInputHandler;
 }
-
-// Example usage:
-/*
-const scanner = new ScannerHandler({
-    bufferTimeout: 500,
-    minScanLength: 3,
-    maxScanLength: 50,
-    onScanComplete: (scanData) => {
-        console.log('Scan complete:', scanData);
-        // Handle the scan data, e.g., submit to server
-    },
-    onScanError: (error, scanData) => {
-        console.error('Scan error:', error, scanData);
-        // Handle scan errors
-    }
-});
-*/
