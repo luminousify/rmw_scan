@@ -39,49 +39,7 @@
     </header>
 
     <div class="flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-white shadow-lg min-h-screen border-r border-gray-200 transition-all duration-300">
-        <div class="p-6">
-          <!-- Enhanced Logo Area -->
-          <div class="flex flex-col items-center space-y-4 mb-8 pb-6 border-b border-gray-100">
-            <div class="relative">
-              <div class="w-16 h-16 <?= ($department === 'production' ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-green-500 to-green-600') ?> rounded-2xl flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                <i class="<?= ($department === 'production' ? 'bi bi-building' : 'bi bi-box-seam') ?> text-white text-2xl"></i>
-              </div>
-              <div class="absolute -bottom-1 -right-1 w-6 h-6 <?= ($department === 'production' ? 'bg-blue-500' : 'bg-green-500') ?> rounded-full flex items-center justify-center">
-                <i class="<?= ($department === 'production' ? 'bi bi-person' : 'bi bi-check2') ?> text-white text-xs"></i>
-              </div>
-            </div>
-            <div class="text-center">
-              <h3 class="text-lg font-bold text-gray-900 capitalize">
-                <?= ($department === 'production' ? 'Production Department' : 'Raw Material Warehouse') ?>
-              </h3>
-              <div class="mt-2">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                  <?= $department === 'production' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' ?>">
-                  <i class="bi bi-diagram-3 mr-1"></i>
-                  <?= htmlspecialchars($userDivision ?? 'Unassigned') ?>
-                </span>
-              </div>
-              <p class="text-sm text-gray-500 mt-2">Management System</p>
-            </div>
-          </div>
-          
-          <!-- Enhanced Navigation -->
-          <nav class="space-y-1" role="navigation" aria-label="Main navigation">
-            <!-- Dashboard -->
-            <a href="<?php echo url('app/controllers/production_dashboard.php'); ?>" 
-               class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'production_dashboard' ? 'nav-active-production' : 'nav-inactive' ?>"
-               role="menuitem" aria-current="<?= $module_name == 'production_dashboard' ? 'page' : 'false' ?>">
-              <i class="bi bi-house-fill mr-3 text-lg"></i>
-              <span>Dashboard</span>
-              <?= $module_name == 'production_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
-            </a>
-            
-  
-          </nav>
-        </div>
-      </aside>
+      <?php include 'common/sidebar.php'; ?>
 
       <!-- Main content -->
       <main class="flex-1 p-6">
