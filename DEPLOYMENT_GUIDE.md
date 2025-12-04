@@ -51,9 +51,8 @@ APP_ENV=production
 DB_TYPE=mysql
 DB_MYSQL_HOST=127.0.0.1:3306
 DB_MYSQL_NAME=rmw_system
-DB_MYSQL_USER=endang
-DB_MYSQL_PASS=endangthea0
-```
+DB_MYSQL_USER=<YOUR_DB_USER>
+DB_MYSQL_PASS=<YOUR_DB_PASSWORD>
 
 ## **Alternative Solutions (Fallback Options)**
 
@@ -83,8 +82,8 @@ Create a `config.local.php` file for manual override:
    // Production Database Settings
    define('LOCAL_DB_MYSQL_HOST', '127.0.0.1:3306');
    define('LOCAL_DB_MYSQL_NAME', 'rmw_system');
-   define('LOCAL_DB_MYSQL_USER', 'endang');
-   define('LOCAL_DB_MYSQL_PASS', 'endangthea0');
+   define('LOCAL_DB_MYSQL_USER', '<YOUR_DB_USER>');
+   define('LOCAL_DB_MYSQL_PASS', '<YOUR_DB_PASSWORD>');
    define('LOCAL_APP_ENV', 'production');
    ?>
    ```
