@@ -28,6 +28,11 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+
+# Local configuration overrides
+config.local.php
 
 # Database files (SQLite, Access DB)
 *.db

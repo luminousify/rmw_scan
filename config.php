@@ -64,15 +64,81 @@ define('INCLUDES_PATH', path('includes'));
 define('APP_PATH', path('app'));
 define('APP_BAK_PATH', path('app_bak'));
 
-// Database Configuration
-define('DB_TYPE', 'mysql');
-define('DB_MYSQL_HOST', '36.92.174.141:3333');
-define('DB_MYSQL_NAME', 'rmw_system');
-define('DB_MYSQL_USER', 'endang');
-define('DB_MYSQL_PASS', 'endangthea0');
+// Load environment variables from .env file (best practice)
+function loadEnv($file) {
+    if (!file_exists($file)) {
+        return;
+    }
+    
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) {
+            continue; // Skip comments
+        }
+        
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            
+            // Remove quotes if present
+            $value = trim($value, '"\'');
+            
+            // Set as environment variable
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv("$key=$value");
+        }
+    }
+}
+
+// Load .env file
+loadEnv(__DIR__ . '/.env');
+
+// Load local configuration override if exists (fallback)
+if (file_exists(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+}
+
+// Environment Detection (fallback if not set)
+$isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production' ||
+               ($_SERVER['HTTP_HOST'] === '36.92.174.141') || 
+               ($_SERVER['SERVER_ADDR'] === '36.92.174.141');
+
+// Database Configuration with Environment Variables
+$dbType = $_ENV['DB_TYPE'] ?? 'mysql';
+$dbHost = $_ENV['DB_MYSQL_HOST'] ?? ($isProduction ? '127.0.0.1:3306' : '36.92.174.141:3333');
+$dbName = $_ENV['DB_MYSQL_NAME'] ?? 'rmw_system';
+$dbUser = $_ENV['DB_MYSQL_USER'] ?? 'endang';
+$dbPass = $_ENV['DB_MYSQL_PASS'] ?? 'endangthea0';
+$appEnv = $_ENV['APP_ENV'] ?? ($isProduction ? 'production' : 'development');
+
+// Use local overrides if available (backward compatibility)
+if (defined('LOCAL_DB_MYSQL_HOST')) {
+    $dbHost = LOCAL_DB_MYSQL_HOST;
+}
+if (defined('LOCAL_DB_MYSQL_NAME')) {
+    $dbName = LOCAL_DB_MYSQL_NAME;
+}
+if (defined('LOCAL_DB_MYSQL_USER')) {
+    $dbUser = LOCAL_DB_MYSQL_USER;
+}
+if (defined('LOCAL_DB_MYSQL_PASS')) {
+    $dbPass = LOCAL_DB_MYSQL_PASS;
+}
+if (defined('LOCAL_APP_ENV')) {
+    $appEnv = LOCAL_APP_ENV;
+}
+
+// Define constants
+define('DB_TYPE', $dbType);
+define('DB_MYSQL_HOST', $dbHost);
+define('DB_MYSQL_NAME', $dbName);
+define('DB_MYSQL_USER', $dbUser);
+define('DB_MYSQL_PASS', $dbPass);
+define('APP_ENV', $appEnv);
 
 // Application Configuration
 define('APP_NAME', 'RMW System');
 define('APP_VERSION', '2.0.0');
-define('APP_ENV', 'development'); // 'development' or 'production'
 ?>

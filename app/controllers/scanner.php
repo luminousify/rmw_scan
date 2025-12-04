@@ -15,6 +15,11 @@ $pass = $_SESSION['pass'] ?? '';
 $idlog = $_SESSION['idlog'] ?? 0;
 $department = $_SESSION['department'] ?? 'production';
 
+// Get user's division
+$db = DatabaseManager::getInstance();
+$stmt = $db->query("SELECT division FROM users WHERE id = ?", [$idlog]);
+$userDivision = $stmt->fetchColumn();
+
 // Get request number from URL parameter if available
 $requestNumberFromUrl = $_GET['request_number'] ?? '';
 
