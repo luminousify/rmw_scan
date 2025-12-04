@@ -30,8 +30,8 @@ $department = $_SESSION['department'] ?? 'production';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Division Management - <?= APP_NAME ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../includes/css/main.css" rel="stylesheet">
+    <link href="../includes/css/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <style>
         .base-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .card-hover { transition: transform 0.2s; }
@@ -157,7 +157,7 @@ $department = $_SESSION['department'] ?? 'production';
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../includes/js/jquery-3.7.0.min.js"></script>
     <script>
         // Add any interactive features here
         console.log('Division Management Page Loaded');

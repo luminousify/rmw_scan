@@ -16,7 +16,7 @@ if (!defined('BASE_URL')) {
     <!-- Tailwind CSS -->
     <link rel="stylesheet" type="text/css" href="<?php echo url('includes/css/output.css'); ?>">
     <!-- Font-icon css-->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo url('includes/css/bootstrap-icons/bootstrap-icons.css'); ?>"
      <!-- Essential javascripts for application to work-->
     <script src="<?php echo url('includes/js/jquery-3.7.0.min.js'); ?>"></script>
   </head>
