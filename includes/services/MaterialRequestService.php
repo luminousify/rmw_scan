@@ -175,18 +175,6 @@ class MaterialRequestService
             // Update request status
             $this->dbManager->query("UPDATE material_requests SET status = 'cancelled', updated_at = CURRENT_TIMESTAMP WHERE id = ?", [$requestId]);
             
-            // Update items status (handle constraint error gracefully)
-            try {
-                $this->dbManager->query("UPDATE material_request_items SET status = 'cancelled' WHERE request_id = ?", [$requestId]);
-            } catch (Exception $e) {
-                // If constraint error, just update to 'rejected' instead
-                if (strpos($e->getMessage(), 'CHECK constraint failed') !== false) {
-                    $this->dbManager->query("UPDATE material_request_items SET status = 'rejected' WHERE request_id = ?", [$requestId]);
-                } else {
-                    throw $e; // Re-throw if it's not a constraint error
-                }
-            }
-            
             // Log the cancellation
             $this->dbManager->query("INSERT INTO activity_log (user_id, action, table_name, record_id, old_values, new_values) VALUES (?, 'CANCEL_REQUEST', 'material_requests', ?, ?, ?)", [
                 $userId,

@@ -49,7 +49,7 @@ nano .env
 # .env (production example)
 APP_ENV=production
 DB_TYPE=mysql
-DB_MYSQL_HOST=127.0.0.1:3306
+DB_MYSQL_HOST=36.92.174.141:3333
 DB_MYSQL_NAME=rmw_system
 DB_MYSQL_USER=<YOUR_DB_USER>
 DB_MYSQL_PASS=<YOUR_DB_PASSWORD>
@@ -64,8 +64,8 @@ The `config.php` includes automatic detection as fallback:
 - SERVER_ADDR is `36.92.174.141`
 
 **Automatic Database Settings:**
-- **Production**: `127.0.0.1:3306` (local MySQL)
-- **Development**: `36.92.174.141:3333` (remote MySQL)
+- **Default**: `36.92.174.141:3333` (remote MySQL)
+- **Override**: Set `DB_MYSQL_HOST` environment variable if needed
 
 ### Solution 3: Local Configuration Override
 Create a `config.local.php` file for manual override:
@@ -80,7 +80,7 @@ Create a `config.local.php` file for manual override:
    ```php
    <?php
    // Production Database Settings
-   define('LOCAL_DB_MYSQL_HOST', '127.0.0.1:3306');
+   define('LOCAL_DB_MYSQL_HOST', '36.92.174.141:3333');
    define('LOCAL_DB_MYSQL_NAME', 'rmw_system');
    define('LOCAL_DB_MYSQL_USER', '<YOUR_DB_USER>');
    define('LOCAL_DB_MYSQL_PASS', '<YOUR_DB_PASSWORD>');
@@ -140,7 +140,7 @@ php test_env.php
 HTTP_HOST: 36.92.174.141
 SERVER_ADDR: 36.92.174.141
 APP_ENV: production
-DB_MYSQL_HOST: 127.0.0.1:3306
+DB_MYSQL_HOST: 36.92.174.141:3333
 DB_MYSQL_NAME: rmw_system
 DB_MYSQL_USER: endang
 DB_TYPE: mysql
@@ -153,7 +153,7 @@ DB_TYPE: mysql
 ### Connection Issues
 - Check MySQL service is running: `systemctl status mysql`
 - Verify MySQL port: `netstat -tlnp | grep :3306`
-- Test MySQL connection: `mysql -h 127.0.0.1 -u endang -p rmw_system`
+- Test MySQL connection: `mysql -h 36.92.174.141 -P 3333 -u endang -p rmw_system`
 
 ### Configuration Issues
 - Verify `config.local.php` exists and has correct permissions

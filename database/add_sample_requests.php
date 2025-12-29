@@ -82,12 +82,11 @@ try {
             $stmt = $pdo->prepare("
                 INSERT INTO material_request_items (
                     request_id, product_id, product_name, requested_quantity, 
-                    unit, description, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    unit, description
+                ) VALUES (?, ?, ?, ?, ?, ?)
             ");
             
             $quantity = rand(1, 100);
-            $itemStatus = $status === 'completed' ? 'completed' : 'pending';
             $description = "Request for {$product['product_name']} - Item " . ($productIndex + 1);
             
             $stmt->execute([
@@ -96,8 +95,7 @@ try {
                 $product['product_name'],
                 $quantity,
                 $product['unit'],
-                $description,
-                $itemStatus
+                $description
             ]);
         }
         

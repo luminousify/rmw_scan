@@ -23,7 +23,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Pengaturan
                 </a>
@@ -257,11 +257,34 @@
 
     <!-- JavaScript -->
     <script>
-      // Products data for dropdown
-      const products = <?= json_encode($products) ?>;
+      const productSearchUrl = <?= json_encode(url('app/controllers/products_autocomplete.php')) ?>;
       let itemCounter = 0;
 
       function addItem() {
+        // Validate existing items before adding a new one
+        const existingItems = document.querySelectorAll('.item-row');
+        for (let i = 0; i < existingItems.length; i++) {
+          const itemRow = existingItems[i];
+          const itemId = itemRow.getAttribute('data-item');
+          
+          if (!isItemValid(itemId)) {
+            // Focus on the first invalid item and show error message
+            const displayInput = itemRow.querySelector(`.product-autocomplete[data-item="${itemId}"]`);
+            if (displayInput) {
+              displayInput.focus();
+              displayInput.setCustomValidity('Lengkapi item ini sebelum menambah item baru.');
+              displayInput.reportValidity();
+              
+              // Clear the custom validity after a delay
+              setTimeout(() => {
+                displayInput.setCustomValidity('');
+              }, 3000);
+            }
+            return; // Don't add new item if existing one is invalid
+          }
+        }
+        
+        // All existing items are valid, proceed to add new item
         itemCounter++;
         const container = document.getElementById('itemsContainer');
         const itemHtml = `
@@ -275,14 +298,25 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Produk</label>
-                <select name="items[${itemCounter}][product_id]" onchange="updateProductInfo(${itemCounter})" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                  <option value="">Pilih Produk</option>
-                  ${products.map(p => `<option value="${p.product_id}" data-name="${p.product_name}" data-unit="${p.unit}">${p.product_id} - ${p.product_name}</option>`).join('')}
-                </select>
+                <div class="relative">
+                  <input
+                    type="text"
+                    class="product-autocomplete w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Cari produk (ID / Nama)..."
+                    autocomplete="off"
+                    data-item="${itemCounter}"
+                    required
+                  >
+                  <div
+                    class="product-suggestions hidden absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-20 max-h-60 overflow-auto"
+                    data-item="${itemCounter}"
+                  ></div>
+                </div>
+                <input type="hidden" name="items[${itemCounter}][product_id]" data-item="${itemCounter}">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kuantitas</label>
-                <input type="number" name="items[${itemCounter}][quantity]" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                <input type="number" name="items[${itemCounter}][quantity]" min="0.01" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Satuan</label>
@@ -297,28 +331,261 @@
           </div>
         `;
         container.insertAdjacentHTML('beforeend', itemHtml);
+
+        // Wire autocomplete events for the new row
+        const input = container.querySelector(`.product-autocomplete[data-item="${itemCounter}"]`);
+        if (input) {
+          setupProductAutocomplete(input);
+        }
+      }
+
+      function isItemValid(itemId) {
+        const displayInput = document.querySelector(`.product-autocomplete[data-item="${itemId}"]`);
+        const idInput = document.querySelector(`input[name="items[${itemId}][product_id]"]`);
+        const quantityInput = document.querySelector(`input[name="items[${itemId}][quantity]"]`);
+        
+        // Check if product is selected (has product_id)
+        const hasProduct = !!(idInput && idInput.value && String(idInput.value).trim() !== '');
+        
+        // Check if quantity is filled and valid
+        const hasQuantity = !!(quantityInput && quantityInput.value && parseFloat(quantityInput.value) > 0);
+        
+        return hasProduct && hasQuantity;
       }
 
       function removeItem(itemId) {
         const itemRow = document.querySelector(`[data-item="${itemId}"]`);
         if (itemRow) {
           itemRow.remove();
+          updateItemLabels();
         }
       }
 
-      function updateProductInfo(itemId) {
-        const select = document.querySelector(`select[name="items[${itemId}][product_id]"]`);
-        const option = select.options[select.selectedIndex];
+      function updateItemLabels() {
+        const itemRows = document.querySelectorAll('.item-row');
+        itemRows.forEach((row, index) => {
+          const labelElement = row.querySelector('h4');
+          if (labelElement) {
+            labelElement.textContent = `Item ${index + 1}`;
+          }
+        });
+      }
+
+      function hasDuplicateProduct(productId, excludeItemId) {
+        const itemRows = document.querySelectorAll('.item-row');
+        for (let i = 0; i < itemRows.length; i++) {
+          const row = itemRows[i];
+          const itemId = row.getAttribute('data-item');
+          if (itemId === excludeItemId.toString()) continue; // Skip current item
+          
+          const idInput = row.querySelector(`input[name="items[${itemId}][product_id]"]`);
+          if (idInput && idInput.value === productId) {
+            return true; // Found duplicate
+          }
+        }
+        return false; // No duplicate found
+      }
+
+      function setItemProduct(itemId, product) {
         const unitInput = document.querySelector(`input[name="items[${itemId}][unit]"]`);
         const nameInput = document.querySelector(`input[name="items[${itemId}][product_name]"]`);
+        const idInput = document.querySelector(`input[name="items[${itemId}][product_id]"]`);
+        const displayInput = document.querySelector(`.product-autocomplete[data-item="${itemId}"]`);
+
+        const productId = product?.product_id || '';
+        const productName = product?.product_name || '';
+        const unit = product?.unit || '';
         
-        if (option.value) {
-          unitInput.value = option.dataset.unit;
-          nameInput.value = option.dataset.name;
-        } else {
-          unitInput.value = '';
-          nameInput.value = '';
+        // Check for duplicate product before setting
+        if (productId && hasDuplicateProduct(productId, itemId)) {
+          const confirmed = confirm(`Produk "${productName}" sudah ada dalam permintaan ini. Apakah ingin menggabungkan kuantitas?`);
+          if (!confirmed) {
+            // User cancelled, clear the selection
+            if (displayInput) {
+              displayInput.value = '';
+              displayInput.focus();
+            }
+            clearItemProductFields(itemId);
+            return;
+          }
         }
+
+        if (idInput) idInput.value = productId;
+        if (nameInput) nameInput.value = productName;
+        if (unitInput) unitInput.value = unit;
+        // Only update the visible input on an actual selection. While typing, we should not wipe user input.
+        if (displayInput && productId) {
+          displayInput.value = productName ? `${productId} - ${productName}` : `${productId}`;
+          // Clear any previous custom validity errors now that a product is selected.
+          displayInput.setCustomValidity('');
+        }
+      }
+
+      function clearItemProductFields(itemId) {
+        const unitInput = document.querySelector(`input[name="items[${itemId}][unit]"]`);
+        const nameInput = document.querySelector(`input[name="items[${itemId}][product_name]"]`);
+        const idInput = document.querySelector(`input[name="items[${itemId}][product_id]"]`);
+        if (idInput) idInput.value = '';
+        if (nameInput) nameInput.value = '';
+        if (unitInput) unitInput.value = '';
+      }
+
+      // --- Autocomplete implementation (server-side) ---
+      const _acTimers = new Map(); // itemId -> timeoutId
+      const _acAborters = new Map(); // itemId -> AbortController
+
+      function setupProductAutocomplete(inputEl) {
+        const itemId = inputEl.dataset.item;
+        if (!itemId) return;
+
+        inputEl.addEventListener('input', function () {
+          // Invalidate current selection on any edit
+          clearItemProductFields(itemId);
+          // Clear any previous submit-time validation error while user is typing.
+          inputEl.setCustomValidity('');
+
+          const q = (inputEl.value || '').trim();
+          scheduleSuggestions(itemId, q);
+        });
+
+        inputEl.addEventListener('focus', function () {
+          const q = (inputEl.value || '').trim();
+          if (q.length >= 2) {
+            scheduleSuggestions(itemId, q);
+          }
+        });
+
+        inputEl.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            hideSuggestions(itemId);
+          }
+        });
+      }
+
+      function scheduleSuggestions(itemId, q) {
+        const timer = _acTimers.get(itemId);
+        if (timer) window.clearTimeout(timer);
+
+        // Don’t query for tiny inputs
+        if (!q || q.length < 2) {
+          renderSuggestions(itemId, [], { emptyState: q ? 'Ketik minimal 2 karakter' : '' });
+          hideSuggestions(itemId);
+          return;
+        }
+
+        _acTimers.set(itemId, window.setTimeout(() => {
+          fetchSuggestions(itemId, q);
+        }, 200));
+      }
+
+      async function fetchSuggestions(itemId, q) {
+        // Abort any in-flight request for this item
+        const prevAborter = _acAborters.get(itemId);
+        if (prevAborter) {
+          prevAborter.abort();
+        }
+
+        const aborter = new AbortController();
+        _acAborters.set(itemId, aborter);
+
+        renderSuggestions(itemId, [], { loading: true });
+        showSuggestions(itemId);
+
+        try {
+          const url = new URL(productSearchUrl, window.location.origin);
+          url.searchParams.set('q', q);
+          url.searchParams.set('limit', '15');
+
+          const res = await fetch(url.toString(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            signal: aborter.signal,
+            credentials: 'same-origin',
+          });
+
+          if (!res.ok) {
+            renderSuggestions(itemId, [], { emptyState: 'Gagal memuat produk' });
+            return;
+          }
+
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            renderSuggestions(itemId, [], { emptyState: 'Tidak ada hasil' });
+            return;
+          }
+
+          renderSuggestions(itemId, data);
+        } catch (err) {
+          // Ignore abort errors
+          if (err && err.name === 'AbortError') return;
+          renderSuggestions(itemId, [], { emptyState: 'Gagal memuat produk' });
+        }
+      }
+
+      function renderSuggestions(itemId, items, opts = {}) {
+        const box = document.querySelector(`.product-suggestions[data-item="${itemId}"]`);
+        if (!box) return;
+
+        if (opts.loading) {
+          box.innerHTML = `
+            <div class="px-3 py-2 text-sm text-gray-500">Memuat...</div>
+          `;
+          return;
+        }
+
+        if (!items || items.length === 0) {
+          const msg = opts.emptyState || 'Tidak ada hasil';
+          box.innerHTML = `<div class="px-3 py-2 text-sm text-gray-500">${escapeHtml(msg)}</div>`;
+          return;
+        }
+
+        box.innerHTML = items.map((p, idx) => {
+          const pid = p.product_id || '';
+          const pname = p.product_name || '';
+          const unit = p.unit || '';
+          const label = pid && pname ? `${pid} - ${pname}` : (pid || pname);
+          return `
+            <button
+              type="button"
+              class="w-full text-left px-3 py-2 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+              data-idx="${idx}"
+            >
+              <div class="text-sm text-gray-900 font-medium">${escapeHtml(label)}</div>
+              <div class="text-xs text-gray-500">Satuan: ${escapeHtml(unit || '-')}</div>
+            </button>
+          `;
+        }).join('');
+
+        // Click handling
+        Array.from(box.querySelectorAll('button[type="button"]')).forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-idx') || '0');
+            const product = items[idx];
+            setItemProduct(itemId, product);
+            hideSuggestions(itemId);
+          });
+        });
+      }
+
+      function showSuggestions(itemId) {
+        const box = document.querySelector(`.product-suggestions[data-item="${itemId}"]`);
+        if (!box) return;
+        box.classList.remove('hidden');
+      }
+
+      function hideSuggestions(itemId) {
+        const box = document.querySelector(`.product-suggestions[data-item="${itemId}"]`);
+        if (!box) return;
+        box.classList.add('hidden');
+      }
+
+      function escapeHtml(str) {
+        return String(str ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
       }
 
       function resetForm() {
@@ -340,6 +607,49 @@
         if (!button || !button.onclick || button.onclick.toString().indexOf('toggleDropdown') === -1) {
           dropdown.classList.add('hidden');
         }
+
+        // Close product suggestions when clicking outside any autocomplete widget
+        const isInsideAutocomplete = !!event.target.closest('.product-autocomplete') || !!event.target.closest('.product-suggestions');
+        if (!isInsideAutocomplete) {
+          document.querySelectorAll('.product-suggestions').forEach(el => el.classList.add('hidden'));
+        }
+      });
+
+      // Form-level validation: ensure product_id is selected for each item row.
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('materialRequestForm');
+        if (!form) return;
+
+        form.addEventListener('submit', function (e) {
+          let firstInvalid = null;
+          document.querySelectorAll('.item-row').forEach(row => {
+            const itemId = row.getAttribute('data-item');
+            if (!itemId) return;
+
+            const displayInput = row.querySelector(`.product-autocomplete[data-item="${itemId}"]`);
+            const idInput = row.querySelector(`input[name="items[${itemId}][product_id]"]`);
+
+            // Clear previous validation messages
+            if (displayInput) {
+              displayInput.setCustomValidity('');
+            }
+
+            const hasId = !!(idInput && idInput.value && String(idInput.value).trim() !== '');
+            if (!hasId) {
+              if (displayInput) {
+                displayInput.setCustomValidity('Pilih produk dari daftar saran.');
+                if (!firstInvalid) firstInvalid = displayInput;
+              }
+            }
+          });
+
+          if (firstInvalid) {
+            e.preventDefault();
+            firstInvalid.reportValidity();
+            firstInvalid.focus();
+            return false;
+          }
+        });
       });
 
       // Add first item by default
@@ -347,87 +657,5 @@
         addItem();
       });
     </script>
-    
-    <!-- Enhanced Sidebar Styles -->
-    <style>
-      /* Navigation Item Styles */
-      .nav-item {
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .nav-item::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        transition: left 0.5s;
-      }
-      
-      .nav-item:hover::before {
-        left: 100%;
-      }
-      
-      .nav-active {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        transform: translateX(4px);
-      }
-      
-      .nav-active-rmw {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        transform: translateX(4px);
-      }
-      
-      .nav-inactive {
-        color: #6b7280;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-      }
-      
-      .nav-inactive:hover {
-        background: #f3f4f6;
-        border-color: #d1d5db;
-        transform: translateX(2px);
-        color: #374151;
-      }
-      
-      .nav-item i {
-        transition: transform 0.2s ease;
-      }
-      
-      .nav-item:hover i {
-        transform: scale(1.1);
-      }
-      
-      /* Logo Animation */
-      .hover-scale {
-        transition: transform 0.3s ease;
-      }
-      
-      .hover-scale:hover {
-        transform: scale(1.05);
-      }
-      
-      /* Active Page Indicator */
-      @keyframes pulse {
-        0%, 100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
-      
-      .animate-pulse {
-        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-      }
-    </style>
   </body>
 </html>

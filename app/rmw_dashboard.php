@@ -1,3 +1,15 @@
+<?php
+// Helper function to build pagination URLs with current filters
+function buildPaginationUrl($page, $perPage = null) {
+    $params = $_GET;
+    $params['page'] = $page;
+    if ($perPage !== null) {
+        $params['per_page'] = $perPage;
+    }
+    $query = http_build_query($params);
+    return 'rmw_dashboard.php' . ($query ? '?' . $query : '');
+}
+?>
 <body class="min-h-screen bg-gray-50">
     <!-- Navbar-->
     <header class="bg-white shadow-sm border-b border-gray-200">
@@ -23,7 +35,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Settings
                 </a>
@@ -44,7 +56,7 @@
       <!-- Main content -->
       <main class="flex-1 p-6">
         <!-- Dashboard Content -->
-        <div class="space-y-6">
+        <div class="dashboard-container space-y-6">
           <!-- Dashboard Title -->
           <div>
             <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
@@ -77,7 +89,7 @@
         <?php endif; ?>
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="stats-container grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center">
               <div class="p-3 bg-yellow-100 rounded-lg">
@@ -85,7 +97,7 @@
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Menunggu</p>
-                <p class="text-2xl font-bold text-gray-900"><?= $stats['pending'] ?? 0 ?></p>
+                <p class="stats-pending text-2xl font-bold text-gray-900"><?= $stats['pending'] ?? 0 ?></p>
               </div>
             </div>
           </div>
@@ -96,8 +108,20 @@
                 <i class="bi bi-gear text-blue-600 text-xl"></i>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Diproses</p>
-                <p class="text-2xl font-bold text-gray-900"><?= $stats['diproses'] ?? 0 ?></p>
+                <p class="text-sm font-medium text-gray-600">Disetujui</p>
+                <p class="stats-approved text-2xl font-bold text-gray-900"><?= $stats['approved'] ?? 0 ?></p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center">
+              <div class="p-3 bg-purple-100 rounded-lg">
+                <i class="bi bi-box text-purple-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Sudah Siap</p>
+                <p class="stats-ready text-2xl font-bold text-gray-900"><?= $stats['ready'] ?? 0 ?></p>
               </div>
             </div>
           </div>
@@ -109,19 +133,7 @@
               </div>
               <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Selesai</p>
-                <p class="text-2xl font-bold text-gray-900"><?= $stats['completed'] ?? 0 ?></p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center">
-              <div class="p-3 bg-gray-100 rounded-lg">
-                <i class="bi bi-x-circle text-gray-600 text-xl"></i>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-600">Dibatalkan</p>
-                <p class="text-2xl font-bold text-gray-900"><?= $stats['cancelled'] ?? 0 ?></p>
+                <p class="stats-completed text-2xl font-bold text-gray-900"><?= $stats['completed'] ?? 0 ?></p>
               </div>
             </div>
           </div>
@@ -165,7 +177,7 @@
           </div>
           
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="requests-table min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Permintaan</th>
@@ -179,7 +191,10 @@
               <tbody class="bg-white divide-y divide-gray-200">
                 <?php if (!empty($requests)): ?>
                   <?php foreach ($requests as $request): ?>
-                  <tr class="hover:bg-gray-50">
+                  <tr data-request-id="<?= $request['id'] ?>" 
+                      data-created-at="<?= htmlspecialchars($request['created_at']) ?>"
+                      data-updated-at="<?= htmlspecialchars($request['updated_at']) ?>"
+                      class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <?= htmlspecialchars($request['request_number']) ?>
                     </td>
@@ -189,7 +204,7 @@
                         <div class="text-xs text-gray-500"><?= htmlspecialchars($request['production_division'] ?? 'Unassigned') ?></div>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="request-date px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <?= date('M d, Y H:i', strtotime($request['created_at'])) ?>
                     </td>
     
@@ -197,10 +212,10 @@
                       <?= $request['item_count'] ?> item
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                           ($request['status'] === 'approved' ? 'bg-blue-100 text-blue-800' : 
-                           ($request['status'] === 'ready' ? 'bg-purple-100 text-purple-800' : 
+                      <span class="request-status px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                           ($request['status'] === 'approved' ? 'bg-blue-100 text-blue-800' :
+                           ($request['status'] === 'ready' ? 'bg-purple-100 text-purple-800' :
                            ($request['status'] === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'))) ?>">
                         <?php
                         $statusIndo = [
@@ -259,12 +274,133 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Controls -->
+          <?php if (isset($pagination)): ?>
+          <div class="pagination-container px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center text-sm text-gray-700">
+                <span class="pagination-info">Menampilkan 
+                  <span class="font-medium"><?= number_format($pagination['start_record']) ?></span> 
+                  hingga 
+                  <span class="font-medium"><?= number_format($pagination['end_record']) ?></span> 
+                  dari 
+                  <span class="font-medium"><?= number_format($pagination['total_records']) ?></span> 
+                  hasil
+                </span>
+              </div>
+              
+              <div class="flex items-center space-x-4">
+                <!-- Per Page Selector -->
+                <div class="flex items-center space-x-2">
+                  <label class="text-sm text-gray-700">Tampilkan:</label>
+                  <select id="perPageSelect" class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <option value="5" <?= $pagination['per_page'] === 5 ? 'selected' : '' ?>>5</option>
+                    <option value="10" <?= $pagination['per_page'] === 10 ? 'selected' : '' ?>>10</option>
+                    <option value="25" <?= $pagination['per_page'] === 25 ? 'selected' : '' ?>>25</option>
+                    <option value="50" <?= $pagination['per_page'] === 50 ? 'selected' : '' ?>>50</option>
+                  </select>
+                </div>
+
+                <!-- Page Navigation - Only show if more than 1 page -->
+                <?php if ($pagination['total_pages'] > 1): ?>
+                <div class="flex items-center space-x-1">
+                  <!-- Previous Button -->
+                  <?php if ($pagination['has_prev']): ?>
+                    <a href="<?= buildPaginationUrl($pagination['prev_page']) ?>" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                      <i class="bi bi-chevron-left"></i> Sebelumnya
+                    </a>
+                  <?php else: ?>
+                    <span class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                      <i class="bi bi-chevron-left"></i> Sebelumnya
+                    </span>
+                  <?php endif; ?>
+
+                  <!-- Page Numbers -->
+                  <?php
+                  $currentPage = $pagination['current_page'];
+                  $totalPages = $pagination['total_pages'];
+                  $startPage = max(1, $currentPage - 2);
+                  $endPage = min($totalPages, $currentPage + 2);
+                  
+                  if ($startPage > 1) {
+                      echo '<a href="' . buildPaginationUrl(1) . '" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>';
+                      if ($startPage > 2) {
+                          echo '<span class="px-2 text-gray-500">...</span>';
+                      }
+                  }
+                  
+                  for ($i = $startPage; $i <= $endPage; $i++) {
+                      if ($i === $currentPage) {
+                          echo '<span class="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-green-600 rounded-md">' . $i . '</span>';
+                      } else {
+                          echo '<a href="' . buildPaginationUrl($i) . '" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">' . $i . '</a>';
+                      }
+                  }
+                  
+                  if ($endPage < $totalPages) {
+                      if ($endPage < $totalPages - 1) {
+                          echo '<span class="px-2 text-gray-500">...</span>';
+                      }
+                      echo '<a href="' . buildPaginationUrl($totalPages) . '" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">' . $totalPages . '</a>';
+                  }
+                  ?>
+
+                  <!-- Next Button -->
+                  <?php if ($pagination['has_next']): ?>
+                    <a href="<?= buildPaginationUrl($pagination['next_page']) ?>" 
+                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                      Selanjutnya <i class="bi bi-chevron-right"></i>
+                    </a>
+                  <?php else: ?>
+                    <span class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-300 rounded-md cursor-not-allowed">
+                      Selanjutnya <i class="bi bi-chevron-right"></i>
+                    </span>
+                  <?php endif; ?>
+                </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
         </div>
         </div>
       </main>
     </div>
 
   
+
+    <!-- Dashboard Updater Script -->
+    <script src="<?php echo url('includes/js/dashboard-updater.js'); ?>"></script>
+
+    <!-- Initialize Dashboard Updater with correct endpoint -->
+    <script>
+      // Override default endpoint with absolute URL
+      document.addEventListener('DOMContentLoaded', function() {
+        const dashboardContainer = document.querySelector('.dashboard-container');
+        
+        if (dashboardContainer && typeof DashboardUpdater !== 'undefined') {
+          // Remove any existing auto-initialized updater
+          if (window.dashboardUpdater) {
+            window.dashboardUpdater.destroy();
+            window.dashboardUpdater = null;
+          }
+          
+          // Initialize with correct absolute endpoint
+          window.dashboardUpdater = new DashboardUpdater({
+            endpoint: '<?php echo url('app/controllers/get_dashboard_updates.php'); ?>',
+            debugMode: true,
+            enableNotifications: false,
+            onConnectionChange: function(status) {
+              console.log('Dashboard connection status:', status);
+            }
+          });
+          
+          console.log('Dashboard updater initialized with endpoint:', '<?php echo url('app/controllers/get_dashboard_updates.php'); ?>');
+        }
+      });
+    </script>
 
     <!-- JavaScript -->
     <script>
@@ -284,15 +420,26 @@
       });
 
       function viewRequest(requestId) {
-        console.log('viewRequest function called with ID:', requestId);
+        // Cache DOM elements for performance
+        const modalCache = viewRequest.modalCache || {};
+        viewRequest.modalCache = modalCache;
         
-        // Remove any existing test modal
+        // Remove any existing modal with cleanup
+        if (modalCache.existingModal) {
+            modalCache.existingModal.remove();
+            modalCache.existingModal = null;
+        }
+        
         const existingTest = document.getElementById('testModal');
-        if (existingTest) existingTest.remove();
+        if (existingTest) {
+            existingTest.remove();
+        }
         
         // Create a working modal with proper structure
         const modal = document.createElement('div');
         modal.id = 'requestModal';
+        modalCache.existingModal = modal;
+        
         modal.style.cssText = `
             position: fixed !important;
             top: 0 !important;
@@ -414,7 +561,6 @@
         
         // Fetch request details via AJAX
         const url = `rmw_dashboard.php?action=get_request_details&id=${requestId}`;
-        console.log('Fetching from URL:', url);
         
         fetch(url, {
           method: 'GET',
@@ -425,8 +571,6 @@
           cache: 'no-cache'
         })
           .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
             
             // Check content type to ensure we're getting JSON
             const contentType = response.headers.get('content-type');
@@ -442,25 +586,20 @@
             return response.text();
           })
           .then(text => {
-            console.log('Response text length:', text.length);
             
             // Validate that response starts with JSON object/array
             const trimmed = text.trim();
             if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
-              console.error('Invalid JSON response - starts with:', trimmed.substring(0, 50));
               throw new Error('Invalid JSON response format');
             }
             
             try {
               return JSON.parse(text);
             } catch (parseError) {
-              console.error('JSON parse error:', parseError);
-              console.error('Response content preview:', text.substring(0, 200));
               throw new Error(`JSON parse error: ${parseError.message}`);
             }
           })
           .then(data => {
-            console.log('Parsed data:', data);
             document.getElementById('modalLoading').style.display = 'none';
             
             // Validate response structure
@@ -469,23 +608,19 @@
             }
             
             if (data.success) {
-              console.log('Data success, calling displayRequestDetails');
               if (!data.request) {
                 throw new Error('Missing request data in response');
               }
               displayRequestDetails(data.request);
             } else {
-              console.log('Data error:', data.error);
               const errorMessage = data.error || 'Failed to load request details';
               const errorType = data.error_type || 'Unknown';
-              console.error('Server error details:', { error: errorMessage, type: errorType });
               
               document.getElementById('modalErrorMessage').textContent = `${errorMessage} (${errorType})`;
               document.getElementById('modalError').style.display = 'block';
             }
           })
           .catch(error => {
-            console.error('Request failed:', error);
             document.getElementById('modalLoading').style.display = 'none';
             
             let errorMessage = error.message;
@@ -513,7 +648,6 @@
       }
       
       function displayRequestDetails(request) {
-        console.log('displayRequestDetails called with:', request);
         
         const itemsHtml = request.items.map(item => `
           <tr style="border-bottom: 1px solid #e5e7eb !important;">
@@ -522,20 +656,6 @@
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.requested_quantity}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.unit}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.description || '-'}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important;">
-              <span style="
-                padding: 4px 8px !important;
-                display: inline-flex !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
-                border-radius: 9999px !important;
-                ${item.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                  item.status === 'approved' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
-                  'background: #fee2e2 !important; color: #991b1b !important;'}
-              ">
-                ${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
-              </span>
-            </td>
           </tr>
         `).join('');
         
@@ -573,23 +693,9 @@
                   ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                 </span>
               </div>
+  
               <div>
-                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Priority</h4>
-                <span style="
-                  padding: 6px 12px !important;
-                  display: inline-flex !important;
-                  font-size: 14px !important;
-                  font-weight: 600 !important;
-                  border-radius: 6px !important;
-                  ${request.priority === 'high' ? 'background: #fee2e2 !important; color: #991b1b !important;' :
-                    request.priority === 'medium' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                    'background: #f3f4f6 !important; color: #374151 !important;'}
-                ">
-                  ${request.priority ? request.priority.charAt(0).toUpperCase() + request.priority.slice(1) : 'Normal'}
-                </span>
-              </div>
-              <div>
-                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Referensi Pelanggan</h4>
+                <h4 style="font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; margin-bottom: 4px !important; letter-spacing: 0.5px !important;">Nomor Bon</h4>
                 <p style="font-size: 16px !important; font-weight: 500 !important; color: #111827 !important; margin: 0 !important;">${request.customer_reference || '-'}</p>
               </div>
             </div>
@@ -669,7 +775,98 @@
         document.getElementById('modalFooter').style.display = 'block';
       }
 
-  
+      // Helper function to build pagination URLs with current filters
+      function buildPaginationUrl(page, perPage = null) {
+        const params = new URLSearchParams(window.location.search);
+        params.set('page', page);
+        if (perPage !== null) {
+          params.set('per_page', perPage);
+        }
+        return 'rmw_dashboard.php' + (params.toString() ? '?' + params.toString() : '');
+      }
+
+      // Handle per-page selector change
+      document.addEventListener('DOMContentLoaded', function() {
+        const perPageSelect = document.getElementById('perPageSelect');
+        if (perPageSelect) {
+          perPageSelect.addEventListener('change', function() {
+            const perPage = this.value;
+            window.location.href = buildPaginationUrl(1, perPage);
+          });
+        }
+
+        // Smooth scroll to table when pagination links are clicked
+        document.querySelectorAll('a[href*="rmw_dashboard.php"]').forEach(link => {
+          link.addEventListener('click', function(e) {
+            // Check if this is a pagination link (has page parameter)
+            const url = new URL(this.href);
+            if (url.searchParams.has('page')) {
+              setTimeout(() => {
+                const table = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+                if (table) {
+                  table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }
+          });
+        });
+      });
+
+        // Initialize Dashboard Updater with RMW-specific configuration
+        document.addEventListener('DOMContentLoaded', function() {
+          // Wait for the auto-initialization to complete, then reconfigure
+          setTimeout(() => {
+            if (window.dashboardUpdater) {
+              // Reconfigure updater with dashboard-specific settings
+              window.dashboardUpdater.options.debugMode = false; // Disable debug mode in production
+              window.dashboardUpdater.options.enableNotifications = false; // Disable notifications initially to prevent issues
+              window.dashboardUpdater.options.fastInterval = 5000; // 5 seconds for active RMW users (reduced frequency)
+              window.dashboardUpdater.options.updateInterval = 10000; // 10 seconds default (increased for performance)
+              window.dashboardUpdater.options.businessHours = { start: 7, end: 18 }; // RMW extended hours
+              window.dashboardUpdater.options.maxRetries = 5; // Increase retry attempts
+              
+              // Custom callbacks for RMW dashboard
+              window.dashboardUpdater.options.onConnectionChange = function(status) {
+                // Show visual feedback for connection issues
+                if (status === 'error') {
+                  // Could show a user-friendly notification here
+                }
+              };
+              
+              window.dashboardUpdater.options.onStatsUpdate = function(stats) {
+                // Optional: Add visual emphasis for critical status changes
+                
+                // Flash important status changes
+                const pendingCount = stats.pending || 0;
+                if (pendingCount > 10) {
+                  // High pending requests - could add visual warning
+                }
+              };
+              
+              window.dashboardUpdater.options.onRequestUpdate = function(requests) {
+                // Check for time-sensitive requests that might need attention
+                requests.forEach(request => {
+                  if (request.status === 'approved' && !request.updated_fields.includes('processed_by')) {
+                    // New approved request ready for processing
+                    // Could highlight or notify user
+                  }
+                });
+              };
+              
+              // Request notification permission for better UX
+              if (window.dashboardUpdater.options.enableNotifications && 'Notification' in window) {
+                if (Notification.permission === 'default') {
+                  Notification.requestPermission().then(permission => {
+                    // Permission handled
+                  });
+                }
+              }
+            } else {
+              // Dashboard updater not found
+            }
+          }, 200);
+        });
+
     </script>
     
     <!-- Enhanced Sidebar Styles -->
@@ -751,6 +948,130 @@
       
       .animate-pulse {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      /* Real-time Update Animations */
+      @keyframes statUpdate {
+        0% {
+          transform: scale(1);
+          background-color: rgba(16, 185, 129, 0);
+        }
+        50% {
+          transform: scale(1.1);
+          background-color: rgba(16, 185, 129, 0.1);
+        }
+        100% {
+          transform: scale(1);
+          background-color: rgba(16, 185, 129, 0);
+        }
+      }
+
+      .stat-updated {
+        animation: statUpdate 1s ease-out;
+      }
+
+      @keyframes newRow {
+        0% {
+          opacity: 0;
+          transform: translateY(-20px);
+          background-color: rgba(16, 185, 129, 0.2);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+          background-color: rgba(16, 185, 129, 0);
+        }
+      }
+
+      .row-new {
+        animation: newRow 0.5s ease-out;
+        background-color: rgba(16, 185, 129, 0.1);
+        border-left: 4px solid #10b981;
+      }
+
+      @keyframes rowUpdate {
+        0% {
+          background-color: rgba(59, 130, 246, 0);
+          border-left-color: transparent;
+        }
+        50% {
+          background-color: rgba(59, 130, 246, 0.1);
+          border-left-color: #3b82f6;
+        }
+        100% {
+          background-color: rgba(59, 130, 246, 0);
+          border-left-color: transparent;
+        }
+      }
+
+      .row-updated {
+        animation: rowUpdate 2s ease-out;
+      }
+
+      @keyframes rowRemove {
+        0% {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
+
+      .row-removed {
+        animation: rowRemove 0.5s ease-out;
+      }
+
+      /* Connection Status Indicator */
+      .connection-indicator {
+        transition: all 0.3s ease;
+      }
+
+      .connection-indicator.connected {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+      }
+
+      .connection-indicator.connecting {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+      }
+
+      .connection-indicator.error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+      }
+
+      /* Loading states */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
     </style>
   </body>

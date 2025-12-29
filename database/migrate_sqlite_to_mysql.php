@@ -99,7 +99,7 @@ try {
 }
 
 // Step 4: Get list of tables to migrate
-$tables = ['users', 'products', 'material_requests', 'material_request_items', 'qr_tracking', 'activity_log', 'StockDetailVer'];
+$tables = ['users', 'products', 'material_requests', 'material_request_items', 'activity_log', 'StockDetailVer'];
 
 // Step 5: Migrate data table by table
 echo CLR_INFO . "[4/8] Migrating data from SQLite to MySQL...\n\n" . CLR_RESET;

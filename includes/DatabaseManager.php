@@ -267,7 +267,7 @@ class DatabaseManager
     {
         try {
             if (empty($custNoRef)) {
-                return ['valid' => false, 'message' => 'Customer reference number is required'];
+                return ['valid' => false, 'message' => 'Nomor Bon wajib diisi'];
             }
             
             // First check if the customer reference exists at all
@@ -279,7 +279,7 @@ class DatabaseManager
             $result = $stmt->fetch();
             
             if ($result['count'] == 0) {
-                return ['valid' => false, 'message' => 'Customer reference not found: ' . $custNoRef];
+                return ['valid' => false, 'message' => 'Nomor Bon tidak ditemukan: ' . $custNoRef];
             }
             
             // Check the actual status of the customer reference
@@ -295,17 +295,167 @@ class DatabaseManager
                 $statusList = implode(', ', $statuses);
                 return [
                     'valid' => true, 
-                    'message' => 'Customer reference found with status: ' . $statusList,
+                    'message' => 'Nomor Bon ditemukan dengan status: ' . $statusList,
                     'statuses' => $statuses,
-                    'record_count' => $result['count']
+                    'record_count' => $result['total_count']
                 ];
             } else {
-                return ['valid' => false, 'message' => 'Customer reference found but no valid status'];
+                return ['valid' => false, 'message' => 'Nomor Bon ditemukan tetapi tidak memiliki status yang valid'];
             }
             
         } catch (Exception $e) {
             $this->logError("Error validating customer reference: " . $e->getMessage(), ['custNoRef' => $custNoRef]);
-            return ['valid' => false, 'message' => 'Error validating customer reference: ' . $e->getMessage()];
+            return ['valid' => false, 'message' => 'Terjadi kesalahan saat memvalidasi Nomor Bon: ' . $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Validate LPB_SJ_No (Nomor Bon)
+     * 
+     * @param string $lpbSjNo Nomor Bon to validate
+     * @return array Validation result with 'valid' and 'message' keys
+     */
+    public function validateLpbSjNo($lpbSjNo)
+    {
+        try {
+            if (empty($lpbSjNo)) {
+                return ['valid' => false, 'message' => 'Nomor Bon (LPB/SJ) wajib diisi'];
+            }
+            
+            error_log("[Scanner] Validating LPB_SJ_No: " . $lpbSjNo);
+            
+            // Check if the LPB_SJ_No exists and get verification status
+            $stmt = $this->query(
+                "SELECT 
+                    COUNT(*) as total_count,
+                    COUNT(CASE WHEN Verifikasi = 1 THEN 1 END) as verified_count,
+                    COUNT(CASE WHEN Verifikasi = 0 THEN 1 END) as unverified_count
+                FROM StockDetailVer 
+                WHERE LPB_SJ_No = ?",
+                [$lpbSjNo]
+            );
+            
+            $result = $stmt->fetch();
+            
+            if ($result['total_count'] == 0) {
+                error_log("[Scanner] LPB_SJ_No not found: " . $lpbSjNo);
+                return ['valid' => false, 'message' => 'Nomor Bon tidak ditemukan: ' . $lpbSjNo];
+            }
+            
+            // Check if any records are already verified
+            if ($result['verified_count'] > 0) {
+                error_log("[Scanner] LPB_SJ_No already verified: " . $lpbSjNo . " - " . $result['verified_count'] . " verified records");
+                return [
+                    'valid' => false, 
+                    'message' => 'Nomor Bon sudah diverifikasi. Tidak dapat memproses ulang.',
+                    'verified_count' => $result['verified_count'],
+                    'unverified_count' => $result['unverified_count'],
+                    'already_verified' => true
+                ];
+            }
+            
+            error_log("[Scanner] LPB_SJ_No found: " . $lpbSjNo . " with " . $result['total_count'] . " records, " . $result['unverified_count'] . " unverified");
+            
+            // Check the actual status
+            $stmt = $this->query(
+                "SELECT DISTINCT status FROM StockDetailVer WHERE LPB_SJ_No = ?",
+                [$lpbSjNo]
+            );
+            
+            $statuses = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            if (!empty($statuses)) {
+                $statusList = implode(', ', $statuses);
+                return [
+                    'valid' => true, 
+                    'message' => 'Nomor Bon ditemukan dengan status: ' . $statusList,
+                    'statuses' => $statuses,
+                    'record_count' => $result['total_count']
+                ];
+            } else {
+                return ['valid' => false, 'message' => 'Nomor Bon ditemukan tetapi tidak memiliki status yang valid'];
+            }
+            
+        } catch (Exception $e) {
+            $this->logError("Error validating LPB_SJ_No: " . $e->getMessage(), ['lpbSjNo' => $lpbSjNo]);
+            return ['valid' => false, 'message' => 'Terjadi kesalahan saat memvalidasi Nomor Bon: ' . $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Get StockDetailVer materials by LPB_SJ_No
+     * 
+     * @param string $lpbSjNo LPB_SJ_No (Nomor Bon)
+     * @return array|null Array with 'items' key containing materials or null if not found
+     */
+    public function getStockDetailVerMaterialsByLpbSjNo($lpbSjNo)
+    {
+        try {
+            if (empty($lpbSjNo)) {
+                return null;
+            }
+            
+            error_log("[Scanner] Fetching materials for LPB_SJ_No: " . $lpbSjNo);
+
+            // Aggregate by Product_ID for the given LPB_SJ_No.
+            // Business rule for scanner comparison:
+            // - compare requested_quantity vs SUM(ShipTotal) per Product_ID
+            $stmt = $this->query(
+                "SELECT
+                    LPB_SJ_No,
+                    Product_ID,
+                    MAX(Unit) AS Unit,
+                    SUM(COALESCE(ShipTotal, 0)) AS ShipTotalSum,
+                    MAX(StockDate) AS LastStockDate,
+                    MAX(CustNoRef) AS CustNoRef,
+                    MAX(Customer) AS Customer
+                 FROM StockDetailVer
+                 WHERE LPB_SJ_No = ?
+                 GROUP BY LPB_SJ_No, Product_ID
+                 ORDER BY LastStockDate DESC",
+                [$lpbSjNo]
+            );
+
+            $rows = $stmt->fetchAll();
+
+            if (empty($rows)) {
+                error_log("[Scanner] No materials found for LPB_SJ_No: " . $lpbSjNo);
+                return null;
+            }
+
+            error_log("[Scanner] Found " . count($rows) . " aggregated Product_ID rows for LPB_SJ_No: " . $lpbSjNo);
+
+            // Extract details from first record
+            $firstRow = $rows[0];
+
+            // Map materials to expected format
+            $mappedMaterials = [];
+            foreach ($rows as $row) {
+                $mappedMaterials[] = [
+                    'product_id' => $row['Product_ID'] ?? 'N/A',
+                    // StockDetailVer doesn't provide a name; keep product_id for display compatibility
+                    'product_name' => $row['Product_ID'] ?? 'Unknown Product',
+                    'quantity' => $row['ShipTotalSum'] ?? 0,
+                    'unit' => $row['Unit'] ?? 'pcs',
+                    'description' => '',
+                    'stock_ref_no' => '',
+                    'customer' => $row['Customer'] ?? '',
+                    'lpb_sj_no' => $row['LPB_SJ_No'] ?? '',
+                    'stock_date' => $row['LastStockDate'] ?? ''
+                ];
+            }
+
+            return [
+                'lpb_sj_no' => $firstRow['LPB_SJ_No'] ?? 'N/A',
+                'customer_reference' => $firstRow['CustNoRef'] ?? 'N/A',
+                'customer_name' => $firstRow['Customer'] ?? 'N/A',
+                'items' => $mappedMaterials,
+                'count' => count($mappedMaterials),
+                'raw_data' => $rows
+            ];
+        } catch (Exception $e) {
+            $this->logError("Error getting StockDetailVer materials by LPB: " . $e->getMessage(), ['lpbSjNo' => $lpbSjNo]);
+            return null;
         }
     }
     

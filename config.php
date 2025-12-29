@@ -107,7 +107,7 @@ $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production' ||
 
 // Database Configuration with Environment Variables
 $dbType = $_ENV['DB_TYPE'] ?? 'mysql';
-$dbHost = $_ENV['DB_MYSQL_HOST'] ?? ($isProduction ? '127.0.0.1:3306' : '36.92.174.141:3333');
+$dbHost = $_ENV['DB_MYSQL_HOST'] ?? '36.92.174.141:3333';
 $dbName = $_ENV['DB_MYSQL_NAME'] ?? 'rmw_system';
 $dbUser = $_ENV['DB_MYSQL_USER'] ?? 'endang';
 $dbPass = $_ENV['DB_MYSQL_PASS'] ?? 'endangthea0';
@@ -141,4 +141,8 @@ define('APP_ENV', $appEnv);
 // Application Configuration
 define('APP_NAME', 'RMW System');
 define('APP_VERSION', '2.0.0');
+
+// Scanner Configuration
+define('AUTO_COMPLETE_ON_PERFECT_MATCH', true); // Enable/disable auto-completion on perfect match
+define('AUTO_COMPLETE_DELAY_SECONDS', 0); // 0 = immediate, >0 = delay in seconds before auto-completing
 ?>

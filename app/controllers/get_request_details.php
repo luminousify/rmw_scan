@@ -40,7 +40,16 @@ try {
     // Get request items
     $itemsQuery = "
         SELECT 
-            mri.*,
+            mri.id,
+            mri.request_id,
+            mri.product_id,
+            mri.product_name,
+            mri.requested_quantity,
+            mri.unit,
+            mri.description,
+            mri.approved_quantity,
+            mri.notes,
+            mri.created_at,
             p.category
         FROM material_request_items mri
         LEFT JOIN products p ON mri.product_id = p.product_id

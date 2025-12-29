@@ -23,7 +23,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Settings
                 </a>
@@ -522,20 +522,6 @@
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.requested_quantity}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.unit}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.description || '-'}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important;">
-              <span style="
-                padding: 4px 8px !important;
-                display: inline-flex !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
-                border-radius: 9999px !important;
-                ${item.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                  item.status === 'approved' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
-                  'background: #fee2e2 !important; color: #991b1b !important;'}
-              ">
-                ${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Pending'}
-              </span>
-            </td>
           </tr>
         `).join('');
         

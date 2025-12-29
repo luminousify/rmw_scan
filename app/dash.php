@@ -23,7 +23,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Pengaturan
                 </a>
@@ -96,19 +96,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Scanned Items Card -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-      <div class="flex items-center">
-        <div class="flex-shrink-0 bg-purple-100 rounded-lg p-3">
-          <i class="bi bi-qr-code text-purple-600 text-xl"></i>
-        </div>
-        <div class="ml-4">
-          <p class="text-sm font-medium text-gray-600">Item Dipindai</p>
-          <p class="text-2xl font-bold text-gray-900" id="scannedItems">0</p>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Charts Row -->
@@ -160,8 +147,7 @@
         stats: {
           totalRequests: <?= getTotalRequests() ?>,
           pendingRequests: <?= getPendingRequests() ?>,
-          approvedRequests: <?= getApprovedRequests() ?>,
-          scannedItems: <?= getScannedItems() ?>
+          approvedRequests: <?= getApprovedRequests() ?>
         },
         requestTrends: {
           labels: <?= json_encode(getLast7Days()) ?>,
@@ -184,7 +170,6 @@
       document.getElementById('totalRequests').textContent = dashboardData.stats.totalRequests;
       document.getElementById('pendingRequests').textContent = dashboardData.stats.pendingRequests;
       document.getElementById('approvedRequests').textContent = dashboardData.stats.approvedRequests;
-      document.getElementById('scannedItems').textContent = dashboardData.stats.scannedItems;
 
       // Request Trends Chart
       const requestTrendsCtx = document.getElementById('requestTrendsChart');
@@ -385,21 +370,6 @@
             $db = DatabaseManager::getInstance();
             $pdo = $db->getConnection();
             $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM material_requests WHERE status = 'approved'");
-            $stmt->execute();
-            return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-        } catch (Exception $e) {
-            return 0;
-        }
-    }
-
-    function getScannedItems() {
-        try {
-            if (!class_exists('DatabaseManager')) {
-                require_once path('includes/DatabaseManager.php');
-            }
-            $db = DatabaseManager::getInstance();
-            $pdo = $db->getConnection();
-            $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM qr_tracking WHERE status = 'scanned'");
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
         } catch (Exception $e) {

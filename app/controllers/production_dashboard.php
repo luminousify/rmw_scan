@@ -9,14 +9,23 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 // Check if user is Production department
 if (!isset($_SESSION['department']) || $_SESSION['department'] !== 'production') {
-    header('Location: ' . url('app/controllers/material_request.php'));
+    // Log unauthorized access attempt
+    error_log("SECURITY: Non-production user attempted to access production dashboard. User: " . 
+              ($_SESSION['user'] ?? 'unknown') . 
+              " Department: " . ($_SESSION['department'] ?? 'unknown'));
+    
+    // Redirect to appropriate dashboard based on department
+    if (isset($_SESSION['department']) && $_SESSION['department'] === 'rmw') {
+        header('Location: ' . url('app/controllers/rmw_dashboard.php'));
+    } else {
+        header('Location: ' . url('app/controllers/dashboard.php'));
+    }
     exit();
 }
 
 $module_name = "production_dashboard";
 $title = "Production Dashboard";
 $name = $_SESSION['user'];
-$pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'];
 

@@ -12,7 +12,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $module_name = "my_requests";
 $title = "Permintaan Saya";
 $name = $_SESSION['user'];
-$pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'] ?? 'production';
 

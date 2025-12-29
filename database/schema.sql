@@ -51,23 +51,6 @@ CREATE TABLE IF NOT EXISTS material_request_items (
     FOREIGN KEY (request_id) REFERENCES material_requests(id) ON DELETE CASCADE
 );
 
--- QR Code Tracking
-CREATE TABLE IF NOT EXISTS qr_tracking (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    qr_code VARCHAR(100) UNIQUE NOT NULL,
-    request_id INTEGER NOT NULL,
-    item_id INTEGER NOT NULL,
-    status VARCHAR(20) DEFAULT 'generated' CHECK (status IN ('generated', 'scanned', 'completed')),
-    generated_by INTEGER NOT NULL,
-    scanned_by INTEGER,
-    generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    scanned_at DATETIME,
-    FOREIGN KEY (request_id) REFERENCES material_requests(id),
-    FOREIGN KEY (item_id) REFERENCES material_request_items(id),
-    FOREIGN KEY (generated_by) REFERENCES users(id),
-    FOREIGN KEY (scanned_by) REFERENCES users(id)
-);
-
 -- Activity Log
 CREATE TABLE IF NOT EXISTS activity_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

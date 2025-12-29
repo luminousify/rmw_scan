@@ -1,22 +1,91 @@
 <?php
 require_once '../../config.php';
+require_once '../../includes/services/NotificationService.php';
 session_start();
 
+// Enhanced session validation
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Clear any potential session hijacking
+    session_unset();
+    session_destroy();
+    
+    // Set error header for debugging (remove in production)
+    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+        header('X-Debug-Error: User not logged in');
+    }
+    
     header('Location: ' . url());
     exit();
 }
 
+// Validate critical session variables
+$requiredSessionVars = ['user', 'idlog', 'department', 'division'];
+foreach ($requiredSessionVars as $var) {
+    if (!isset($_SESSION[$var]) || empty($_SESSION[$var])) {
+        error_log("SECURITY: Incomplete session data. Missing: $var. User: " . ($_SESSION['user'] ?? 'unknown'));
+        
+        // Clear invalid session
+        session_unset();
+        session_destroy();
+        
+        header('Location: ' . url());
+        exit();
+    }
+}
+
 // Check if user is RMW department
 if (!isset($_SESSION['department']) || $_SESSION['department'] !== 'rmw') {
-    header('Location: ' . url('app/controllers/material_request.php'));
+    // Log unauthorized access attempt
+    error_log("SECURITY: Non-RMW user attempted to access RMW dashboard. User: " . 
+              ($_SESSION['user'] ?? 'unknown') . 
+              " Department: " . ($_SESSION['department'] ?? 'unknown'));
+    
+    // Redirect to appropriate dashboard based on department
+    if (isset($_SESSION['department'])) {
+        if ($_SESSION['department'] === 'production') {
+            header('Location: ' . url('app/controllers/production_dashboard.php'));
+        } else {
+            header('Location: ' . url('app/controllers/dashboard.php'));
+        }
+    } else {
+        header('Location: ' . url());
+    }
+    exit();
+}
+
+// Validate user exists in database
+try {
+    include '../../includes/conn_mysql.php';
+    
+    $stmt = $pdo->prepare("SELECT id, username, department, division FROM users WHERE id = ? AND username = ? AND department = ?");
+    $stmt->execute([$_SESSION['idlog'], $_SESSION['user'], $_SESSION['department']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$user) {
+        error_log("SECURITY: User validation failed. User ID: " . $_SESSION['idlog'] . ", Name: " . $_SESSION['user']);
+        
+        // Clear invalid session
+        session_unset();
+        session_destroy();
+        
+        header('Location: ' . url());
+        exit();
+    }
+    
+    // Update session with latest user data
+    $_SESSION['division'] = $user['division'];
+    
+} catch (Exception $e) {
+    error_log("DATABASE ERROR in session validation: " . $e->getMessage());
+    
+    // Don't expose database errors to user
+    header('Location: ' . url());
     exit();
 }
 
 $module_name = "rmw_dashboard";
 $title = "RMW Dashboard";
 $name = $_SESSION['user'];
-$pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'];
 
@@ -127,6 +196,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_request_details') {
                 'production_department' => htmlspecialchars($request['production_department'] ?? 'Unknown'),
                 'production_division' => htmlspecialchars($request['production_division'] ?? 'Unassigned'),
                 'processed_by' => htmlspecialchars($processedBy),
+                'production_user_id' => (int)$request['production_user_id'],
                 'rmw_user_id' => (int)$request['rmw_user_id'],
                 'items' => array_map(function($item) {
                     return [
@@ -199,12 +269,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $requestId = $_POST['request_id'];
             $newStatus = $_POST['status'];
             
-            // Get request details for logging
-            $requestQuery = "SELECT request_number FROM material_requests WHERE id = ?";
+            // Get complete request details for logging and notifications
+            $requestQuery = "
+                SELECT mr.*, u.full_name as production_user_name, u.division as production_division
+                FROM material_requests mr
+                LEFT JOIN users u ON mr.production_user_id = u.id
+                WHERE mr.id = ?
+            ";
             $stmt = $pdo->prepare($requestQuery);
             $stmt->execute([$requestId]);
             $requestDetails = $stmt->fetch(PDO::FETCH_ASSOC);
             $requestNumber = $requestDetails['request_number'];
+            $productionDivision = $requestDetails['production_division'];
             
             $processedBy = $_SESSION['full_name'] ?? $_SESSION['user'];
             
@@ -217,6 +293,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 ");
                 $processedDate = date('Y-m-d H:i:s');
                 $stmt->execute([$newStatus, $idlog, $processedDate, $processedBy, $processedBy, $requestId]);
+                
+                // Send notification to all production users in the division
+                try {
+                    $notificationService = new NotificationService();
+                    $notificationRequestDetails = [
+                        'request_number' => $requestNumber,
+                        'production_division' => $productionDivision,
+                        'created_by' => $requestDetails['production_user_name'],
+                        'notes' => $requestDetails['notes'] ?? '',
+                        'priority' => $requestDetails['priority'] ?? 'medium'
+                    ];
+                    
+                    $notificationResult = $notificationService->sendRequestApprovedNotification(
+                        $requestId, 
+                        $notificationRequestDetails, 
+                        $productionDivision, 
+                        $processedBy
+                    );
+                    
+                    if ($notificationResult['success']) {
+                        error_log("Approval notification sent successfully for request {$requestNumber} to division {$productionDivision}");
+                    } else {
+                        error_log("Failed to send approval notification for request {$requestNumber}: " . $notificationResult['message']);
+                    }
+                    
+                } catch (Exception $e) {
+                    error_log("Notification service error for request {$requestNumber} approval: " . $e->getMessage());
+                    // Don't show error to user to avoid confusing them
+                }
+                
             } elseif ($newStatus === 'ready') {
                 $stmt = $pdo->prepare("
                     UPDATE material_requests 
@@ -225,6 +331,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 ");
                 $readyDate = date('Y-m-d H:i:s');
                 $stmt->execute([$newStatus, $idlog, $readyDate, $processedBy, $requestId]);
+                
+                // Send notification to all production users in the division
+                try {
+                    $notificationService = new NotificationService();
+                    $notificationRequestDetails = [
+                        'request_number' => $requestNumber,
+                        'production_division' => $productionDivision,
+                        'created_by' => $requestDetails['production_user_name'],
+                        'notes' => $requestDetails['notes'] ?? '',
+                        'priority' => $requestDetails['priority'] ?? 'medium'
+                    ];
+                    
+                    $notificationResult = $notificationService->sendRequestReadyNotification(
+                        $requestId, 
+                        $notificationRequestDetails, 
+                        $productionDivision, 
+                        $processedBy
+                    );
+                    
+                    if ($notificationResult['success']) {
+                        error_log("Ready notification sent successfully for request {$requestNumber} to division {$productionDivision}");
+                    } else {
+                        error_log("Failed to send ready notification for request {$requestNumber}: " . $notificationResult['message']);
+                    }
+                    
+                } catch (Exception $e) {
+                    error_log("Notification service error for request {$requestNumber} ready: " . $e->getMessage());
+                    // Don't show error to user to avoid confusing them
+                }
+                
             } else {
                 $stmt = $pdo->prepare("
                     UPDATE material_requests 
@@ -273,6 +409,18 @@ try {
     $search = $_GET['search'] ?? '';
     $divisionFilter = $_GET['division'] ?? $userDivision; // Use user's division by default
 
+    // Pagination parameters with robust validation
+    $page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]));
+    $perPageInput = filter_input(INPUT_GET, 'per_page', FILTER_VALIDATE_INT, ['options' => ['default' => 10]]);
+    $perPage = in_array($perPageInput, [5, 10, 25, 50]) ? $perPageInput : 10;
+    
+    // Ensure perPage is never zero
+    if ($perPage <= 0) {
+        $perPage = 10;
+    }
+    
+    $offset = ($page - 1) * $perPage;
+
     // Build query based on filters
     $whereConditions = [];
     $params = [];
@@ -289,7 +437,7 @@ try {
     }
 
     if (!empty($search)) {
-        $whereConditions[] = "(mr.request_number LIKE ? OR u.full_name LIKE ? OR mri.product_name LIKE ?)";
+        $whereConditions[] = "(mr.request_number LIKE ? OR u.full_name LIKE ? OR EXISTS (SELECT 1 FROM material_request_items mri_search WHERE mri_search.request_id = mr.id AND mri_search.product_name LIKE ?))";
         $searchParam = "%$search%";
         $params[] = $searchParam;
         $params[] = $searchParam;
@@ -298,24 +446,71 @@ try {
 
     $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
 
-    // Get requests with details - filtered by division
-    $query = "
-        SELECT
-            mr.*,
-            u.full_name as production_user_name,
-            u.division as production_division,
-            COUNT(mri.id) as item_count
+    // Get total count for pagination
+    $countQuery = "
+        SELECT COUNT(DISTINCT mr.id) as total
         FROM material_requests mr
         LEFT JOIN users u ON mr.production_user_id = u.id
         LEFT JOIN material_request_items mri ON mr.id = mri.request_id
         $whereClause
-        GROUP BY mr.id
-        ORDER BY mr.created_at DESC
     ";
     
-    $stmt = $pdo->prepare($query);
+    $stmt = $pdo->prepare($countQuery);
     $stmt->execute($params);
+    $countResult = $stmt->fetch(PDO::FETCH_ASSOC);
+    $totalRecords = $countResult ? (int)$countResult['total'] : 0;
+    
+    // Prevent division by zero
+    $totalPages = $perPage > 0 ? ceil($totalRecords / $perPage) : 0;
+
+    // Adjust page if it's beyond the total pages
+    if ($totalPages > 0 && $page > $totalPages) {
+        $page = $totalPages;
+        $offset = ($page - 1) * $perPage;
+    }
+
+    // Get requests with details - filtered by division with pagination
+    $query = "
+        SELECT DISTINCT
+            mr.*,
+            u.full_name as production_user_name,
+            u.division as production_division,
+            COALESCE(COUNT(DISTINCT mri.id), 0) as item_count
+        FROM material_requests mr
+        LEFT JOIN users u ON mr.production_user_id = u.id
+        LEFT JOIN material_request_items mri ON mr.id = mri.request_id
+        $whereClause
+        GROUP BY mr.id, u.full_name, u.division
+        ORDER BY mr.created_at DESC
+        LIMIT ? OFFSET ?
+    ";
+    
+    // Ensure integer parameters for LIMIT and OFFSET
+    $paginationParams = array_merge($params, [(int)$perPage, (int)$offset]);
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($paginationParams);
     $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Pagination metadata for the view with safe defaults
+    $pagination = [
+        'current_page' => max(1, $page),
+        'per_page' => max(1, $perPage),
+        'total_records' => max(0, $totalRecords),
+        'total_pages' => max(0, $totalPages),
+        'has_prev' => $page > 1,
+        'has_next' => $totalPages > 0 && $page < $totalPages,
+        'prev_page' => max(1, $page - 1),
+        'next_page' => $totalPages > 0 ? min($totalPages, $page + 1) : $page + 1,
+        'start_record' => $totalRecords > 0 ? $offset + 1 : 0,
+        'end_record' => $totalRecords > 0 ? min($offset + $perPage, $totalRecords) : 0
+    ];
+    
+    // Check for duplicate request numbers in the result (for debugging)
+    $requestNumbers = array_column($requests, 'request_number');
+    $duplicateNumbers = array_diff_assoc($requestNumbers, array_unique($requestNumbers));
+    if (!empty($duplicateNumbers)) {
+        error_log("RMW Dashboard: Found duplicate request numbers in result: " . implode(', ', $duplicateNumbers));
+    }
     
     // Get items summary for each request
     foreach ($requests as &$request) {

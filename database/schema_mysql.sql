@@ -23,12 +23,15 @@ CREATE TABLE IF NOT EXISTS material_requests (
     request_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
-    status ENUM('pending', 'diproses', 'completed', 'cancelled') DEFAULT 'pending',
+    status ENUM('pending', 'approved', 'ready', 'completed', 'cancelled') DEFAULT 'pending',
     rmw_user_id INT,
     processed_date DATETIME,
+    ready_date DATETIME,
     completed_date DATETIME,
     created_by VARCHAR(100),
     processed_by VARCHAR(100),
+    approved_by VARCHAR(100),
+    ready_by VARCHAR(100),
     completed_by VARCHAR(100),
     customer_reference VARCHAR(50),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -43,31 +46,14 @@ CREATE TABLE IF NOT EXISTS material_request_items (
     request_id INT NOT NULL,
     product_id VARCHAR(50) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
-    requested_quantity INT NOT NULL,
+    requested_quantity DECIMAL(15,2) NOT NULL,
     unit VARCHAR(20) DEFAULT 'pcs',
     description TEXT,
     status ENUM('pending', 'approved', 'rejected', 'completed', 'cancelled') DEFAULT 'pending',
-    approved_quantity INT,
+    approved_quantity DECIMAL(15,2),
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (request_id) REFERENCES material_requests(id) ON DELETE CASCADE
-);
-
--- QR Code Tracking
-CREATE TABLE IF NOT EXISTS qr_tracking (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    qr_code VARCHAR(100) UNIQUE NOT NULL,
-    request_id INT NOT NULL,
-    item_id INT NOT NULL,
-    status ENUM('generated', 'scanned', 'completed') DEFAULT 'generated',
-    generated_by INT NOT NULL,
-    scanned_by INT,
-    generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    scanned_at DATETIME,
-    FOREIGN KEY (request_id) REFERENCES material_requests(id),
-    FOREIGN KEY (item_id) REFERENCES material_request_items(id),
-    FOREIGN KEY (generated_by) REFERENCES users(id),
-    FOREIGN KEY (scanned_by) REFERENCES users(id)
 );
 
 -- Activity Log

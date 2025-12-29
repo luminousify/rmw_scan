@@ -23,7 +23,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Settings
                 </a>
@@ -52,7 +52,7 @@
               </div>
               <div>
                 <h1 class="text-2xl font-bold text-gray-900">Material Scanner</h1>
-                <p class="text-gray-500">Scan and verify customer reference materials</p>
+                <p class="text-gray-500">Scan and verify Nomor Bon (LPB/SJ) materials</p>
               </div>
             </div>
           </div>
@@ -67,7 +67,7 @@
 
 
       <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
         <div class="bg-white rounded-lg p-6 flex flex-col items-center space-y-4">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           <p class="text-gray-600 font-medium">Processing...</p>
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Toast Container -->
-      <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+      <div id="toastContainer" class="fixed top-4 right-4 z-30 space-y-2 max-w-sm"></div>
 
       <!-- Scanner Content -->
       <div class="space-y-6">
@@ -118,13 +118,13 @@
           
           <div class="flex gap-2">
             <div class="flex-1">
-              <label for="lot_material_bc" class="block text-sm font-medium text-gray-700 mb-2">Customer Reference</label>
+              <label for="lot_material_bc" class="block text-sm font-medium text-gray-700 mb-2">Nomor Bon (LPB_SJ_No)</label>
               <input 
                 id="lot_material_bc" 
                 type="text" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400 font-mono text-lg" 
                 name="nobon" 
-                placeholder="e.g., INJ/FG/1887-1" 
+                placeholder="e.g., LPB/2024/001" 
                 value="<?= htmlspecialchars($nobon) ?>"
                 required 
                 <?php echo empty($nobon) ? 'autofocus' : ''; ?>
@@ -179,7 +179,7 @@
                   <td class="px-3 py-2 font-mono text-xs text-gray-500"><?php echo $no++; ?></td>
                   <td class="px-3 py-2 font-mono text-xs text-gray-900"><?= htmlspecialchars($d['product_id'] ?? 'N/A'); ?></td>
                   <td class="px-3 py-2 text-xs text-gray-900" title="<?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?>"><?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?></td>
-                  <td class="px-3 py-2 text-xs text-center text-gray-900"><?= number_format($d['requested_quantity'] ?? 0, 0, '', ','); ?></td>
+                  <td class="px-3 py-2 text-xs text-center text-gray-900"><?= number_format((float)($d['requested_quantity'] ?? 0), 2, '.', ','); ?></td>
                   <td class="px-3 py-2 text-xs text-gray-500"><?= htmlspecialchars($d['unit'] ?? 'pcs'); ?></td>
                 </tr>
                 <?php endforeach; ?>
@@ -201,7 +201,26 @@
             </div>
           </div>
           <div class="p-4">
-            <div class="text-sm font-mono text-gray-600 mb-3">Cust Ref: <?= htmlspecialchars($customerReferenceData['customer_reference'] ?? 'N/A') ?></div>
+            <div class="text-sm font-mono text-gray-600 mb-3">Nomor Bon: <?= htmlspecialchars($customerReferenceData['lpb_sj_no'] ?? 'N/A') ?></div>
+            <?php if (isset($customerReferenceData['items']) && is_array($customerReferenceData['items'])): ?>
+            <?php
+              $verifiedCount = 0;
+              $totalCount = count($customerReferenceData['items']);
+              foreach ($customerReferenceData['items'] as $item) {
+                  if (isset($item['Verifikasi']) && $item['Verifikasi'] == 1) {
+                      $verifiedCount++;
+                  }
+              }
+            ?>
+            <div class="text-xs text-gray-500 mb-2">
+              Status Verifikasi: 
+              <?php if ($verifiedCount > 0): ?>
+                <span class="text-orange-600 font-medium">⚠️ <?= $verifiedCount ?> verified / <?= $totalCount ?> items</span>
+              <?php else: ?>
+                <span class="text-green-600 font-medium">✅ <?= $totalCount ?> items unverified</span>
+              <?php endif; ?>
+            </div>
+            <?php endif; ?>
             <div class="text-sm space-y-1 text-gray-700">
               <div>Matched Items: <span class="font-semibold"><?= $comparisonResults['summary']['matched_items'] ?></span></div>
               <?php if (!$comparisonResults['summary']['identical']): ?>
@@ -214,9 +233,57 @@
         </div>
         <?php endif; ?>
         <?php endif; ?>
+
+        <!-- Auto-Completion Notification -->
+        <?php if (isset($auto_completed) && $auto_completed): ?>
+        <div class="fixed top-4 right-4 z-50 max-w-md 
+                    animate-slide-in 
+                    notification-auto-complete-auto 
+                    group">
+          <div class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-lg shadow-2xl">
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                  <i class="bi bi-check-circle-fill text-white text-xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-white text-lg">Auto-Completed!</h4>
+                <p class="text-green-100 text-sm mt-1">
+                  Perfect match detected. Request marked as completed automatically.
+                </p>
+                <div class="mt-3 flex items-center space-x-2">
+                  <a href="<?php echo url('app/controllers/dashboard.php'); ?>"
+                     class="inline-flex items-center px-3 py-1.5 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm font-medium transition-colors">
+                    <i class="bi bi-house-door mr-1"></i>
+                    Dashboard
+                  </a>
+                  <a href="<?php echo url('app/controllers/my_requests.php'); ?>"
+                     class="inline-flex items-center px-3 py-1.5 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm font-medium transition-colors">
+                    <i class="bi bi-list-check mr-1"></i>
+                    My Requests
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto-redirect after 3 seconds -->
+        <?php if (isset($auto_complete_redirect)): ?>
+        <script>
+          setTimeout(function() {
+            console.log('3 seconds passed, redirecting to: <?= $auto_complete_redirect ?>');
+            window.location.href = '<?= htmlspecialchars($auto_complete_redirect) ?>';
+          }, 3000);
+        </script>
+        <?php endif; ?>
         
-        <!-- Complete Request Button -->
-        <?php if ($department === 'production' && isset($requestDetails) && $requestDetails['status'] === 'ready'): ?>
+        <?php endif; ?>
+
+        <!-- Complete Request Button - Only show if NOT auto-completed -->
+        <?php if (!isset($auto_completed) || !$auto_completed): ?>
+          <?php if ($department === 'production' && isset($requestDetails) && $requestDetails['status'] === 'ready'): ?>
         <div class="mt-6 p-4 border-l-4 border-orange-500 bg-orange-50">
           <form method="POST" id="completeForm">
             <input type="hidden" name="action" value="complete_request">
@@ -224,11 +291,10 @@
             <input type="hidden" name="nobon" value="<?= htmlspecialchars($nobon ?? '') ?>">
             <button 
               type="submit" 
-              onclick="return confirm('<?= isset($comparisonResults) && !$comparisonResults['summary']['identical'] ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.' : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.' ?>')"
-              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center space-x-3 border-t border-green-400"
+              class="w-full inline-flex items-center justify-center rounded-lg text-base font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-green-600 text-white hover:bg-green-700 h-14 px-8 shadow-md"
             >
-              <i class="bi bi-check-circle-fill text-2xl"></i>
-              <span>Selesaikan Permintaan</span>
+              <i class="bi bi-check-circle-fill mr-2 text-xl"></i>
+              Selesaikan Permintaan
             </button>
             <p class="text-xs text-gray-600 mt-2 text-center">
               <i class="bi bi-info-circle mr-1"></i>
@@ -241,10 +307,11 @@
           </form>
         </div>
         <?php endif; ?>
+        <?php endif; // End of auto-completed check ?>
 
         <!-- Request Information -->
-  
-        
+
+
         <?php elseif (isset($error_message)): ?>
         <div class="text-center py-10">
           <div class="text-red-400 mb-4">
@@ -277,7 +344,7 @@
 </div>
 
 <!-- Success Alert Component -->
-<div id="successAlert" class="fixed top-4 right-4 z-50 hidden">
+<div id="successAlert" class="fixed top-4 right-4 z-40 hidden animate-fade-in transition-all duration-300 ease-in-out top-4">
   <div class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3 min-w-[320px] animate-slide-in">
     <div class="flex-shrink-0">
       <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
@@ -298,12 +365,12 @@
 </div>
 
 <!-- Difference Modal Component -->
-<div id="differenceModal" class="fixed inset-0 z-50 hidden">
+<div id="differenceModal" class="fixed inset-0 z-50 hidden animate-modal-backdrop">
   <!-- Backdrop -->
   <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeDifferenceModal()"></div>
   
   <!-- Modal Content -->
-  <div class="absolute inset-4 md:inset-8 lg:inset-16 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+  <div class="absolute inset-4 md:inset-8 lg:inset-16 bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-modal-content">
     <!-- Modal Header -->
     <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-4">
       <div class="flex items-center justify-between">
@@ -356,9 +423,6 @@
         <button onclick="closeDifferenceModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors font-medium">
           Close
         </button>
-        <button onclick="acknowledgeDifferences()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
-          Acknowledge & Continue
-        </button>
       </div>
     </div>
   </div>
@@ -366,50 +430,20 @@
 
 <script src="<?php echo url('includes/js/main.js'); ?>"></script>
 <script src="<?php echo url('includes/js/scanner.js'); ?>"></script>
-    <style>
-      @keyframes fade-in {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
-      .animate-fade-in {
-        animation: fade-in 0.3s ease-out;
-      }
-      
-      @keyframes slide-in {
-        from { opacity: 0; transform: translateX(100%); }
-        to { opacity: 1; transform: translateX(0); }
-      }
-      
-      .animate-slide-in {
-        animation: slide-in 0.4s ease-out;
-      }
-      
-      @keyframes modal-backdrop {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      
-      @keyframes modal-content {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
-      }
-      
-      #differenceModal {
-        animation: modal-backdrop 0.3s ease-out;
-      }
-      
-      #differenceModal .absolute:last-child {
-        animation: modal-content 0.3s ease-out;
-      }
-      
-      /* Progress bar animation */
-      .transition-all.duration-5000 {
-        transition-duration: 5s;
-      }
-    </style>
-    
-    <script>
+
+<style>
+  /* Auto-dismiss notification transitions */
+  .notification-auto-complete-auto {
+    transition: all 0.5s ease-in;
+  }
+  
+  .notification-auto-complete-auto.removing {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+</style>
+
+<script>
     // Success Alert Functions
     function showSuccessAlert() {
         const alert = document.getElementById('successAlert');
@@ -457,8 +491,8 @@
         
         // Update summary counts
         document.getElementById('matchedCount').textContent = comparisonData.summary.matched_items;
-        document.getElementById('mismatchedCount').textContent = 
-            comparisonData.mismatched_names.length + 
+        // Mismatches are quantity-only (product_id match + quantity compare)
+        document.getElementById('mismatchedCount').textContent =
             comparisonData.mismatched_quantities.length;
         document.getElementById('missingCount').textContent = comparisonData.missing_in_customer.length;
         document.getElementById('extraCount').textContent = comparisonData.extra_in_customer.length;
@@ -467,38 +501,7 @@
         
         // Build difference details HTML
         let detailsHTML = '';
-        
-        // Name mismatches
-        if (comparisonData.mismatched_names.length > 0) {
-            detailsHTML += `
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h4 class="font-semibold text-yellow-800 mb-3 flex items-center">
-                        <i class="bi bi-exclamation-triangle-fill mr-2"></i>
-                        Name Mismatches (${comparisonData.mismatched_names.length})
-                    </h4>
-                    <div class="space-y-2">
-            `;
-            
-            comparisonData.mismatched_names.forEach(item => {
-                detailsHTML += `
-                    <div class="bg-white rounded p-3 border border-yellow-100">
-                        <div class="flex items-center justify-between">
-                            <span class="font-mono text-sm font-medium">${item.product_id || 'N/A'}</span>
-                            <span class="text-xs text-yellow-600">Different Names</span>
-                        </div>
-                        <div class="mt-2 text-sm">
-                            <div class="text-gray-600">Request: <span class="font-medium">${item.request_name || 'Unknown'}</span></div>
-                            <div class="text-gray-600">Customer: <span class="font-medium">${item.customer_name || 'Unknown'}</span></div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            detailsHTML += `
-                    </div>
-                </div>
-            `;
-        }
+        // Name mismatches removed: comparison is by product_id + quantity only
         
         // Quantity differences
         if (comparisonData.mismatched_quantities.length > 0) {
@@ -522,7 +525,7 @@
                             <div class="text-gray-900 font-medium">${item.product_name || 'Unknown Product'}</div>
                             <div class="flex justify-between mt-1">
                                 <span class="text-gray-600">Request: <span class="font-medium text-orange-600">${item.request_quantity || 0}</span></span>
-                                <span class="text-gray-600">Customer: <span class="font-medium text-orange-600">${item.customer_quantity || 0}</span></span>
+                                <span class="text-gray-600">Data Bon: <span class="font-medium text-orange-600">${item.customer_quantity || 0}</span></span>
                             </div>
                         </div>
                     </div>
@@ -619,12 +622,6 @@
         const modal = document.getElementById('differenceModal');
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
-    }
-    
-    function acknowledgeDifferences() {
-        closeDifferenceModal();
-        // Additional logic if needed when user acknowledges differences
-        console.log('Differences acknowledged');
     }
     
     // Keyboard navigation
@@ -1024,8 +1021,8 @@
           return;
         }
 
-        // Basic validation for customer reference format
-        const isValid = value.length > 3 && /^[A-Z0-9\/\-]+$/.test(value);
+        // Basic validation for Nomor Bon format (LPB/SJ)
+        const isValid = value.length > 3;
         
         statusEl.classList.remove('hidden');
         if (isValid) {
@@ -1170,10 +1167,46 @@
         toast.show('Processing scanner data...', 'info', 0);
       });
 
+      // Complete request form handler
+      const completeForm = document.getElementById('completeForm');
+      if (completeForm) {
+        completeForm.addEventListener('submit', function(e) {
+          const hasDifferences = <?= (isset($comparisonResults) && !$comparisonResults['summary']['identical']) ? 'true' : 'false' ?>;
+          const message = hasDifferences 
+            ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.' 
+            : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.';
+          
+          if (!confirm(message)) {
+            e.preventDefault();
+            return false;
+          }
+          
+          showLoading();
+          toast.show('Menyelesaikan permintaan...', 'info', 0);
+          
+          // Disable button to prevent double submission
+          const submitBtn = this.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split mr-2 animate-spin"></i> Memproses...';
+          }
+        });
+      }
+
       // Initialize on page load
       document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips and other UI elements
-        toast.show('Scanner ready', 'success', 2000);
+        // Initialize NotificationManager FIRST
+        NotificationManager.init();
+        
+        // Check for auto-completion immediately
+        if (NotificationManager.hasAutoComplete()) {
+          // Dismiss any existing toasts
+          NotificationManager.dismissAllToasts();
+          console.log('Auto-complete detected, toasts dismissed');
+        }
+        
+        // Don't show "Scanner ready" toast - it causes overlap with auto-completion
+        // Users can see the scanner is ready by the focused input field
         
         // Auto-focus logic
         const qrInput = document.getElementById('lot_material_bc');
@@ -1217,6 +1250,158 @@
         // Escape to close modals
         if (e.key === 'Escape') {
           hideLoading();
+        }
+      });
+      
+      // Notification Manager to prevent overlap
+      const NotificationManager = {
+        elements: {
+          autoComplete: null,
+          success: null,
+          toasts: null
+        },
+        
+        init() {
+          this.elements.autoComplete = document.querySelector('.notification-auto-complete');
+          this.elements.success = document.getElementById('successAlert');
+          this.elements.toasts = document.getElementById('toastContainer');
+          
+          // Dismiss all toasts when auto-complete is present
+          if (this.hasAutoComplete()) {
+            this.dismissAllToasts();
+          }
+        },
+        
+        // Check if auto-complete notification is visible
+        hasAutoComplete() {
+          return this.elements.autoComplete !== null;
+        },
+        
+        // Dismiss all active toasts
+        dismissAllToasts() {
+          if (!this.elements.toasts) return;
+          
+          const toasts = this.elements.toasts.querySelectorAll('.toast');
+          toasts.forEach(toast => {
+            toast.remove();
+          });
+          
+          console.log('All toasts dismissed');
+        },
+        
+        // Prevent new toasts when auto-complete is present
+        shouldShowToast() {
+          // Don't show toasts if auto-completion is visible
+          if (this.hasAutoComplete()) {
+            console.log('Toast suppressed - auto-complete notification visible');
+            return false;
+          }
+          return true;
+        },
+        
+        // Shift success alert down if auto-complete is visible
+        adjustSuccessAlert() {
+          if (!this.elements.success) return;
+          
+          if (this.hasAutoComplete()) {
+            // Use Tailwind arbitrary value for shifting
+            this.elements.success.classList.remove('top-4');
+            this.elements.success.classList.add('!top-32');
+            console.log('Success alert shifted down');
+          } else {
+            this.elements.success.classList.remove('!top-32');
+            this.elements.success.classList.add('top-4');
+          }
+        },
+        
+        // Hide success alert when auto-complete appears
+        hideSuccessIfAutoComplete() {
+          if (this.hasAutoComplete() && this.elements.success) {
+            this.elements.success.classList.add('hidden');
+            console.log('Success alert hidden - auto-complete visible');
+          }
+        }
+      };
+      
+      // Initialize NotificationManager on page load (moved up before first use)
+      NotificationManager.init();
+      
+      // Check for auto-completion immediately
+      if (NotificationManager.hasAutoComplete()) {
+        NotificationManager.dismissAllToasts();
+        console.log('Auto-complete detected on page load, toasts dismissed');
+      }
+      
+      // Wrap ToastManager.show to prevent overlap
+      const originalToastShow = ToastManager.prototype.show;
+      ToastManager.prototype.show = function(message, type, duration) {
+        // Check if we should show this toast
+        if (!NotificationManager.shouldShowToast()) {
+          console.log(`Toast suppressed: ${message}`);
+          return;
+        }
+        
+        // Call original show method
+        return originalToastShow.call(this, message, type, duration);
+      };
+      
+      // Override showSuccessAlert to check for auto-complete
+      const originalShowSuccessAlert = window.showSuccessAlert;
+      window.showSuccessAlert = function() {
+        NotificationManager.hideSuccessIfAutoComplete();
+        
+        const successAlert = document.getElementById('successAlert');
+        if (successAlert && !successAlert.classList.contains('hidden')) {
+          originalShowSuccessAlert();
+        }
+      };
+      
+      // Auto-dismiss auto-completion notification after 3 seconds
+      document.addEventListener('DOMContentLoaded', function() {
+        const autoCompleteNotification = document.querySelector('.notification-auto-complete-auto');
+        
+        if (autoCompleteNotification) {
+          let dismissTimer = setTimeout(dismissNotification, 3000);
+          let isHovered = false;
+          
+          // Pause on hover
+          autoCompleteNotification.addEventListener('mouseenter', () => {
+            isHovered = true;
+            clearTimeout(dismissTimer);
+            console.log('Auto-dismiss paused (hover)');
+          });
+          
+          // Resume on mouse leave
+          autoCompleteNotification.addEventListener('mouseleave', () => {
+            isHovered = false;
+            dismissTimer = setTimeout(dismissNotification, 1500); // 1.5s after hover ends
+            console.log('Auto-dismiss resumed (mouse leave)');
+          });
+          
+          function dismissNotification() {
+            if (isHovered) return; // Don't dismiss if still hovering
+            
+            autoCompleteNotification.classList.add('removing');
+            
+            // Remove from DOM after animation
+            setTimeout(() => {
+              autoCompleteNotification.remove();
+              
+              // THEN redirect to my_requests.php
+              <?php if (isset($auto_complete_redirect)): ?>
+              console.log('Notification dismissed, redirecting to: <?= $auto_complete_redirect ?>');
+              window.location.href = '<?= htmlspecialchars($auto_complete_redirect) ?>';
+              <?php endif; ?>
+            }, 500);
+          }
+          
+          // Allow manual dismiss on click (not on buttons)
+          autoCompleteNotification.addEventListener('click', (e) => {
+            if (!e.target.closest('a')) {
+              clearTimeout(dismissTimer);
+              dismissNotification();
+            }
+          });
         }
       });
     </script>

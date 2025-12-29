@@ -29,15 +29,15 @@
             </div>
           </div>
           
-          <!-- Enhanced Navigation - Pure Tailwind -->
+          <!-- Enhanced Navigation -->
           <nav class="space-y-1" role="navigation" aria-label="Main navigation">
             <!-- Dashboard -->
             <a href="<?php echo url('app/controllers/dashboard.php'); ?>" 
-               class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' ?>"
+               class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'dashboard' ? 'nav-active' : 'nav-inactive' ?>"
                role="menuitem" aria-current="<?= $module_name == 'dashboard' ? 'page' : 'false' ?>">
-              <i class="bi bi-house-fill mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+              <i class="bi bi-house-fill mr-3 text-lg"></i>
               <span>Dasbor</span>
-              <?= $module_name == 'dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>' : '' ?>
+              <?= $module_name == 'dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
             </a>
             
             <?php if ($department === 'production'): ?>
@@ -46,19 +46,19 @@
               <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Produksi</h4>
               
               <a href="<?php echo url('app/controllers/material_request.php'); ?>" 
-                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' ?>"
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'material_request' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'material_request' ? 'page' : 'false' ?>">
-                <i class="bi bi-plus-circle-fill mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+                <i class="bi bi-plus-circle-fill mr-3 text-lg"></i>
                 <span>Buat Permintaan</span>
-                <?= $module_name == 'material_request' ? '<div class="absolute right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>' : '' ?>
+                <?= $module_name == 'material_request' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
               
               <a href="<?php echo url('app/controllers/my_requests.php'); ?>" 
-                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' ?>"
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'my_requests' ? 'nav-active' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'my_requests' ? 'page' : 'false' ?>">
-                <i class="bi bi-list-task mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+                <i class="bi bi-list-task mr-3 text-lg"></i>
                 <span>Permintaan Saya</span>
-                <?= $module_name == 'my_requests' ? '<div class="absolute right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>' : '' ?>
+                <?= $module_name == 'my_requests' ? '<div class="absolute right-2 w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
             
@@ -68,15 +68,16 @@
               <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gudang</h4>
               
               <a href="<?php echo url('app/controllers/rmw_dashboard.php'); ?>" 
-                 class="group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' ?>"
+                 class="nav-item group relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <?= $module_name == 'rmw_dashboard' ? 'nav-active-rmw' : 'nav-inactive' ?>"
                  role="menuitem" aria-current="<?= $module_name == 'rmw_dashboard' ? 'page' : 'false' ?>">
-                <i class="bi bi-box-seam-fill mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+                <i class="bi bi-box-seam-fill mr-3 text-lg"></i>
                 <span>Dasbor Gudang</span>
-                <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-white rounded-full animate-pulse"></div>' : '' ?>
+                <?= $module_name == 'rmw_dashboard' ? '<div class="absolute right-2 w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>' : '' ?>
               </a>
             </div>
             <?php endif; ?>
             
+  
           </nav>
         </div>
       </aside>

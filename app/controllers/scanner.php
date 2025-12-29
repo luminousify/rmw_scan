@@ -10,30 +10,60 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $module_name = "scanner";
 $title = "Scan QR Code";
-$name = $_SESSION['user'] ?? '';
-$pass = $_SESSION['pass'] ?? '';
-$idlog = $_SESSION['idlog'] ?? 0;
-$department = $_SESSION['department'] ?? 'production';
+$name = $_SESSION['user'];
+$idlog = $_SESSION['idlog'];
+$department = $_SESSION['department'];
 
-// Get user's division
-$db = DatabaseManager::getInstance();
-$stmt = $db->query("SELECT division FROM users WHERE id = ?", [$idlog]);
-$userDivision = $stmt->fetchColumn();
+// Import DatabaseManager for division queries (consistent with working controllers)
+require_once '../../includes/DatabaseManager.php';
+
+// Debug: Log session information
+error_log("[Scanner] Session debug - User: '$name', ID: '$idlog', Department: '$department'");
+
+// Get user's division (multiple sources with fallback)
+$userDivision = null;
+
+// 1. Try to get from session first (most reliable)
+if (isset($_SESSION['division']) && !empty($_SESSION['division'])) {
+    $userDivision = $_SESSION['division'];
+    error_log("[Scanner] Division from session: $userDivision");
+}
+
+// 2. If session division is empty, query database
+if (!$userDivision && $idlog > 0) {
+    try {
+        $db = DatabaseManager::getInstance();
+        $stmt = $db->query("SELECT division FROM users WHERE id = ?", [$idlog]);
+        $userDivision = $stmt->fetchColumn();
+        
+        error_log("[Scanner] Division from DB query: " . ($userDivision ?? 'NULL/empty'));
+    } catch (Exception $e) {
+        error_log("[Scanner] Error getting user division from DB: " . $e->getMessage());
+    }
+}
+
+// 3. Final fallback
+if (!$userDivision) {
+    error_log("[Scanner] No division found for user ID $idlog, using default");
+    $userDivision = 'Unassigned';
+}
+
+error_log("[Scanner] Final division value: $userDivision");
 
 // Get request number from URL parameter if available
 $requestNumberFromUrl = $_GET['request_number'] ?? '';
 
 /**
- * Get StockDetailVer customer reference material data
+ * Get StockDetailVer materials by LPB_SJ_No
  * Uses real data from StockDetailVer table
  */
-function getStockDetailVerCustomerData($custNoRef) {
+function getStockDetailVerMaterialsByLpb($lpbSjNo) {
     try {
         // Use DatabaseManager to get StockDetailVer data
         $dbManager = DatabaseManager::getInstance();
-        return $dbManager->getStockDetailVerMaterials($custNoRef);
+        return $dbManager->getStockDetailVerMaterialsByLpbSjNo($lpbSjNo);
     } catch (Exception $e) {
-        error_log("Error getting StockDetailVer customer data: " . $e->getMessage());
+        error_log("Error getting StockDetailVer LPB data: " . $e->getMessage());
         return null;
     }
 }
@@ -44,7 +74,6 @@ function getStockDetailVerCustomerData($custNoRef) {
 function compareMaterials($requestItems, $customerItems) {
     $comparison = [
         'matched' => [],
-        'mismatched_names' => [],
         'mismatched_quantities' => [],
         'missing_in_customer' => [],
         'extra_in_customer' => [],
@@ -79,18 +108,7 @@ function compareMaterials($requestItems, $customerItems) {
     foreach ($requestMap as $productId => $requestItem) {
         if (isset($customerMap[$productId])) {
             $customerItem = $customerMap[$productId];
-            
-            // Check for name differences
-            if ($requestItem['product_name'] !== $customerItem['product_name']) {
-                $comparison['mismatched_names'][] = [
-                    'product_id' => $productId,
-                    'request_name' => $requestItem['product_name'],
-                    'customer_name' => $customerItem['product_name'],
-                    'request_quantity' => $requestItem['requested_quantity'],
-                    'customer_quantity' => $customerItem['quantity']
-                ];
-            }
-            
+
             // Check for quantity differences
             if ($requestItem['requested_quantity'] != $customerItem['quantity']) {
                 $comparison['mismatched_quantities'][] = [
@@ -101,9 +119,8 @@ function compareMaterials($requestItems, $customerItems) {
                 ];
             }
             
-            // If both name and quantity match
-            if ($requestItem['product_name'] === $customerItem['product_name'] && 
-                $requestItem['requested_quantity'] == $customerItem['quantity']) {
+            // If quantity matches (comparison is by product_id + quantity only)
+            if ($requestItem['requested_quantity'] == $customerItem['quantity']) {
                 $comparison['matched'][] = [
                     'product_id' => $productId,
                     'product_name' => $requestItem['product_name'],
@@ -125,8 +142,7 @@ function compareMaterials($requestItems, $customerItems) {
     }
     
     // Build summary
-    $totalIssues = count($comparison['mismatched_names']) + 
-                   count($comparison['mismatched_quantities']) + 
+    $totalIssues = count($comparison['mismatched_quantities']) + 
                    count($comparison['missing_in_customer']) + 
                    count($comparison['extra_in_customer']);
     
@@ -189,8 +205,7 @@ if ($_POST == NULL) {
                         mri.product_name,
                         mri.requested_quantity,
                         mri.unit,
-                        mri.description,
-                        mri.status as item_status
+                        mri.description
                     FROM material_request_items mri
                     WHERE mri.request_id = ?
                     ORDER BY mri.product_name ASC
@@ -227,8 +242,10 @@ if ($_POST == NULL) {
     include '../scan.php';
 } else {
     $id = $_POST['nobon'] ?? '';
-    $customerReference = trim($id);
+    $lpbSjNo = trim($id);
     $currentRequestNumber = $_POST['current_request_number'] ?? '';
+    
+    error_log("[Scanner] Processing POST: nobon='$lpbSjNo', current_request_number='$currentRequestNumber'");
     
     // If no current request number, check for request number input
     if (empty($currentRequestNumber) && !empty($_POST['request_number_input'])) {
@@ -250,21 +267,28 @@ if ($_POST == NULL) {
             throw new Exception("No request number specified");
         }
         
-        // Validate customer reference using DatabaseManager
+        // Validate LPB_SJ_No using DatabaseManager
         $dbManager = DatabaseManager::getInstance();
-        $validation = $dbManager->validateCustNoRef($customerReference);
+        $validation = $dbManager->validateLpbSjNo($lpbSjNo);
         
         if (!$validation['valid']) {
             // Enhanced error message with debugging information
             $errorMsg = $validation['message'];
-            if (strpos($errorMsg, 'not found') !== false) {
-                $errorMsg .= " (Scanned: '$customerReference'). Please check if the customer reference exists in the StockDetailVer table.";
+            if (stripos($errorMsg, 'tidak ditemukan') !== false) {
+                $errorMsg .= ". Silakan periksa apakah Nomor Bon tersebut ada di Database.";
             }
+            
+            // Special handling for already verified items
+            if (isset($validation['already_verified']) && $validation['already_verified']) {
+                $errorMsg = "⚠️ " . $validation['message'] . 
+                           " Nomor Bon ini telah diverifikasi " . $validation['verified_count'] . " record(s).";
+            }
+            
             throw new Exception($errorMsg);
         }
         
         // Log successful validation for debugging
-        error_log("Customer reference validation successful: '$customerReference' - " . $validation['message']);
+        error_log("Nomor Bon validation successful: '$lpbSjNo' - " . $validation['message']);
         
         // Get request details (no status restriction for comparison)
         $requestQuery = "
@@ -299,8 +323,7 @@ if ($_POST == NULL) {
                 mri.product_name,
                 mri.requested_quantity,
                 mri.unit,
-                mri.description,
-                mri.status as item_status
+                mri.description
             FROM material_request_items mri
             WHERE mri.request_id = ?
             ORDER BY mri.product_name ASC
@@ -314,14 +337,22 @@ if ($_POST == NULL) {
             $info_message = "Request has no materials to compare.";
         }
         
-        // Get StockDetailVer customer reference data
-        $customerReferenceData = getStockDetailVerCustomerData($customerReference);
+        // Get StockDetailVer LPB data
+        $customerReferenceData = getStockDetailVerMaterialsByLpb($lpbSjNo);
         
         if (!$customerReferenceData) {
-            $warning_message = "No data found for customer reference: " . $customerReference . " in StockDetailVer table";
+            $warning_message = "Data tidak ditemukan untuk Nomor Bon: " . $lpbSjNo . " di Database";
         } else {
             // Perform comparison
             $comparisonResults = compareMaterials($requestItems, $customerReferenceData['items']);
+
+            // Debug summary for troubleshooting issue counts
+            $summary = $comparisonResults['summary'] ?? [];
+            error_log("[Scanner] Compare summary request_number='{$currentRequestNumber}' bon='{$lpbSjNo}' matched=" . ($summary['matched_items'] ?? 0) .
+                      " issues=" . ($summary['total_issues'] ?? 0) .
+                      " qty_mismatch=" . count($comparisonResults['mismatched_quantities'] ?? []) .
+                      " missing=" . count($comparisonResults['missing_in_customer'] ?? []) .
+                      " extra=" . count($comparisonResults['extra_in_customer'] ?? []));
             
             // Generate appropriate message based on comparison results
             if ($comparisonResults['summary']['identical']) {
@@ -329,10 +360,7 @@ if ($_POST == NULL) {
             } else {
                 $warning_message = "Material differences detected: ";
                 $issues = [];
-                
-                if (!empty($comparisonResults['mismatched_names'])) {
-                    $issues[] = count($comparisonResults['mismatched_names']) . " name mismatch(es)";
-                }
+
                 if (!empty($comparisonResults['mismatched_quantities'])) {
                     $issues[] = count($comparisonResults['mismatched_quantities']) . " quantity difference(s)";
                 }
@@ -342,16 +370,126 @@ if ($_POST == NULL) {
                 if (!empty($comparisonResults['extra_in_customer'])) {
                     $issues[] = count($comparisonResults['extra_in_customer']) . " extra item(s)";
                 }
-                
+
                 $warning_message .= implode(", ", $issues) . ". See comparison details below.";
             }
+
+            // Auto-complete on perfect match if enabled
+            $auto_completed = false;
+            if ($comparisonResults['summary']['identical']
+                && $department === 'production'
+                && $requestDetails['status'] === 'ready'
+                && AUTO_COMPLETE_ON_PERFECT_MATCH) {
+
+                // Check if any items are already verified
+                $hasVerifiedItems = false;
+                foreach ($customerReferenceData['items'] as $item) {
+                    if (isset($item['Verifikasi']) && $item['Verifikasi'] == 1) {
+                        $hasVerifiedItems = true;
+                        break;
+                    }
+                }
+
+                // Only auto-complete if no items are already verified
+                if (!$hasVerifiedItems) {
+                    try {
+                        // Apply delay if configured
+                        if (AUTO_COMPLETE_DELAY_SECONDS > 0) {
+                            sleep(AUTO_COMPLETE_DELAY_SECONDS);
+                        }
+
+                        // Start transaction for atomic operations
+                        $pdo->beginTransaction();
+
+                        // 1. Update StockDetailVer Verifikasi = 1 for records with matching LPB_SJ_No
+                        $stmt = $pdo->prepare("
+                            UPDATE StockDetailVer
+                            SET Verifikasi = 1
+                            WHERE LPB_SJ_No = ?
+                        ");
+                        $stmt->execute([$lpbSjNo]);
+                        $stockDetailVerUpdated = $stmt->rowCount();
+
+                        // 2. Update material_requests status to completed
+                        $completedBy = $_SESSION['full_name'] ?? $_SESSION['user'];
+                        $stmt = $pdo->prepare("
+                            UPDATE material_requests
+                            SET status = 'completed',
+                                completed_date = CURRENT_TIMESTAMP,
+                                completed_by = ?,
+                                updated_at = CURRENT_TIMESTAMP
+                            WHERE request_number = ?
+                        ");
+                        $stmt->execute([$completedBy, $currentRequestNumber]);
+
+                        // Commit transaction
+                        $pdo->commit();
+
+                        // Set flag for view
+                        $auto_completed = true;
+                        $success_message = "✅ Perfect match! Request automatically completed ({$comparisonResults['summary']['matched_items']} items verified)";
+
+                        // Prepare redirect URL (will be used in view)
+                        $auto_complete_redirect = url('app/controllers/my_requests.php');
+
+                        // Prepare activity log data
+                        $activityData = [
+                            'status' => 'completed',
+                            'completed_by' => $completedBy,
+                            'request_number' => $currentRequestNumber,
+                            'scanned_reference' => $lpbSjNo,
+                            'auto_completed' => true,
+                            'stockdetailver_updated' => $stockDetailVerUpdated,
+                            'lpb_sj_numbers' => [$lpbSjNo],
+                            'comparison_results' => [
+                                'identical' => true,
+                                'has_differences' => false,
+                                'matched_items' => $comparisonResults['summary']['matched_items'],
+                                'total_issues' => 0
+                            ]
+                        ];
+
+                        // Log activity with AUTO_COMPLETE_REQUEST action
+                        $stmt = $pdo->prepare("
+                            INSERT INTO activity_log (user_id, action, table_name, record_id, new_values)
+                            VALUES (?, 'AUTO_COMPLETE_REQUEST', 'material_requests', ?, ?)
+                        ");
+                        $stmt->execute([$idlog, $requestDetails['request_id'], json_encode($activityData)]);
+
+                        // Refresh request details after completion
+                        $stmt = $pdo->prepare("
+                            SELECT
+                                mr.id as request_id,
+                                mr.request_number,
+                                mr.status,
+                                mr.priority,
+                                mr.notes,
+                                mr.customer_reference,
+                                u.full_name as production_user
+                            FROM material_requests mr
+                            LEFT JOIN users u ON mr.production_user_id = u.id
+                            WHERE mr.request_number = ?
+                        ");
+                        $stmt->execute([$currentRequestNumber]);
+                        $requestDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    } catch (Exception $e) {
+                        // Rollback on error
+                        if ($pdo->inTransaction()) {
+                            $pdo->rollBack();
+                        }
+                        $error_message = "Auto-completion failed: " . $e->getMessage();
+                        $auto_completed = false;
+                    }
+                }
+            }
         }
-        
+
         $dat = $requestItems;
-        $nobon = $customerReference;
+        $nobon = $lpbSjNo;
         
     } catch (Exception $e) {
-        $error_message = "Error processing comparison: " . $e->getMessage();
+        $error_message = "Gagal memproses perbandingan: " . $e->getMessage();
         $dat = '';
         $nobon = '';
         $requestDetails = null;
@@ -394,40 +532,18 @@ if ($_POST == NULL) {
             try {
                 // 1. Update StockDetailVer Verifikasi = 1 for records with matching LPB_SJ_No
                 if (!empty($scannedReference)) {
-                    // Get LPB_SJ_No from StockDetailVer records matching the customer reference
+                    // Update Verifikasi = 1 for all records with matching LPB_SJ_No
                     $stmt = $pdo->prepare("
-                        SELECT DISTINCT LPB_SJ_No 
-                        FROM StockDetailVer 
-                        WHERE CustNoRef = ? AND LPB_SJ_No IS NOT NULL AND LPB_SJ_No != ''
+                        UPDATE StockDetailVer 
+                        SET Verifikasi = 1 
+                        WHERE LPB_SJ_No = ?
                     ");
                     $stmt->execute([$scannedReference]);
-                    $lpbSjNumbersUpdated = $stmt->fetchAll(PDO::FETCH_COLUMN);
-                    
-                    if (!empty($lpbSjNumbersUpdated)) {
-                        // Update Verifikasi = 1 for all records with matching LPB_SJ_No
-                        foreach ($lpbSjNumbersUpdated as $lpbSjNo) {
-                            $stmt = $pdo->prepare("
-                                UPDATE StockDetailVer 
-                                SET Verifikasi = 1 
-                                WHERE LPB_SJ_No = ?
-                            ");
-                            $stmt->execute([$lpbSjNo]);
-                            $stockDetailVerUpdated += $stmt->rowCount();
-                        }
-                    }
+                    $stockDetailVerUpdated = $stmt->rowCount();
+                    $lpbSjNumbersUpdated = [$scannedReference];
                 }
                 
-                // 2. Approve all items in material_request_items
-                $stmt = $pdo->prepare("
-                    UPDATE material_request_items 
-                    SET status = 'approved',
-                        approved_quantity = requested_quantity
-                    WHERE request_id = ? AND status != 'approved'
-                ");
-                $stmt->execute([$requestCheck['id']]);
-                $itemsApproved = $stmt->rowCount();
-                
-                // 3. Update material_requests status to completed
+                // 2. Update material_requests status to completed
                 $stmt = $pdo->prepare("
                     UPDATE material_requests 
                     SET status = 'completed', 
@@ -468,7 +584,6 @@ if ($_POST == NULL) {
                     'has_differences' => !($comparisonResults['summary']['identical'] ?? true),
                     'matched_items' => $comparisonResults['summary']['matched_items'] ?? 0,
                     'total_issues' => $comparisonResults['summary']['total_issues'] ?? 0,
-                    'mismatched_names_count' => count($comparisonResults['mismatched_names'] ?? []),
                     'mismatched_quantities_count' => count($comparisonResults['mismatched_quantities'] ?? []),
                     'missing_items_count' => count($comparisonResults['missing_in_customer'] ?? []),
                     'extra_items_count' => count($comparisonResults['extra_in_customer'] ?? [])

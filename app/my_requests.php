@@ -1,4 +1,4 @@
-<body class="min-h-screen bg-gray-50" style="position: relative;">
+<body class="min-h-screen bg-gray-50">
     <!-- Mobile menu backdrop -->
     <div id="mobileMenuBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden" onclick="closeMobileMenu()"></div>
     
@@ -49,7 +49,7 @@
               
               <!-- Dropdown Menu -->
               <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 lg:origin-top-right lg:scale-100 transition-transform">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <a href="<?php echo url('app/controllers/settings.php'); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <i class="bi bi-gear mr-2"></i>
                   Pengaturan
                 </a>
@@ -410,41 +410,54 @@
     </div>
 
     <!-- Request Details Modal -->
-    <div id="requestModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="relative min-h-screen flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-slide-up">
+    <div id="requestModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
           <!-- Modal Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
-            <h3 id="modalTitle" class="text-xl font-semibold text-gray-900">Detail Permintaan</h3>
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
+            <h3 id="modalTitle" class="text-lg sm:text-2xl font-bold text-gray-900 flex items-center min-w-0 flex-1">
+              <i class="bi bi-file-text mr-2 sm:mr-3 text-blue-600"></i>
+              <span class="truncate">Detail Permintaan</span>
+            </h3>
             <button 
               onclick="closeModal()" 
-              class="text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-lg p-2"
+              class="flex-shrink-0 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-lg p-3 sm:p-2 -mr-1 sm:mr-0"
               aria-label="Close modal">
-              <i class="bi bi-x-lg text-xl" aria-hidden="true"></i>
+              <i class="bi bi-x-lg text-lg sm:text-xl"></i>
             </button>
           </div>
           
           <!-- Modal Body -->
-          <div class="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
+          <div class="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-8rem)] sm:max-h-[calc(90vh-6rem)] bg-gray-50">
             <!-- Loading State -->
             <div id="modalLoading" class="hidden">
               <div class="flex flex-col items-center justify-center py-12 space-y-4">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p class="text-gray-600">Memuat detail permintaan...</p>
+                <div class="relative">
+                  <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600"></div>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="bi bi-arrow-clockwise text-blue-600 text-xl animate-pulse"></i>
+                  </div>
+                </div>
+                <p class="text-gray-600 text-lg font-medium animate-pulse">Memuat detail permintaan...</p>
               </div>
             </div>
             
             <!-- Error State -->
             <div id="modalError" class="hidden">
               <div class="flex flex-col items-center justify-center py-12 space-y-4">
-                <i class="bi bi-exclamation-triangle text-red-500 text-5xl" aria-hidden="true"></i>
-                <div class="text-center">
-                  <h4 class="text-lg font-medium text-gray-900 mb-2">Kesalahan Memuat Detail</h4>
-                  <p class="text-gray-600" id="modalErrorMessage">Gagal memuat detail permintaan</p>
+                <div class="relative">
+                  <div class="bg-red-100 rounded-full p-4 animate-pulse">
+                    <i class="bi bi-exclamation-triangle text-red-600 text-5xl"></i>
+                  </div>
+                </div>
+                <div class="text-center max-w-md">
+                  <h4 class="text-xl font-bold text-gray-900 mb-2">Kesalahan Memuat Detail</h4>
+                  <p class="text-gray-600 mb-4" id="modalErrorMessage">Gagal memuat detail permintaan</p>
                   <button 
                     onclick="closeModal()" 
-                    class="mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
-                    Close
+                    class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg">
+                    <i class="bi bi-x-circle mr-2"></i>
+                    Tutup
                   </button>
                 </div>
               </div>
@@ -455,45 +468,78 @@
               <!-- Request details will be loaded here -->
             </div>
           </div>
-          
-          <!-- Modal Footer -->
-          <div id="modalFooter" class="hidden p-6 border-t border-gray-200 bg-gray-50">
-            <div class="flex justify-end space-x-3">
-              <button 
-                onclick="closeModal()" 
-                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                Tutup
-              </button>
-            </div>
-          </div>
+  
         </div>
       </div>
     </div>
 
-    <!-- Simple Confirmation Modal -->
-    <div id="confirmModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="modal-icon">
-            <i class="bi bi-exclamation-triangle"></i>
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-95 opacity-0" id="confirmModalContent">
+          <!-- Modal Header -->
+          <div class="bg-gradient-to-r from-red-500 to-orange-500 px-6 py-4 rounded-t-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="relative">
+                  <div class="bg-white bg-opacity-20 rounded-full p-3 animate-pulse">
+                    <i class="bi bi-exclamation-triangle text-white text-2xl"></i>
+                  </div>
+                  <div class="absolute -top-1 -right-1">
+                    <div class="bg-yellow-400 rounded-full p-1 animate-ping">
+                      <i class="bi bi-exclamation text-yellow-900 text-xs"></i>
+                    </div>
+                  </div>
+                </div>
+                <h3 id="confirmTitle" class="text-xl font-bold text-white">Konfirmasi Pembatalan</h3>
+              </div>
+              <button 
+                onclick="closeConfirmModal()" 
+                class="text-white hover:text-red-200 transition-colors duration-200 p-1 rounded-lg hover:bg-white hover:bg-opacity-10">
+                <i class="bi bi-x-lg text-xl"></i>
+              </button>
+            </div>
           </div>
-          <h3 id="confirmTitle">Konfirmasi Pembatalan</h3>
-        </div>
-        <p id="confirmMessage">Apakah Anda yakin ingin membatalkan permintaan ini?</p>
-        <div class="modal-actions">
-          <button 
-            id="confirmCancel"
-            type="button"
-            onclick="closeConfirmModal()" 
-            class="btn btn-secondary">
-            Tidak, Simpan Permintaan
-          </button>
-          <button 
-            id="confirmAction"
-            type="button"
-            class="btn btn-danger">
-            Ya, Batalkan Permintaan
-          </button>
+          
+          <!-- Modal Body -->
+          <div class="p-6">
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <div class="bg-red-100 rounded-full p-3">
+                  <i class="bi bi-question-circle text-red-600 text-xl"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p id="confirmMessage" class="text-gray-700 text-lg leading-relaxed">
+                  Apakah Anda yakin ingin membatalkan permintaan ini?
+                </p>
+                <p class="text-gray-500 text-sm mt-2">
+                  Tindakan ini tidak dapat dibatalkan dan permintaan akan dihapus secara permanen.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modal Actions -->
+          <div class="px-6 pb-6">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button 
+                id="confirmCancel"
+                type="button"
+                onclick="closeConfirmModal()" 
+                class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200 font-medium flex items-center justify-center space-x-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
+                <i class="bi bi-x-circle"></i>
+                <span>Tidak, Simpan Permintaan</span>
+              </button>
+              <button 
+                id="confirmAction"
+                type="button"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center space-x-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 shadow-lg">
+                <i class="bi bi-trash"></i>
+                <span>Ya, Batalkan Permintaan</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -750,6 +796,63 @@
         }
       }
       
+      /* Modal responsive improvements */
+      @media (max-width: 768px) {
+        #requestModal {
+          padding: 0.75rem;
+        }
+        
+        #modalContent {
+          max-height: 95vh;
+          margin: 0;
+        }
+        
+        #modalContent .modal-header {
+          padding: 1rem;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+        
+        #modalContent .modal-body {
+          padding: 1rem;
+          max-height: calc(95vh - 140px);
+        }
+        
+        #modalContent .modal-footer {
+          padding: 1rem;
+          position: sticky;
+          bottom: 0;
+          z-index: 10;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        #requestModal {
+          padding: 0.5rem;
+        }
+        
+        #modalContent {
+          max-height: 98vh;
+          border-radius: 0.75rem;
+        }
+        
+        #modalContent .modal-body {
+          max-height: calc(98vh - 120px);
+        }
+      }
+      
+      /* Ensure modal is visible on small screens */
+      @media (max-height: 600px) {
+        #modalContent {
+          max-height: 90vh;
+        }
+        
+        #modalContent .modal-body {
+          max-height: calc(90vh - 100px);
+        }
+      }
+      
       /* Ensure proper responsive layout */
       @media (min-width: 1024px) {
         /* Desktop: sidebar is visible, content has proper margin */
@@ -920,131 +1023,25 @@
       function viewRequest(requestId) {
         console.log('viewRequest function called with ID:', requestId);
         
-        // Remove any existing test modal
-        const existingTest = document.getElementById('testModal');
-        if (existingTest) existingTest.remove();
+        const modal = document.getElementById('requestModal');
+        const modalContent = document.getElementById('modalContent');
         
-        // Create a working modal with proper structure
-        const modal = document.createElement('div');
-        modal.id = 'requestModal';
-        modal.style.cssText = `
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            z-index: 999999 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            overflow-y: auto !important;
-        `;
+        // Reset modal states
+        document.getElementById('modalLoading').classList.remove('hidden');
+        document.getElementById('modalError').classList.add('hidden');
+        document.getElementById('requestDetails').classList.add('hidden');
         
-        modal.innerHTML = `
-            <div style="
-                background: white !important;
-                border-radius: 12px !important;
-                max-width: 1200px !important;
-                width: 95% !important;
-                max-height: 90vh !important;
-                overflow: hidden !important;
-                box-shadow: 0 25px 50px rgba(0,0,0,0.25) !important;
-                display: flex !important;
-                flex-direction: column !important;
-            ">
-                <!-- Header -->
-                <div style="
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: space-between !important;
-                    padding: 24px !important;
-                    border-bottom: 1px solid #e5e7eb !important;
-                    background: #f9fafb !important;
-                ">
-                    <h3 style="font-size: 20px !important; font-weight: 600 !important; color: #111827 !important; margin: 0 !important;">
-                        Request Details
-                    </h3>
-                    <button onclick="this.closest('#requestModal').remove()" style="
-                        background: none !important;
-                        border: none !important;
-                        color: #6b7280 !important;
-                        cursor: pointer !important;
-                        padding: 8px !important;
-                        border-radius: 6px !important;
-                        font-size: 20px !important;
-                    ">&times;</button>
-                </div>
-                
-                <!-- Loading State -->
-                <div id="modalLoading" style="
-                    display: flex !important;
-                    flex-direction: column !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    padding: 60px !important;
-                ">
-                    <div style="
-                        width: 48px !important;
-                        height: 48px !important;
-                        border: 4px solid #e5e7eb !important;
-                        border-top: 4px solid #3b82f6 !important;
-                        border-radius: 50% !important;
-                        animation: spin 1s linear infinite !important;
-                        margin-bottom: 16px !important;
-                    "></div>
-                    <p style="color: #6b7280 !important; margin: 0 !important;">Loading request details...</p>
-                </div>
-                
-                <!-- Error State -->
-                <div id="modalError" style="display: none !important; padding: 60px !important; text-align: center !important;">
-                    <div style="font-size: 48px !important; color: #ef4444 !important; margin-bottom: 16px !important;">⚠️</div>
-                    <h4 style="font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; margin-bottom: 8px !important;">Error Loading Details</h4>
-                    <p id="modalErrorMessage" style="color: #6b7280 !important; margin-bottom: 16px !important;">Failed to load request details</p>
-                    <button onclick="this.closest('#requestModal').remove()" style="
-                        background: #6b7280 !important;
-                        color: white !important;
-                        padding: 8px 16px !important;
-                        border: none !important;
-                        border-radius: 6px !important;
-                        cursor: pointer !important;
-                    ">Close</button>
-                </div>
-                
-                <!-- Request Details Content -->
-                <div id="requestDetails" style="display: none !important; padding: 24px !important; overflow-y: auto !important; flex: 1 !important;">
-                    <!-- Content will be loaded here -->
-                </div>
-                
-                <!-- Footer -->
-                <div id="modalFooter" style="display: none !important; padding: 24px !important; border-top: 1px solid #e5e7eb !important; background: #f9fafb !important; text-align: right !important;">
-                    <button onclick="this.closest('#requestModal').remove()" style="
-                        background: #6b7280 !important;
-                        color: white !important;
-                        padding: 8px 16px !important;
-                        border: none !important;
-                        border-radius: 6px !important;
-                        cursor: pointer !important;
-                    ">Close</button>
-                </div>
-            </div>
-        `;
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modal.classList.remove('opacity-0');
+          modal.classList.add('opacity-100');
+          modalContent.classList.remove('scale-95', 'opacity-0');
+          modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
         
-        // Add animation styles
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Remove any existing modal and add new one
-        const existingModal = document.getElementById('requestModal');
-        if (existingModal) existingModal.remove();
-        
-        document.body.appendChild(modal);
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
         
         // Fetch request details via AJAX
         const url = `get_request_details.php?id=${requestId}`;
@@ -1060,7 +1057,7 @@
           })
           .then(data => {
             console.log('Response data:', data);
-            document.getElementById('modalLoading').style.display = 'none';
+            document.getElementById('modalLoading').classList.add('hidden');
             
             if (data.success) {
               console.log('Data success, calling displayRequestDetails');
@@ -1068,189 +1065,129 @@
             } else {
               console.log('Data error:', data.error);
               document.getElementById('modalErrorMessage').textContent = data.error || 'Failed to load request details';
-              document.getElementById('modalError').style.display = 'block';
+              document.getElementById('modalError').classList.remove('hidden');
             }
           })
           .catch(error => {
             console.error('Error:', error);
-            document.getElementById('modalLoading').style.display = 'none';
+            document.getElementById('modalLoading').classList.add('hidden');
             document.getElementById('modalErrorMessage').textContent = 'Network error: ' + error.message;
-            document.getElementById('modalError').style.display = 'block';
+            document.getElementById('modalError').classList.remove('hidden');
           });
       }
       
       function displayRequestDetails(request) {
         console.log('displayRequestDetails called with:', request);
         
-        const itemsHtml = request.items.map(item => `
-          <tr style="border-bottom: 1px solid #e5e7eb !important;">
-            <td style="padding: 12px 16px !important; font-size: 14px !important; font-family: monospace !important; color: #111827 !important;">${item.product_id}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.product_name}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.requested_quantity}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.unit}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.description || '-'}</td>
-            <td style="padding: 12px 16px !important; font-size: 14px !important;">
-              <span style="
-                padding: 4px 8px !important;
-                display: inline-flex !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
-                border-radius: 9999px !important;
-                ${item.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                  item.status === 'approved' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
-                  'background: #fee2e2 !important; color: #991b1b !important;'}
-              ">
-                ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-              </span>
-            </td>
+        const itemsHtml = request.items.map(item => {
+          return `
+          <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3 text-sm font-mono text-gray-900">${item.product_id || ''}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.product_name || ''}</td>
+            <td class="px-4 py-3 text-sm text-gray-900">${item.requested_quantity || ''}</td>
+            <td class="px-4 py-3 text-sm text-gray-900">${item.unit || ''}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${item.description || '-'}</td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
         
-        const statusColor = request.status === 'pending' ? 'background: #fef3c7 !important; color: #92400e !important;' :
-                           request.status === 'approved' ? 'background: #dbeafe !important; color: #1e40af !important;' :
-                           request.status === 'ready' ? 'background: #e9d5ff !important; color: #6b21a8 !important;' :
-                           request.status === 'completed' ? 'background: #d1fae5 !important; color: #065f46 !important;' :
-                           'background: #fee2e2 !important; color: #991b1b !important;';
+        // Safely handle request status with Tailwind classes
+        const requestStatus = request.status || 'pending';
+        const statusClasses = requestStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                             requestStatus === 'approved' ? 'bg-blue-100 text-blue-800' :
+                             requestStatus === 'diproses' ? 'bg-purple-100 text-purple-800' :
+                             requestStatus === 'ready' ? 'bg-indigo-100 text-indigo-800' :
+                             requestStatus === 'completed' ? 'bg-green-100 text-green-800' :
+                             'bg-red-100 text-red-800';
         
         const detailsContent = `
-          <div style="display: flex !important; flex-direction: column !important; gap: 24px !important;">
-            <!-- Request Header -->
-            <div style="
-              background: #f9fafb !important;
-              border-radius: 8px !important;
-              padding: 24px !important;
-              border: 1px solid #e5e7eb !important;
-            ">
-              <div style="display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px !important;">
-                <div>
-                  <label style="font-size: 14px !important; font-weight: 500 !important; color: #6b7280 !important; display: block !important; margin-bottom: 8px !important;">Request Number</label>
-                  <p style="font-size: 18px !important; font-weight: 600 !important; color: #111827 !important; font-family: monospace !important; margin: 0 !important;">${request.request_number}</p>
-                </div>
-                <div>
-                  <label style="font-size: 14px !important; font-weight: 500 !important; color: #6b7280 !important; display: block !important; margin-bottom: 8px !important;">Status</label>
-                  <p style="margin: 0 !important;">
-                    <span style="
-                      padding: 6px 12px !important;
-                      display: inline-flex !important;
-                      font-size: 14px !important;
-                      font-weight: 600 !important;
-                      border-radius: 9999px !important;
-                      ${statusColor}
-                    ">
-                      ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                    </span>
-                  </p>
-                </div>
-  
-                <div>
-                  <label style="font-size: 14px !important; font-weight: 500 !important; color: #6b7280 !important; display: block !important; margin-bottom: 8px !important;">Created Date</label>
-                  <p style="font-size: 18px !important; color: #111827 !important; margin: 0 !important;">
-                    <time datetime="${request.created_at}">${new Date(request.created_at).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</time>
-                  </p>
-                </div>
-                <div>
-                  <label style="font-size: 14px !important; font-weight: 500 !important; color: #6b7280 !important; display: block !important; margin-bottom: 8px !important;">Created By</label>
-                  <p style="font-size: 18px !important; color: #111827 !important; margin: 0 !important;">${request.created_by || 'System'}</p>
-                </div>
+          <div class="space-y-8">
+            <!-- Request Header Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3">
+                <h3 class="text-white font-semibold flex items-center">
+                  <i class="bi bi-info-circle mr-2"></i>
+                  Informasi Permintaan
+                </h3>
               </div>
-              ${request.notes ? `
-                <div style="margin-top: 24px !important;">
-                  <label style="font-size: 14px !important; font-weight: 500 !important; color: #6b7280 !important; display: block !important; margin-bottom: 8px !important;">Notes</label>
-                  <p style="color: #111827 !important; background: white !important; padding: 12px !important; border-radius: 6px !important; border: 1px solid #e5e7eb !important; margin: 0 !important;">${request.notes}</p>
+              
+              <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-500 uppercase tracking-wider">Nomor Permintaan</label>
+                    <p class="text-xl font-bold text-gray-900 font-mono">${request.request_number}</p>
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-500 uppercase tracking-wider">Status</label>
+                    <div class="inline-flex items-center">
+                      <span class="px-4 py-2 inline-flex text-sm font-semibold rounded-full ${statusClasses}">
+                        <i class="bi bi-circle-fill mr-2 text-xs"></i>
+                        ${requestStatus.charAt(0).toUpperCase() + requestStatus.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-500 uppercase tracking-wider">Tanggal Dibuat</label>
+                    <p class="text-lg text-gray-900">
+                      <i class="bi bi-calendar3 mr-2 text-gray-400"></i>
+                      <time datetime="${request.created_at}">${new Date(request.created_at).toLocaleDateString('id-ID', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</time>
+                    </p>
+                  </div>
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-500 uppercase tracking-wider">Dibuat Oleh</label>
+                    <p class="text-lg text-gray-900">
+                      <i class="bi bi-person-circle mr-2 text-gray-400"></i>
+                      ${request.created_by || 'System'}
+                    </p>
+                  </div>
                 </div>
-              ` : ''}
+                
+                ${request.notes ? `
+                  <div class="mt-6 pt-6 border-t border-gray-200">
+                    <label class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3 block">Catatan</label>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p class="text-gray-800 whitespace-pre-wrap">${request.notes}</p>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
             </div>
             
-            <!-- Request Items -->
-            <div>
-              <h4 style="
-                font-size: 18px !important;
-                font-weight: 600 !important;
-                color: #111827 !important;
-                margin-bottom: 16px !important;
-                display: flex !important;
-                align-items: center !important;
-              ">
-                📦 Requested Items (${request.items.length})
-              </h4>
-              <div style="overflow-x: auto !important;">
-                <table style="
-                  min-width: 100% !important;
-                  border: 1px solid #e5e7eb !important;
-                  border-radius: 8px !important;
-                  background: white !important;
-                ">
-                  <thead style="background: #f9fafb !important;">
+            <!-- Request Items Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-3">
+                <h3 class="text-white font-semibold flex items-center justify-between">
+                  <span>
+                    <i class="bi bi-box-seam mr-2"></i>
+                    Item yang Diminta
+                  </span>
+                  <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
+                    ${request.items.length} item
+                  </span>
+                </h3>
+              </div>
+              
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
                     <tr>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Product ID</th>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Product Name</th>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Quantity</th>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Unit</th>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Description</th>
-                      <th style="
-                        padding: 12px 16px !important;
-                        text-align: left !important;
-                        font-size: 12px !important;
-                        font-weight: 600 !important;
-                        color: #6b7280 !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.05em !important;
-                        border-bottom: 1px solid #e5e7eb !important;
-                      ">Status</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Produk</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Produk</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satuan</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
                     </tr>
                   </thead>
-                  <tbody style="background: white !important;">
+                  <tbody class="bg-white divide-y divide-gray-200">
                     ${itemsHtml}
                   </tbody>
                 </table>
@@ -1261,10 +1198,48 @@
         
         console.log('Setting innerHTML, content length:', detailsContent.length);
         document.getElementById('requestDetails').innerHTML = detailsContent;
-        document.getElementById('requestDetails').style.display = 'block';
-        document.getElementById('modalFooter').style.display = 'block';
+        document.getElementById('requestDetails').classList.remove('hidden');
         console.log('InnerHTML set successfully');
       }
+      
+      // Close modal function
+      function closeModal() {
+        const modal = document.getElementById('requestModal');
+        const modalContent = document.getElementById('modalContent');
+        
+        // Animate out
+        modal.classList.add('opacity-0');
+        modal.classList.remove('opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        
+        // Hide modal after animation
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          // Restore body scroll
+          document.body.style.overflow = '';
+        }, 300);
+      }
+      
+      // Add click outside to close functionality
+      document.addEventListener('click', function(e) {
+        const modal = document.getElementById('requestModal');
+        const modalContent = document.getElementById('modalContent');
+        
+        if (!modal.classList.contains('hidden') && 
+            !modalContent.contains(e.target) && 
+            !e.target.closest('button[onclick*="viewRequest"]')) {
+          closeModal();
+        }
+      });
+      
+      // Add escape key to close functionality
+      document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('requestModal');
+        if (!modal.classList.contains('hidden') && e.key === 'Escape') {
+          closeModal();
+        }
+      });
 
       // Modal state management
       let modalState = {
@@ -1451,26 +1426,32 @@
         }
       }
 
-      function closeModal() {
-        const modal = document.getElementById('requestModal');
-        modal.classList.add('hidden');
-        // Reset modal content
-        document.getElementById('requestDetails').innerHTML = '';
-      }
+      
 
       /**
        * Open confirmation modal
        */
       function openConfirmModal() {
         const modal = document.getElementById('confirmModal');
-        if (!modal) {
+        const modalContent = document.getElementById('confirmModalContent');
+        
+        if (!modal || !modalContent) {
           console.error('Modal element not found!');
           return;
         }
         
+        // Show modal with animation
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         modalState.isOpen = true;
+        
+        // Trigger animations
+        setTimeout(() => {
+          modal.classList.remove('opacity-0');
+          modal.classList.add('opacity-100');
+          modalContent.classList.remove('scale-95', 'opacity-0');
+          modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
         
         // Set up the Yes button handler
         const yesBtn = document.getElementById('confirmAction');
@@ -1492,7 +1473,9 @@
        */
       function closeConfirmModal() {
         const modal = document.getElementById('confirmModal');
-        if (!modal) return;
+        const modalContent = document.getElementById('confirmModalContent');
+        
+        if (!modal || !modalContent) return;
         
         // Clean up event listener
         const yesBtn = document.getElementById('confirmAction');
@@ -1500,8 +1483,17 @@
           yesBtn.onclick = null;
         }
         
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
+        // Animate out
+        modal.classList.add('opacity-0');
+        modal.classList.remove('opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        
+        // Hide modal after animation
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 300);
         
         // Reset state
         modalState.isOpen = false;

@@ -10,7 +10,6 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $module_name = "dashboard";
 $title = "Dashboard";
 $name = $_SESSION['user'];
-$pass = $_SESSION['pass'];
 $idlog = $_SESSION['idlog'];
 $department = $_SESSION['department'] ?? 'production';
 
