@@ -2,6 +2,25 @@
 // Dynamic path configuration
 // This file handles all base URLs and paths dynamically
 
+// --- Session isolation for rmw_scan ---
+// This app is deployed on a host that also runs another PHP app using the default PHP session cookie.
+// If both apps share the same session cookie name/path, they will overwrite each other's session data.
+// Symptom: login succeeds but RMW dashboard logs "Missing: division" and redirects back to login.
+//
+// Fix: use a unique session name + restrict cookie path to /rmw_scan BEFORE any session_start().
+if (function_exists('session_status') && session_status() === PHP_SESSION_NONE) {
+    // Unique cookie name so we don't collide with other apps (e.g., CodeIgniter using PHPSESSID).
+    @session_name('RMWSCANSESSID');
+
+    // Restrict cookie to this app only to avoid cross-app leakage.
+    $cookiePath = '/rmw_scan';
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? null) == 443);
+
+    // PHP 7.2 signature: session_set_cookie_params(lifetime, path, domain, secure, httponly)
+    // (SameSite not supported natively in PHP 7.2 without workarounds; leave default.)
+    @session_set_cookie_params(0, $cookiePath, '', (bool)$isHttps, true);
+}
+
 // Get the base URL dynamically
 function getBaseUrl() {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
