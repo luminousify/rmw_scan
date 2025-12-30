@@ -23,10 +23,13 @@ if (in_array('mysql', PDO::getAvailableDrivers())) {
       session_start();
       $_SESSION['loggedin'] = true;
       $_SESSION['user'] = $results['username'];
-      $_SESSION['pass'] = $results['password'];
       $_SESSION['idlog'] = $results['id'];
       $_SESSION['department'] = $results['department'];
+      $_SESSION['division'] = $results['division'];
       $_SESSION['full_name'] = $results['full_name'];
+      
+      // Force session data to be written before redirect (fixes PHP 7.2 session issue)
+      session_write_close();
       
       // Redirect based on department
       if ($results['department'] === 'production') {
