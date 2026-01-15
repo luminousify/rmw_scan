@@ -278,52 +278,53 @@ class NotificationService
     private function getTargetUsernamesForNotifications($productionDivision = null)
     {
         try {
-            // If production division is specified, find ALL RMW users in same division
+            // If production division is specified, find ALL RMW users monitoring that division
             if ($productionDivision) {
                 $stmt = $this->dbManager->query("
-                    SELECT DISTINCT om_username 
-                    FROM users 
-                    WHERE department = 'rmw' 
-                      AND division = ? 
-                      AND om_username IS NOT NULL 
-                      AND om_username != ''
-                      AND is_active = 1
-                    ORDER BY username
+                    SELECT DISTINCT u.om_username
+                    FROM users u
+                    INNER JOIN user_notification_divisions und ON u.id = und.user_id
+                    WHERE u.department = 'rmw'
+                      AND und.division = ?
+                      AND u.om_username IS NOT NULL
+                      AND u.om_username != ''
+                      AND u.is_active = 1
+                    ORDER BY u.username
                 ", [$productionDivision]);
-                
+
                 $results = $stmt->fetchAll();
                 $usernames = array_column($results, 'om_username');
-                
+
                 if (!empty($usernames)) {
-                    error_log("Found " . count($usernames) . " OM usernames for RMW users in division '{$productionDivision}': " . implode(', ', $usernames));
+                    error_log("Found " . count($usernames) . " OM usernames for RMW users monitoring division '{$productionDivision}': " . implode(', ', $usernames));
                     return $usernames;
                 }
-                
-                error_log("No active RMW users with OM username found in division '{$productionDivision}'");
+
+                error_log("No active RMW users with OM username found monitoring division '{$productionDivision}'");
             }
-            
+
             // Fallback: Get all active RMW users with OM usernames
             $stmt = $this->dbManager->query("
-                SELECT DISTINCT om_username 
-                FROM users 
-                WHERE department = 'rmw' 
-                  AND om_username IS NOT NULL 
+                SELECT DISTINCT om_username
+                FROM users
+                WHERE department = 'rmw'
+                  AND om_username IS NOT NULL
                   AND om_username != ''
                   AND is_active = 1
                 ORDER BY username
             ");
-            
+
             $results = $stmt->fetchAll();
             $usernames = array_column($results, 'om_username');
-            
+
             if (!empty($usernames)) {
                 error_log("Using fallback OM usernames from all RMW users: " . implode(', ', $usernames));
                 return $usernames;
             }
-            
+
             error_log("No active RMW users with OM usernames found in system");
             return [];
-            
+
         } catch (Exception $e) {
             error_log("Error getting notification targets: " . $e->getMessage());
             return [];
