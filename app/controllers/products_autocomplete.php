@@ -32,33 +32,11 @@ try {
     $qLike = '%' . $q . '%';
     $qPrefix = $q . '%';
 
-    // Get user's division for filtering
-    $userId = $_SESSION['idlog'];
-    $stmtUser = $pdo->prepare("SELECT division FROM users WHERE id = ?");
-    $stmtUser->execute([$userId]);
-    $userDivision = $stmtUser->fetchColumn();
-    
-    // Check if user is admin (can see all divisions)
-    $userDepartment = $_SESSION['department'] ?? '';
-    $isAdmin = ($userDepartment === 'admin');
-
     // NOTE: LIMIT is safely interpolated after strict integer clamping above.
     $sql = "
         SELECT product_id, product_name, unit
         FROM products
         WHERE is_active = 1
-    ";
-    
-    // Use only positional parameters to avoid binding issues
-    $params = [];
-    
-    // Add division filter for non-admin users (case-insensitive and trimmed)
-    if (!$isAdmin && $userDivision) {
-        $sql .= " AND TRIM(LOWER(Divisi)) = TRIM(LOWER(?))";
-        $params[] = $userDivision;
-    }
-    
-    $sql .= "
           AND (
             product_id LIKE ?
             OR product_name LIKE ?
@@ -70,11 +48,13 @@ try {
         LIMIT $limit
     ";
 
-    // Add search parameters
-    $params[] = $qLike;
-    $params[] = $qLike;
-    $params[] = $qPrefix;
-    $params[] = $qPrefix;
+    // Use only positional parameters to avoid binding issues
+    $params = [
+        $qLike,
+        $qLike,
+        $qPrefix,
+        $qPrefix
+    ];
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
