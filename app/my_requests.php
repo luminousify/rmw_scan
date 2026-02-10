@@ -1087,6 +1087,7 @@
             <td class="px-4 py-3 text-sm text-gray-900">${item.requested_quantity || ''}</td>
             <td class="px-4 py-3 text-sm text-gray-900">${item.unit || ''}</td>
             <td class="px-4 py-3 text-sm text-gray-600">${item.description || '-'}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">${item.machine || '-'}</td>
           </tr>
         `;
         }).join('');
@@ -1185,6 +1186,7 @@
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satuan</th>
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mesin</th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">

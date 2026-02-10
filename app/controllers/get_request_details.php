@@ -47,6 +47,7 @@ try {
             mri.requested_quantity,
             mri.unit,
             mri.description,
+            mri.machine,
             mri.approved_quantity,
             mri.notes,
             mri.created_at,
