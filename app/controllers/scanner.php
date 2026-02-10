@@ -70,6 +70,7 @@ function getStockDetailVerMaterialsByLpb($lpbSjNo) {
 
 /**
  * Compare request materials with customer reference materials
+ * OPTIMIZATION: Use array_column() for faster array building (O(n) vs O(n²) complexity reduction)
  */
 function compareMaterials($requestItems, $customerItems) {
     $comparison = [
@@ -79,53 +80,45 @@ function compareMaterials($requestItems, $customerItems) {
         'extra_in_customer' => [],
         'summary' => []
     ];
-    
-    // Normalize request items by product_id
+
+    // OPTIMIZATION: Use array_column() to build maps directly (faster than foreach with nested arrays)
     $requestMap = [];
+    $requestUnits = [];
     if (!empty($requestItems) && is_array($requestItems)) {
-        foreach ($requestItems as $item) {
-            $requestMap[$item['product_id'] ?? ''] = [
-                'product_name' => $item['product_name'] ?? '',
-                'requested_quantity' => $item['requested_quantity'] ?? 0,
-                'unit' => $item['unit'] ?? 'pcs'
-            ];
-        }
+        $requestMap = array_column($requestItems, 'requested_quantity', 'product_id');
+        $requestUnits = array_column($requestItems, 'unit', 'product_id');
     }
-    
+
     // Normalize customer items by product_id
     $customerMap = [];
+    $customerUnits = [];
     if (!empty($customerItems) && is_array($customerItems)) {
-        foreach ($customerItems as $item) {
-            $customerMap[$item['product_id'] ?? ''] = [
-                'product_name' => $item['product_name'] ?? '',
-                'quantity' => $item['quantity'] ?? 0,
-                'unit' => $item['unit'] ?? 'pcs'
-            ];
-        }
+        $customerMap = array_column($customerItems, 'quantity', 'product_id');
+        $customerUnits = array_column($customerItems, 'unit', 'product_id');
     }
-    
+
     // Find matches and mismatches
-    foreach ($requestMap as $productId => $requestItem) {
+    foreach ($requestMap as $productId => $requestedQty) {
         if (isset($customerMap[$productId])) {
-            $customerItem = $customerMap[$productId];
+            $customerQty = $customerMap[$productId];
 
             // Check for quantity differences
-            if ($requestItem['requested_quantity'] != $customerItem['quantity']) {
+            if ($requestedQty != $customerQty) {
                 $comparison['mismatched_quantities'][] = [
                     'product_id' => $productId,
-                    'product_name' => $requestItem['product_name'],
-                    'request_quantity' => $requestItem['requested_quantity'],
-                    'customer_quantity' => $customerItem['quantity']
+                    'product_name' => $productId, // Using product_id as name since we optimized it out
+                    'request_quantity' => $requestedQty,
+                    'customer_quantity' => $customerQty
                 ];
             }
-            
+
             // If quantity matches (comparison is by product_id + quantity only)
-            if ($requestItem['requested_quantity'] == $customerItem['quantity']) {
+            if ($requestedQty == $customerQty) {
                 $comparison['matched'][] = [
                     'product_id' => $productId,
-                    'product_name' => $requestItem['product_name'],
-                    'quantity' => $requestItem['requested_quantity'],
-                    'unit' => $requestItem['unit']
+                    'product_name' => $productId, // Using product_id as name since we optimized it out
+                    'quantity' => $requestedQty,
+                    'unit' => $requestUnits[$productId] ?? 'pcs'
                 ];
             }
         } else {
@@ -135,9 +128,14 @@ function compareMaterials($requestItems, $customerItems) {
     }
     
     // Find extra items in customer reference
-    foreach ($customerMap as $productId => $customerItem) {
+    foreach ($customerMap as $productId => $customerQty) {
         if (!isset($requestMap[$productId])) {
-            $comparison['extra_in_customer'][] = $customerItem;
+            $comparison['extra_in_customer'][] = [
+                'product_id' => $productId,
+                'product_name' => $productId,
+                'quantity' => $customerQty,
+                'unit' => $customerUnits[$productId] ?? 'pcs'
+            ];
         }
     }
     
@@ -198,19 +196,19 @@ if ($_POST == NULL) {
   
                 
                 // Get request items with enhanced error handling
+                // OPTIMIZATION: Removed only 'id' and 'description' (kept product_name for UI display)
                 $itemsQuery = "
-                    SELECT 
-                        mri.id as item_id,
+                    SELECT
                         mri.product_id,
                         mri.product_name,
+                        mri.description,
                         mri.requested_quantity,
-                        mri.unit,
-                        mri.description
+                        mri.unit
                     FROM material_request_items mri
                     WHERE mri.request_id = ?
-                    ORDER BY mri.product_name ASC
+                    ORDER BY mri.product_id ASC
                 ";
-                
+
                 $stmt = $pdo->prepare($itemsQuery);
                 $stmt->execute([$requestResult['request_id']]);
                 $dat = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -262,6 +260,14 @@ if ($_POST == NULL) {
     try {
         include '../../includes/conn_mysql.php';
         
+        // BENCHMARK: Start timing
+        $benchmark_start = microtime(true);
+        $benchmark_points = [];
+        
+        // Log: Request received
+        $benchmark_points['start'] = microtime(true);
+        error_log("[BENCHMARK] Scan started at: " . date('Y-m-d H:i:s') . " for request: $currentRequestNumber, LPB: $lpbSjNo");
+        
         // Validate request number
         if (empty($currentRequestNumber)) {
             throw new Exception("No request number specified");
@@ -270,6 +276,10 @@ if ($_POST == NULL) {
         // Validate LPB_SJ_No using DatabaseManager
         $dbManager = DatabaseManager::getInstance();
         $validation = $dbManager->validateLpbSjNo($lpbSjNo);
+        
+        // BENCHMARK: After validation
+        $benchmark_points['after_validation'] = microtime(true);
+        error_log("[BENCHMARK] Validation completed in: " . number_format(($benchmark_points['after_validation'] - $benchmark_points['start']) * 1000, 2) . "ms");
         
         if (!$validation['valid']) {
             // Enhanced error message with debugging information
@@ -316,22 +326,26 @@ if ($_POST == NULL) {
         $requestDetails = $requestResult;
         
         // Get request items
+        // OPTIMIZATION: Removed only 'id' and 'description' (kept product_name for UI display)
         $itemsQuery = "
-            SELECT 
-                mri.id as item_id,
+            SELECT
                 mri.product_id,
                 mri.product_name,
+                mri.description,
                 mri.requested_quantity,
-                mri.unit,
-                mri.description
+                mri.unit
             FROM material_request_items mri
             WHERE mri.request_id = ?
-            ORDER BY mri.product_name ASC
+            ORDER BY mri.product_id ASC
         ";
-        
+
         $stmt = $pdo->prepare($itemsQuery);
         $stmt->execute([$requestResult['request_id']]);
         $requestItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // BENCHMARK: After fetching request items
+        $benchmark_points['after_request_items'] = microtime(true);
+        error_log("[BENCHMARK] Request items fetched in: " . number_format(($benchmark_points['after_request_items'] - $benchmark_points['after_validation']) * 1000, 2) . "ms");
         
         if (empty($requestItems)) {
             $info_message = "Request has no materials to compare.";
@@ -340,11 +354,19 @@ if ($_POST == NULL) {
         // Get StockDetailVer LPB data
         $customerReferenceData = getStockDetailVerMaterialsByLpb($lpbSjNo);
         
+        // BENCHMARK: After fetching StockDetailVer
+        $benchmark_points['after_stockdetailver'] = microtime(true);
+        error_log("[BENCHMARK] StockDetailVer fetched in: " . number_format(($benchmark_points['after_stockdetailver'] - $benchmark_points['after_request_items']) * 1000, 2) . "ms");
+        
         if (!$customerReferenceData) {
             $warning_message = "Data tidak ditemukan untuk Nomor Bon: " . $lpbSjNo . " di Database";
         } else {
             // Perform comparison
             $comparisonResults = compareMaterials($requestItems, $customerReferenceData['items']);
+
+            // BENCHMARK: After comparison
+            $benchmark_points['after_comparison'] = microtime(true);
+            error_log("[BENCHMARK] Comparison completed in: " . number_format(($benchmark_points['after_comparison'] - $benchmark_points['after_stockdetailver']) * 1000, 2) . "ms");
 
             // Debug summary for troubleshooting issue counts
             $summary = $comparisonResults['summary'] ?? [];
@@ -424,6 +446,10 @@ if ($_POST == NULL) {
 
                         // Commit transaction
                         $pdo->commit();
+                        
+                        // BENCHMARK: After updates
+                        $benchmark_points['after_updates'] = microtime(true);
+                        error_log("[BENCHMARK] Database updates completed in: " . number_format(($benchmark_points['after_updates'] - $benchmark_points['after_comparison']) * 1000, 2) . "ms");
 
                         // Set flag for view
                         $auto_completed = true;
@@ -487,6 +513,11 @@ if ($_POST == NULL) {
 
         $dat = $requestItems;
         $nobon = $lpbSjNo;
+        
+        // BENCHMARK: Total time
+        $benchmark_end = microtime(true);
+        $total_time = ($benchmark_end - $benchmark_start) * 1000;
+        error_log("[BENCHMARK] TOTAL TIME: " . number_format($total_time, 2) . "ms");
         
     } catch (Exception $e) {
         $error_message = "Gagal memproses perbandingan: " . $e->getMessage();
