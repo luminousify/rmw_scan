@@ -656,6 +656,7 @@ function buildPaginationUrl($page, $perPage = null) {
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.requested_quantity}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.unit}</td>
             <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.description || '-'}</td>
+            <td style="padding: 12px 16px !important; font-size: 14px !important; color: #111827 !important;">${item.machine || '-'}</td>
           </tr>
         `).join('');
         
@@ -759,6 +760,7 @@ function buildPaginationUrl($page, $perPage = null) {
                       <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Jumlah</th>
                       <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Satuan</th>
                       <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Deskripsi</th>
+                      <th style="padding: 12px 16px !important; text-align: left !important; font-size: 12px !important; font-weight: 600 !important; color: #6b7280 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;">Mesin</th>
                     </tr>
                   </thead>
                   <tbody>
