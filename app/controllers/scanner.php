@@ -202,6 +202,7 @@ if ($_POST == NULL) {
                         mri.product_id,
                         mri.product_name,
                         mri.description,
+                        mri.machine,
                         mri.requested_quantity,
                         mri.unit
                     FROM material_request_items mri
@@ -332,6 +333,7 @@ if ($_POST == NULL) {
                 mri.product_id,
                 mri.product_name,
                 mri.description,
+                mri.machine,
                 mri.requested_quantity,
                 mri.unit
             FROM material_request_items mri

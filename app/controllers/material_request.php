@@ -61,29 +61,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $today = date('Ymd');
             $maxRetries = 10;
             $requestNumber = null;
-            
+
+            // Validate user division - use 'GEN' as fallback if not set
+            $divisionCode = strtoupper($userDivision ?? 'GEN');
+            if (empty($divisionCode) || $divisionCode === 'UNASSIGNED') {
+                $divisionCode = 'GEN';
+            }
+
             // Generate unique request number with retry logic
             for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-                // Get today's highest sequential number
+                // Get today's highest sequential number for this division
                 $stmt = $pdo->prepare("
-                    SELECT request_number 
-                    FROM material_requests 
-                    WHERE request_number LIKE ? 
-                    ORDER BY request_number DESC 
+                    SELECT request_number
+                    FROM material_requests
+                    WHERE request_number LIKE ?
+                    ORDER BY request_number DESC
                     LIMIT 1
                 ");
-                $stmt->execute(["REQ-{$today}-%"]);
+                $stmt->execute(["REQ-{$divisionCode}-{$today}-%"]);
                 $lastRequest = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if ($lastRequest) {
-                    // Extract the sequence number from the last request
+                    // Extract the sequence number from the last request (last 4 digits)
                     $lastSequence = (int)substr($lastRequest['request_number'], -4);
                     $newSequence = $lastSequence + 1;
                 } else {
-                    $newSequence = 1; // Start with 0001 for today
+                    $newSequence = 1; // Start with 0001 for this division + date combination
                 }
-                
-                $requestNumber = 'REQ-' . $today . '-' . str_pad($newSequence, 4, '0', STR_PAD_LEFT);
+
+                $requestNumber = 'REQ-' . $divisionCode . '-' . $today . '-' . str_pad($newSequence, 4, '0', STR_PAD_LEFT);
                 
                 // Verify this request number doesn't exist (safety check)
                 $checkStmt = $pdo->prepare("SELECT id FROM material_requests WHERE request_number = ?");
@@ -135,7 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 'product_name' => $item['product_name'] ?? '',
                                 'quantity' => $qty,
                                 'unit' => $item['unit'] ?? 'pcs',
-                                'description' => $item['description'] ?? ''
+                                'description' => $item['description'] ?? '',
+                                'machine' => $item['machine'] ?? ''
                             ];
 
                             // Group by product_id to consolidate duplicates
@@ -162,8 +169,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                     // Insert consolidated items
                     $stmt = $pdo->prepare("
-                        INSERT INTO material_request_items (request_id, product_id, product_name, requested_quantity, unit, description)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO material_request_items (request_id, product_id, product_name, requested_quantity, unit, description, machine)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
                     ");
 
                     foreach ($consolidatedItems as $item) {
@@ -173,7 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             $item['product_name'],
                             number_format($item['quantity'], 2, '.', ''),
                             $item['unit'],
-                            $item['description']
+                            $item['description'],
+                            $item['machine']
                         ]);
                     }
                 }

@@ -170,6 +170,7 @@
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product ID</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Machine</th>
                   <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Qty</th>
                   <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
                 </tr>
@@ -181,6 +182,7 @@
                   <td class="px-3 py-2 font-mono text-xs text-gray-900"><?= htmlspecialchars($d['product_id'] ?? 'N/A'); ?></td>
                   <td class="px-3 py-2 text-xs text-gray-900" title="<?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?>"><?= htmlspecialchars($d['product_name'] ?? 'Unknown Product'); ?></td>
                   <td class="px-3 py-2 text-xs text-gray-600"><?= htmlspecialchars($d['description'] ?? '-'); ?></td>
+                  <td class="px-3 py-2 text-xs text-gray-600"><?= htmlspecialchars($d['machine'] ?? '-'); ?></td>
                   <td class="px-3 py-2 text-xs text-center text-gray-900"><?= number_format((float)($d['requested_quantity'] ?? 0), 2, '.', ','); ?></td>
                   <td class="px-3 py-2 text-xs text-gray-500"><?= htmlspecialchars($d['unit'] ?? 'pcs'); ?></td>
                 </tr>
