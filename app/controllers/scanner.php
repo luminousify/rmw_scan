@@ -400,10 +400,17 @@ if ($_POST == NULL) {
 
             // Auto-complete on perfect match if enabled
             $auto_completed = false;
+            // Hands-off completion also requires the scanned bon number to match the
+            // request number; otherwise the user must confirm via 'Selesaikan Permintaan'
+            $bonMatchesRequest = (strcasecmp($lpbSjNo, $requestDetails['request_number']) === 0);
             if ($comparisonResults['summary']['identical']
                 && $department === 'production'
                 && $requestDetails['status'] === 'ready'
                 && AUTO_COMPLETE_ON_PERFECT_MATCH) {
+
+                if (!$bonMatchesRequest) {
+                    error_log("[Scanner] Auto-complete skipped: bon '{$lpbSjNo}' does not match request '{$requestDetails['request_number']}' - manual confirmation required");
+                }
 
                 // Check if any items are already verified
                 $hasVerifiedItems = false;
@@ -415,7 +422,7 @@ if ($_POST == NULL) {
                 }
 
                 // Only auto-complete if no items are already verified
-                if (!$hasVerifiedItems) {
+                if ($bonMatchesRequest && !$hasVerifiedItems) {
                     try {
                         // Apply delay if configured
                         if (AUTO_COMPLETE_DELAY_SECONDS > 0) {
@@ -603,6 +610,7 @@ if ($_POST == NULL) {
                 'request_number' => $currentRequestNumber,
                 'scanned_reference' => !empty($scannedReference) ? $scannedReference : null,
                 'completed_without_scan' => empty($scannedReference),
+                'bon_number_mismatch' => !empty($scannedReference) && strcasecmp($scannedReference, $currentRequestNumber) !== 0,
                 'stockdetailver_updated' => $stockDetailVerUpdated,
                 'lpb_sj_numbers' => $lpbSjNumbersUpdated,
                 'items_approved' => $itemsApproved

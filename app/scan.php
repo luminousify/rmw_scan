@@ -288,7 +288,17 @@
         <!-- Complete Request Button - Only show if NOT auto-completed -->
         <?php if (!isset($auto_completed) || !$auto_completed): ?>
           <?php if ($department === 'production' && isset($requestDetails) && $requestDetails['status'] === 'ready'): ?>
+          <?php $bonMismatch = !empty($nobon) && strcasecmp($nobon, $requestDetails['request_number']) !== 0; ?>
         <div class="mt-6 p-4 border-l-4 border-orange-500 bg-orange-50">
+          <?php if ($bonMismatch): ?>
+          <div class="mb-3 p-3 rounded bg-red-50 border border-red-300 text-sm text-red-700">
+            <i class="bi bi-exclamation-triangle-fill mr-1"></i>
+            <span class="font-semibold">Nomor Bon tidak sama dengan nomor permintaan.</span>
+            Bon: <span class="font-mono"><?= htmlspecialchars($nobon) ?></span> &mdash;
+            Permintaan: <span class="font-mono"><?= htmlspecialchars($requestDetails['request_number']) ?></span>.
+            Periksa kembali sebelum menyelesaikan permintaan ini.
+          </div>
+          <?php endif; ?>
           <form method="POST" id="completeForm">
             <input type="hidden" name="action" value="complete_request">
             <input type="hidden" name="current_request_number" value="<?= htmlspecialchars($currentRequestNumber) ?>">
@@ -1176,9 +1186,10 @@
       if (completeForm) {
         completeForm.addEventListener('submit', function(e) {
           const hasDifferences = <?= (isset($comparisonResults) && !$comparisonResults['summary']['identical']) ? 'true' : 'false' ?>;
-          const message = hasDifferences 
-            ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.' 
-            : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.';
+          const bonMismatchWarning = <?= json_encode(!empty($bonMismatch) ? "PERHATIAN: Nomor Bon '{$nobon}' TIDAK SAMA dengan nomor permintaan '{$requestDetails['request_number']}'.\n\n" : '', JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+          const message = bonMismatchWarning + (hasDifferences
+            ? 'Selesaikan permintaan ini meskipun ada perbedaan? Setelah diselesaikan, status tidak dapat diubah.'
+            : 'Selesaikan permintaan ini? Setelah diselesaikan, status tidak dapat diubah.');
           
           if (!confirm(message)) {
             e.preventDefault();
