@@ -42,7 +42,7 @@
       <?php include '../common/sidebar.php'; ?>
 
       <!-- Main content -->
-      <main class="flex-1 p-6">
+      <main class="flex-1 p-6" style="padding-bottom: 7rem;">
         <!-- Page Header -->
         <div class="mb-6">
           <h1 class="text-3xl font-bold text-gray-900">Buat Permintaan Material</h1>
@@ -255,12 +255,50 @@
       </main>
     </div>
 
+    <!-- Floating "Tambah Item" button: stays reachable from anywhere in a long item list -->
+    <style>
+      .fab-add-item {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 40;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.25rem;
+        border: none;
+        border-radius: 9999px;
+        background-color: #2563eb; /* blue-600, matches the header button */
+        color: #ffffff;
+        font-weight: 500;
+        line-height: 1;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2), 0 4px 6px -4px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease;
+      }
+      .fab-add-item:hover {
+        background-color: #1d4ed8; /* blue-700 */
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.25), 0 8px 10px -6px rgba(0,0,0,0.25);
+      }
+      .fab-add-item:active { transform: translateY(1px); }
+      .fab-add-item:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+      .fab-add-item .fab-label { font-size: 0.95rem; }
+      @media (max-width: 640px) {
+        .fab-add-item { padding: 0.875rem; }
+        .fab-add-item .fab-label { display: none; } /* icon-only on small screens */
+      }
+    </style>
+    <button type="button" id="fabAddItem" class="fab-add-item" onclick="addItem()" title="Tambah Item" aria-label="Tambah Item">
+      <i class="bi bi-plus-lg" style="font-size: 1.25rem;"></i>
+      <span class="fab-label">Tambah Item</span>
+    </button>
+
     <!-- JavaScript -->
     <script>
-      const productSearchUrl = <?= json_encode(url('app/controllers/products_autocomplete.php')) ?>;
+      const productSearchUrl =<?= json_encode(url('app/controllers/products_autocomplete.php')) ?>;
       let itemCounter = 0;
 
-      function addItem() {
+      function addItem(focusNew = true) {
         // Validate existing items before adding a new one
         const existingItems = document.querySelectorAll('.item-row');
         for (let i = 0; i < existingItems.length; i++) {
@@ -340,6 +378,18 @@
         const input = container.querySelector(`.product-autocomplete[data-item="${itemCounter}"]`);
         if (input) {
           setupProductAutocomplete(input);
+        }
+
+        // UX: bring the new row into view and focus its product field so items can
+        // be added from the bottom of a long list without scrolling back up.
+        if (focusNew) {
+          const newRow = container.lastElementChild;
+          if (newRow) {
+            newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          if (input) {
+            input.focus({ preventScroll: true });
+          }
         }
       }
 
@@ -656,9 +706,9 @@
         });
       });
 
-      // Add first item by default
+      // Add first item by default (no auto-scroll/focus on initial page load)
       document.addEventListener('DOMContentLoaded', function() {
-        addItem();
+        addItem(false);
       });
     </script>
   </body>
