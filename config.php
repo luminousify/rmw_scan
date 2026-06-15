@@ -2,6 +2,13 @@
 // Dynamic path configuration
 // This file handles all base URLs and paths dynamically
 
+// --- Application timezone ---
+// Set once, globally, so every date()/strtotime() in the app uses WIB (UTC+7).
+// Without this, code paths that don't include the DB/notification classes fall
+// back to php.ini's default (often UTC), which saved request_date 7h behind.
+// Asia/Bangkok matches the offset already used elsewhere in the app (== WIB).
+date_default_timezone_set('Asia/Bangkok');
+
 // --- Session isolation for rmw_scan ---
 // This app is deployed on a host that also runs another PHP app using the default PHP session cookie.
 // If both apps share the same session cookie name/path, they will overwrite each other's session data.
